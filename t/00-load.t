@@ -2,13 +2,10 @@
 
 use Test::More;
 
-BEGIN {
-	use_ok( 'Curses::Toolkit' );
-}
-
 my @modules = qw(
     Curses
     Curses::Toolkit
+	Params::Validate
 );
 
 plan tests => scalar(@modules);
@@ -17,5 +14,3 @@ plan tests => scalar(@modules);
 foreach my $module (@modules) {
     use_ok( $module );
 }
-
-diag( "Testing Curses::Toolkit $Curses::Toolkit::VERSION, Perl $], $^X" );

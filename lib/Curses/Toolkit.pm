@@ -32,16 +32,54 @@ build "graphical" console user interfaces easily.
 
 =head2 init_root_window
 
-Initialize the Curses environment, and return an object representing it
+Initialize the Curses environment, and return an object representing it. This
+is not really a constructor, because you can't have more than one
+Curses::Toolkit object for one Curses environment.
 
   input : none
-  output : a Curses::Tookit object
+#clear_background : optional, boolean, default 1 : if true, clears background
+  output : a Curses::Toolkit object
 
 =cut
 
 sub init_root_window {
+    my $class = shift;
+    
+    use Params::Validate qw(:all);
+#    my %params = validate(@_, { clear_background => { type => BOOLEAN,
+#                                                      default => 1
+#                                                    },
+#                              }
+#                         );
+
+    # get the Curses handler
+    use Curses;
     my $curses_handler = Curses->new();
+    
+    # curses basic init
+#    Curses::noecho();
+#    Curses::cbreak();
+#    curs_set(0);
+#    Curses::leaveok(1);
+
+#$curses_handler->erase();
+
+    # erase the window if asked.
+#    print STDERR Dumper($params{clear_background}); use Data::Dumper;
+#    $params{clear_background} and $curses_handler->erase();
+    
+    my $self = bless { curses_handler => $curses_handler
+                     }, $class;
+    return $self;
 }
+
+DESTROY {
+    my ($obj) = @_;
+    # ending Curses
+    Curses::endwin;
+}
+
+=head2 
 
 =head1 AUTHOR
 
