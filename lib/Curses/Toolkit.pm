@@ -74,13 +74,10 @@ sub init_root_window {
     my $container = Curses::Toolkit::Warper->new();
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,
-                       warper => $warper,
+                       windows => [],
                      }, $class;
     return $self;
 }
-
-# not to be used outside
-sub get_warper { shift->{warper} }
 
 DESTROY {
     my ($obj) = @_;
@@ -102,9 +99,27 @@ Adds a window on the root window. Returns the root window
 
 sub add {
     my $self = shift;
-    my ($widget) = validate_pos( @_, {  isa => 'Curses::Toolkit::Window' }, );
-    $self->get_warper()->warp($widget);
+    my ($window) = validate_pos( @_, {  isa => 'Curses::Toolkit::Window' }, );
+    push @{$self->{windows}}, $window;
+    return $self;
 }
+
+=head2 get_windows
+
+  my @windows = $root->get_windows();
+
+Returns the list of windows loaded
+
+  input : none
+  output : ARRAY of Curses::Toolkit::Window
+
+=cut
+
+sub get_windows {
+    my ($self) = @_;
+    return @{$self->{windows}};
+}
+
 
 =head2 show_all
 
@@ -119,19 +134,58 @@ Set visibility property to true for every element. Returns the root windows
 
 sub show_all {
     my ($self) = @_;
-    foreach my $window ($self->get_warper()->children()) {
+    foreach my $window ($self->get_windows()) {
         $window->show_all();
     }
+    return $self;
 }
 
 
-# private package that warp windows on the root window
+=head2 render
 
-package Curses::Toolkit::Warper;
+  $root->render();
 
-# constructor
-sub new 
+Draw everything on the screen
 
+  input : none
+  output : the root window
+
+=cut
+
+sub render {
+    my ($self) = @_;
+    my ($screen_w, $screen_h);
+    $class->{curses_handler}->getmaxyx($screen_h, $screen_w);
+    return $self->render(0, 0, $screen_h, $screen_w);
+}
+
+
+=head2 render
+
+  $root->render(10, 10, 50, 20);
+
+Draw only a rectangle
+
+  input : position1 x
+          position1 y
+          position2 x
+          position2 y
+  output : the root window
+
+=cut
+
+sub render_rectangle {
+    my ($self) = @_;
+    my ($pos1x, $pos1y, $pos2x, $pos2y) =
+      validate_pos( @_, { type => SCALAR,}, { type => SCALAR },
+                        { type => SCALAR }, { type => SCALAR },
+                  );
+    foreach my $window ($self->get_windows()) {
+        if ($window->is_in_rectangle($pos1x, $pos1y, $pos2x, $pos2y)) {
+            $window->draw_rectangle($pos1x, $pos1y, $pos2x, $pos2y);
+        }
+    }
+}
 
 
 =head1 AUTHOR
