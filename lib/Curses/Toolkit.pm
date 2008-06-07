@@ -32,6 +32,8 @@ build "graphical" console user interfaces easily.
 
 =head2 init_root_window
 
+  my $root = Curses::Toolkit->init_root_window();
+
 Initialize the Curses environment, and return an object representing it. This
 is not really a constructor, because you can't have more than one
 Curses::Toolkit object for one Curses environment.
@@ -68,10 +70,17 @@ sub init_root_window {
 #    print STDERR Dumper($params{clear_background}); use Data::Dumper;
 #    $params{clear_background} and $curses_handler->erase();
     
-    my $self = bless { curses_handler => $curses_handler
+    use Curses::Toolkit::Widget::Container;
+    my $container = Curses::Toolkit::Warper->new();
+    my $self = bless { initialized => 1, 
+                       curses_handler => $curses_handler,
+                       warper => $warper,
                      }, $class;
     return $self;
 }
+
+# not to be used outside
+sub get_warper { shift->{warper} }
 
 DESTROY {
     my ($obj) = @_;
@@ -79,7 +88,51 @@ DESTROY {
     Curses::endwin;
 }
 
-=head2 
+=head2 add
+
+  my $window = Curses::Toolkit::Window->new();
+  $root->add($window);
+
+Adds a window on the root window. Returns the root window
+
+  input : a Curses::Toolkit::Window object
+  output : the root windows
+
+=cut
+
+sub add {
+    my $self = shift;
+    my ($widget) = validate_pos( @_, {  isa => 'Curses::Toolkit::Window' }, );
+    $self->get_warper()->warp($widget);
+}
+
+=head2 show_all
+
+  $root->show_all();
+
+Set visibility property to true for every element. Returns the root windows
+
+  input : none
+  output : the root window
+
+=cut
+
+sub show_all {
+    my ($self) = @_;
+    foreach my $window ($self->get_warper()->children()) {
+        $window->show_all();
+    }
+}
+
+
+# private package that warp windows on the root window
+
+package Curses::Toolkit::Warper;
+
+# constructor
+sub new 
+
+
 
 =head1 AUTHOR
 
