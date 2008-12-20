@@ -11,6 +11,16 @@ Curses::Toolkit::Widget::Window - a window
 
 =head1 DESCRIPTION
 
-This widget is a window
+This is a window widget
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+  input : none
+  output : a Curses::Toolkit::Widget::Window
 
 =cut
+
+
+1;

@@ -3,6 +3,8 @@ package Curses::Toolkit;
 use warnings;
 use strict;
 
+use Params::Validate qw(:all);
+
 =head1 NAME
 
 Curses::Toolkit - a modern Curses toolkit
@@ -23,7 +25,7 @@ build "graphical" console user interfaces easily.
   use Curses::Toolkit;
 
   my $root = Curses::Toolkit->init_root_window();
-  my $window = Curses::Toolkit::Window->new();
+  my $window = Curses::Toolkit::Widget::Window->new();
   $root->add($window);
   ...
   $root->render
@@ -38,8 +40,7 @@ Initialize the Curses environment, and return an object representing it. This
 is not really a constructor, because you can't have more than one
 Curses::Toolkit object for one Curses environment.
 
-  input : none
-#clear_background : optional, boolean, default 1 : if true, clears background
+  input : clear_background : optional, boolean, default 1 : if true, clears background
   output : a Curses::Toolkit object
 
 =cut
@@ -47,12 +48,14 @@ Curses::Toolkit object for one Curses environment.
 sub init_root_window {
     my $class = shift;
     
-    use Params::Validate qw(:all);
-#    my %params = validate(@_, { clear_background => { type => BOOLEAN,
-#                                                      default => 1
-#                                                    },
-#                              }
-#                         );
+    my %params = validate(@_, { clear => { type => BOOLEAN,
+										   default => 1,
+										 },
+								theme => { isa => 'Curses::Toolkit::Theme',
+										   optional => 1,
+										 },
+							  }
+                         );
 
     # get the Curses handler
     use Curses;
@@ -67,11 +70,14 @@ sub init_root_window {
 #$curses_handler->erase();
 
     # erase the window if asked.
-#    print STDERR Dumper($params{clear_background}); use Data::Dumper;
-#    $params{clear_background} and $curses_handler->erase();
+#    print STDERR Dumper($params{clear}); use Data::Dumper;
+#    $params{clear} and $curses_handler->erase();
     
-    use Curses::Toolkit::Widget::Container;
-    my $container = Curses::Toolkit::Warper->new();
+#    use Curses::Toolkit::Widget::Container;
+#    my $container = Curses::Toolkit::Widget::Warper->new();
+
+	use Curses::Toolkit::Theme::Default;
+	$params{theme} ||= Curses::Toolkit::Theme::Default->new();
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,
                        windows => [],
@@ -85,21 +91,21 @@ DESTROY {
     Curses::endwin;
 }
 
-=head2 add
+=head2 add_window
 
-  my $window = Curses::Toolkit::Window->new();
-  $root->add($window);
+  my $window = Curses::Toolkit::Widget::Window->new();
+  $root->add_window($window);
 
 Adds a window on the root window. Returns the root window
 
-  input : a Curses::Toolkit::Window object
-  output : the root windows
+  input : a Curses::Toolkit::Widget::Window object
+  output : the root window
 
 =cut
 
-sub add {
+sub add_window {
     my $self = shift;
-    my ($window) = validate_pos( @_, {  isa => 'Curses::Toolkit::Window' }, );
+    my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
     push @{$self->{windows}}, $window;
     return $self;
 }
@@ -111,7 +117,7 @@ sub add {
 Returns the list of windows loaded
 
   input : none
-  output : ARRAY of Curses::Toolkit::Window
+  output : ARRAY of Curses::Toolkit::Widget::Window
 
 =cut
 
@@ -154,38 +160,53 @@ Draw everything on the screen
 
 sub render {
     my ($self) = @_;
-    my ($screen_w, $screen_h);
-    $class->{curses_handler}->getmaxyx($screen_h, $screen_w);
-    return $self->render(0, 0, $screen_h, $screen_w);
+	foreach my $window (sort { $b->{stack} <=> $a->{stack} } $self->get_windows()) {
+		$window->render($self->{curses_handler});
+	}
+	return $self;
+}
+
+sub display {
+	my ($self) = @_;
+	$self->{curses_handler}->refresh();
+	return $self;
 }
 
 
-=head2 render
 
-  $root->render(10, 10, 50, 20);
 
-Draw only a rectangle
+#    my ($screen_w, $screen_h);
+#    $self->{curses_handler}->getmaxyx($screen_h, $screen_w);
+#    return $self->render_rectangle(0, 0, $screen_h, $screen_w);
 
-  input : position1 x
-          position1 y
-          position2 x
-          position2 y
-  output : the root window
+# =head2 render
 
-=cut
+#   $root->render(10, 10, 50, 20);
 
-sub render_rectangle {
-    my ($self) = @_;
-    my ($pos1x, $pos1y, $pos2x, $pos2y) =
-      validate_pos( @_, { type => SCALAR,}, { type => SCALAR },
-                        { type => SCALAR }, { type => SCALAR },
-                  );
-    foreach my $window ($self->get_windows()) {
-        if ($window->is_in_rectangle($pos1x, $pos1y, $pos2x, $pos2y)) {
-            $window->draw_rectangle($pos1x, $pos1y, $pos2x, $pos2y);
-        }
-    }
-}
+# Draw only a rectangle
+
+#   input : position1 x
+#           position1 y
+#           position2 x
+#           position2 y
+#   output : the root window
+
+# =cut
+
+# sub render_rectangle {
+#     my $self = shift;
+#     my ($pos1x, $pos1y, $pos2x, $pos2y) =
+#       validate_pos( @_, { type => SCALAR,}, { type => SCALAR },
+#                         { type => SCALAR }, { type => SCALAR },
+#                   );
+#     $pos1x <= $pos2x or ($pos1x, $pos2x) = ($pos2x, $pos1x);
+#     $pos1y <= $pos2y or ($pos1y, $pos2y) = ($pos2y, $pos1y);
+#     foreach my $window ($self->get_windows()) {
+#         if ($window->is_in_rectangle($pos1x, $pos1y, $pos2x, $pos2y)) {
+#             $window->draw_rectangle($pos1x, $pos1y, $pos2x, $pos2y);
+#         }
+#     }
+# }
 
 
 =head1 AUTHOR
