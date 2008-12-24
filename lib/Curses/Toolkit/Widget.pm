@@ -29,10 +29,51 @@ sub new {
 	return bless { flags => Curses::Toolkit::Object::Flags->new(),
 				   children => [],
 				   parent => undef,
+				   name => 'unknown',
 				 }, $class;
 }
 
+=head2 set_name
+
+Set the name of the widget. It's only a help, the name is used only in error
+message, so that you know which sicget it is talking about. Default name is
+'unknown'.
+
+  input  : the name
+  output : the widget
+
+=cut
+
+sub set_name {
+	my ($self, $name) = @_;
+	$self->{name} = $name;
+	return $self;
+}
+
+=head2 get_name
+
+Get the name of a widget
+
+  input  : the widget
+  output : the name
+
+=cut
+
+sub get_name {
+	my ($self) = @_;
+	return $self->{name};
+}
+
 =head1 METHODS
+
+=head2 draw
+
+Default drawing for the widget.
+This method doesn't draw anything
+
+=cut
+
+sub draw { return; }
 
 =head2 render
 
@@ -44,11 +85,10 @@ Default rendering method for the widget.
 =cut
 
 sub render {
-	my $self = shift;
-    my ($curses_handler) = validate_pos( @_, { isa => 'Curses' } );
-	$self->render_border($curses_handler);
+	my ($self) = @_;
+	$self->draw();
 	foreach my $child ($self->get_children()) {
-		$child->render();
+		$child->draw();
 	}
     return;
 }
@@ -67,6 +107,18 @@ sub get_children {
 	return @{$self->{children}};
 }
 
+# Sets the parent of the widget
+#
+#  input : Curses::Toolkit::Widget::Container object
+#  output : the current widget
+
+sub _set_parent {
+	my $self = shift;
+	my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Container' } );
+	$self->{parent} = $widget;
+	return $self;
+}
+
 =head2 get_parent
 
 Returns the parent of the widget
@@ -81,45 +133,68 @@ sub get_parent {
 	return $self->{parent};
 }
 
-=head2 render_border
+# =head2 render_border
 
-Render the border of the widget
+# Render the border of the widget
 
-  input  : curses_handler
+#   input  : curses_handler
+#   output : the widget
+
+# =cut
+
+# sub render_border {
+# 	my $self = shift;
+#     my ($curses_handler) = validate_pos( @_, { isa => 'Curses' } );
+# 	$self->get_theme()->draw_border( curses_handler => $curses_handler,
+# 									 coordinates => $self->{coordinates},
+# 									 flags => $self->{flags},
+# 								   );
+# 	return;
+# }
+
+=head2 set_theme_name
+
+Set a specific display theme name.
+
+  input  : a STRING, name of a class inheriting from Curses::Toolkit::Theme
   output : the widget
 
 =cut
 
-sub render_border {
+sub set_theme_name {
 	my $self = shift;
-    my ($curses_handler) = validate_pos( @_, { isa => 'Curses' } );
-	$self->get_theme()->draw_border( curses_handler => $curses_handler,
-									 coordinates => $self->{coordinates},
-									 flags => $self->{flags},
+    my ($theme_name) = validate_pos( @_, { type => SCALAR }
+									 # isa => 'Curses::Toolkit::Theme' }
 								   );
+	$self->{theme_name} = $theme_name;
+	return $self;
 }
 
-=head2 set_theme
+=head2 get_theme_class
 
-Set a specific display theme.
+Get the theme name used for this widget. If there is none, tries to get it from
+the parent. If there is no parent, the default theme name is used
 
-  input  : a Curses::Toolkit::Theme
-  output : the widget
+  input  : none
+  output : a STRING, name of a class inheriting from Curses::Toolkit::Theme
 
 =cut
 
-sub set_theme {
-	my $self = shift;
-    my ($theme) = validate_pos( @_, { isa => 'Curses::Toolkit::Theme' } );
-	$self->{theme} = $theme;
-	return $self;
+sub get_theme_name {
+	my ($self) = @_;
+	if ( ! defined $self->{theme_name} ) {
+		my $parent = $self->get_parent();
+		defined $parent and
+		  return $parent->get_theme_name();
+		$self->{theme_name} = 'Curses::Toolkit::Theme::Default';
+	}
+	return $self->{theme_name};
 }
 
 =head2 get_theme
 
-Get the widge current theme. If none is set, tries to get it from the parent
-widget. If there is no perent widget, sets the theme to a new
-Curses::Toolkit::Theme::Default and returns it.
+Get the widget current theme instance. If none is set, creates a new instance
+from the widget's theme name (see L<get_theme_name>).
 
   input  : none
   output : a Curses::Toolkit::Theme object
@@ -129,63 +204,118 @@ Curses::Toolkit::Theme::Default and returns it.
 sub get_theme {
 	my ($self) = @_;
 	if ( ! defined $self->{theme} ) {
-		my $parent = $self->get_parent();
-		defined $parent and
-		  return $parent->get_theme();
-		use Curses::Toolkit::Theme::Default;
-		$self->{theme} = Curses::Toolkit::Theme::Default->new();
+		$self->{theme} = $self->get_theme_name()->new($self);
 	}
 	return $self->{theme};
 }
 
 
-=head2 set_border_width
+# =head2 set_border_width
 
-Sets the border width
+# Sets the border width
 
-  input  : the border width
-  output : the widget
+#   input  : the border width
+#   output : the widget
 
-=cut
+# =cut
 
-sub set_border_width {
-	my ($self, $border_width) = @_;
-	$self->{border_width} = $border_width;
-	return $self;
-}
-
-=head2 set_coordinates
-
-Set the coordinates (see L<Curses::Toolkit::Object::Coordinates> )
-
-  input  : x1 : top left x
-           y1 : top left y
-           x2 : right bottom x
-           y2 : right bottom y
-  output : the window
-
-=cut
-
-sub set_coordinates {
-	my $self = shift;
-	use Curses::Toolkit::Object::Coordinates;
-	$self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
-	return $self;
-}
+# sub set_border_width {
+# 	my ($self, $border_width) = @_;
+# 	$self->{border_width} = $border_width;
+# 	return $self;
+# }
 
 =head2 get_coordinates
 
-Get the coordinates (see L<Curses::Toolkit::Object::Coordinates> )
+Get the absolute coordinates (see L<Curses::Toolkit::Object::Coordinates> )
 
   input  : none
   output : a Curses::Toolkit::Object::Coordinates object
-           or undef;
 
 =cut
 
 sub get_coordinates {
 	my ($self) = @_;
-	return $self->{coordinates};
+	defined $self->{coordinates} and
+	  return $self->{coordinates};
+	my $parent = $self->get_parent();
+	if (defined $parent) {
+		my $pc = $parent->get_coordinates();
+		my $rc = $self->get_relatives_coordinates();
+		use Curses::Toolkit::Object::Coordinates;
+		my $c = Curses::Toolkit::Object::Coordinates->new(
+			x1 => $pc->x1() + $rc->x1(), y1 => $pc->y1() + $rc->y1(),
+			x2 => $pc->x1() + $rc->x2(), y2 => $pc->y1() + $rc->y2(),
+		);
+		return $c;
+	}
+	die "widget of name '" . $self->get_name() . "' (type '" . ref($self) . "') has no coordinates.";
+}
+
+=head2 get_relatives_coordinates
+
+Get the relative coordinates (see L<Curses::Toolkit::Object::Coordinates> )
+
+  input  : none
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub get_relatives_coordinates {
+	my ($self) = @_;
+	defined $self->{relatives_coordinates} or
+	  die "widget of name '" . $self->get_name() . "' (type '" . ref($self) . "') has no relatives coordinate\n";
+	return $self->{relatives_coordinates};
+}
+
+# sets the relatives coordinates, from the origin of the parent widget
+#  input  : any Curses::Toolkit::Object::Coordinates costructor input
+#  output : the widget
+sub _set_relatives_coordinates {
+	my $self = shift;
+	use Curses::Toolkit::Object::Coordinates;
+	$self->{relatives_coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
+	return $self;
+}
+
+
+# Returns the relative rectangle that a child widget can occupy.
+# This is the default method, returns the whole widget space.
+#
+# input : none
+# output : a Curses::Toolkit::Object::Coordinates object
+
+sub _get_available_space {
+	my ($self) = @_;
+	return $self->get_relatives_coordinates();
+}
+
+# Sets the Curses object to the widget. Typically done when adding a child
+# widget.
+#
+#  input  : a Curses object
+#  output : the current widget
+
+sub _set_curses_handler {
+	my $self = shift;
+    my ($curses_handler) = validate_pos( @_, { isa => 'Curses' } );
+	$self->{curses_handler} = $curses_handler;
+	return $self;
+}
+
+# Returns the Curses object. Typically called when drawing things
+#
+#  input  : none
+#  output : a Curses object
+
+sub _get_curses_handler {
+	my ($self) = @_;
+	defined $self->{curses_handler} and
+	  return $self->{curses_handler};
+	my $parent = $self->get_parent();
+	defined $parent and
+	  return $parent->_get_curses_handler();
+	die "couldn't get Curses object from widget (name '" . $self->get_name() . "' type '" . ref($self) ."')";
 }
 
 1;

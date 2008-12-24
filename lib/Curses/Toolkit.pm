@@ -51,16 +51,22 @@ sub init_root_window {
     my %params = validate(@_, { clear => { type => BOOLEAN,
 										   default => 1,
 										 },
-								theme => { isa => 'Curses::Toolkit::Theme',
-										   optional => 1,
-										 },
+								theme_name => { type => SCALAR,
+#												isa => 'Curses::Toolkit::Theme',
+												optional => 1,
+											   },
 							  }
                          );
 
     # get the Curses handler
     use Curses;
     my $curses_handler = Curses->new();
-    
+    start_color();
+print STDERR "colors number : " . COLORS . "\n";
+print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
+print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+
+
     # curses basic init
 #    Curses::noecho();
 #    Curses::cbreak();
@@ -77,10 +83,11 @@ sub init_root_window {
 #    my $container = Curses::Toolkit::Widget::Warper->new();
 
 	use Curses::Toolkit::Theme::Default;
-	$params{theme} ||= Curses::Toolkit::Theme::Default->new();
+	$params{theme_name} ||= 'Curses::Toolkit::Theme::Default';
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,
                        windows => [],
+					   theme_name => $params{theme_name},
                      }, $class;
     return $self;
 }
@@ -106,6 +113,7 @@ Adds a window on the root window. Returns the root window
 sub add_window {
     my $self = shift;
     my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
+	$window->_set_curses_handler($self->{curses_handler});
     push @{$self->{windows}}, $window;
     return $self;
 }
@@ -161,7 +169,7 @@ Draw everything on the screen
 sub render {
     my ($self) = @_;
 	foreach my $window (sort { $b->{stack} <=> $a->{stack} } $self->get_windows()) {
-		$window->render($self->{curses_handler});
+		$window->render();
 	}
 	return $self;
 }

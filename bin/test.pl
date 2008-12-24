@@ -9,15 +9,23 @@ main() unless caller;
 sub main {
 
 	use Curses::Toolkit;
-	my $root = Curses::Toolkit->init_root_window(clear => 0);
-
 	use Curses::Toolkit::Widget::Window;
-	my $window = Curses::Toolkit::Widget::Window->new();
-	$window->set_coordinates(x1 => 2, y1 => 5,
-							 x2 => 7, y2 => 7,
-							);
-	$root->add_window($window);
-	$root->render();
-	$root->display();
-	sleep 5;
+	use Curses::Toolkit::Widget::Border;
+
+	my $root = Curses::Toolkit
+	  ->init_root_window(clear => 0)
+	  ->add_window(
+	    my $window = Curses::Toolkit::Widget::Window
+		  ->new()
+		  ->set_name('main_window')
+		  ->set_coordinates(x1 => 2,  y1 => 5,
+							x2 => 60, y2 => 30)
+		  ->add_widget(
+			Curses::Toolkit::Widget::Border
+			  ->new()
+		  )
+	  )
+	  ->render()
+	  ->display();
+	sleep 50;
 }
