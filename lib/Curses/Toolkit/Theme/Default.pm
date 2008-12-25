@@ -25,15 +25,6 @@ This theme is used by default when rendering widgets.
 
 =cut
 
-# gets the curses handler of the associated widget
-#
-#  input  : none
-#  output : a Curses object
-sub _get_curses_handler {
-	my ($self) = @_;
-	return $self->{widget}->_get_curses_handler();
-}
-
 sub ULCORNER { ACS_ULCORNER; }
 sub LLCORNER { ACS_LLCORNER; }
 sub URCORNER { ACS_URCORNER; }

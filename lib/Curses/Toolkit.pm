@@ -52,7 +52,6 @@ sub init_root_window {
 										   default => 1,
 										 },
 								theme_name => { type => SCALAR,
-#												isa => 'Curses::Toolkit::Theme',
 												optional => 1,
 											   },
 							  }
@@ -61,10 +60,43 @@ sub init_root_window {
     # get the Curses handler
     use Curses;
     my $curses_handler = Curses->new();
-    start_color();
-print STDERR "colors number : " . COLORS . "\n";
-print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+	if (has_colors) {
+		start_color();
+		print STDERR "color is supported\n";
+		print STDERR "colors number : " . COLORS . "\n";
+		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
+		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+
+#  	my $pair_nb = 1;
+#  	foreach my $bg_nb (0..COLORS()-1) {
+#  		foreach my $fg_nb (0..COLORS()-1) {
+#  #			print STDERR "color pairing : $pair_nb, $fg_nb, $bg_nb \n";
+#  			init_pair($pair_nb, $fg_nb, $bg_nb);
+#  			$pair_nb++;
+#  		}
+#  	}
+
+# 	my $curses = $curses_handler;
+# 	foreach my $x (0..7) {
+# 		$curses->addstr(0, ($x+1)*3, $x);
+# 	}
+# 	foreach my $y (0..7) {
+# 		$curses->addstr($y+1, 0, $y);
+# 	}
+
+# 	my $pair = 1;
+# 	foreach my $x (0..7) {
+# 		foreach my $y (0..7) {
+# 			COLOR_PAIR($pair);
+# 			$curses->attrset(COLOR_PAIR($pair));
+# 			$curses->addstr($y+1, ($x+1)*3, "$x$y");
+# 			$pair++;
+# 		}
+# 	}
+
+	} else {
+		print STDERR "no color support\n";
+	}
 
 
     # curses basic init
@@ -83,7 +115,8 @@ print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
 #    my $container = Curses::Toolkit::Widget::Warper->new();
 
 	use Curses::Toolkit::Theme::Default;
-	$params{theme_name} ||= 'Curses::Toolkit::Theme::Default';
+	use Curses::Toolkit::Theme::Default::Color;
+	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color' : 'Curses::Toolkit::Theme::Default');
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,
                        windows => [],
@@ -114,6 +147,7 @@ sub add_window {
     my $self = shift;
     my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
 	$window->_set_curses_handler($self->{curses_handler});
+	$window->set_theme_name($self->{theme_name});
     push @{$self->{windows}}, $window;
     return $self;
 }

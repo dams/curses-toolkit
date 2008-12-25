@@ -28,4 +28,13 @@ sub new {
 	return bless { widget => $widget }, $class;
 }
 
+# gets the curses handler of the associated widget
+#
+#  input  : none
+#  output : a Curses object
+sub _get_curses_handler {
+	my ($self) = @_;
+	return $self->{widget}->_get_curses_handler();
+}
+
 1;
