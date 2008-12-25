@@ -30,6 +30,8 @@ sub new {
 				   children => [],
 				   parent => undef,
 				   name => 'unknown',
+ 				   relatives_coordinates => Curses::Toolkit::Object::Coordinates
+ 				                            ->new_zero(),
 				 }, $class;
 }
 
@@ -86,10 +88,10 @@ Default rendering method for the widget.
 
 sub render {
 	my ($self) = @_;
-	$self->draw();
 	foreach my $child ($self->get_children()) {
-		$child->draw();
+		$child->render();
 	}
+	$self->draw();
     return;
 }
 
@@ -287,7 +289,12 @@ sub _set_relatives_coordinates {
 
 sub _get_available_space {
 	my ($self) = @_;
-	return $self->get_relatives_coordinates();
+	my $rc = $self->get_relatives_coordinates();
+	use Curses::Toolkit::Object::Coordinates;
+	return Curses::Toolkit::Object::Coordinates->new(
+		x1 => 0, y1 => 0,
+        x2 => $rc->width(), y2 => $rc->height(),
+	);
 }
 
 # Sets the Curses object to the widget. Typically done when adding a child

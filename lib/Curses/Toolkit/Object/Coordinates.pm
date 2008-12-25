@@ -12,24 +12,26 @@ use overload
   '-' => 'substract';
 
 sub add {
-	my ($self, $ca, $cb) = @_;
-	return __PACKAGE__->new( x1 => $ca->x1() + $cb->x1(), y1 => $ca->y1() + $cb->y1(),
-							 x2 => $ca->x2() + $cb->x2(), y2 => $ca->y2() + $cb->y2(),
+	my ($self, $c) = @_;
+	return __PACKAGE__->new( x1 => $self->x1() + $c->x1(), y1 => $self->y1() + $c->y1(),
+							 x2 => $self->x2() + $c->x2(), y2 => $self->y2() + $c->y2(),
 						   );
 }
 
 sub substract {
-	my ($self, $ca, $cb) = @_;
+	my ($self, $c) = @_;
+	# argument is a constant
+	ref $c or
+	  return __PACKAGE__->new( x1 => $self->x1() - $c, y1 => $self->y1() - $c,
+							   x2 => $self->x2() - $c, y2 => $self->y2() - $c,
+							 );
 	# argument is a Coordinates object
-	if ($cb->isa(__PACKAGE__)) {
-		return __PACKAGE__->new( x1 => $ca->x1() - $cb->x1(), y1 => $ca->y1() - $cb->y1(),
-								 x2 => $ca->x2() - $cb->x2(), y2 => $ca->y2() - $cb->y2(),
+	if ($c->isa(__PACKAGE__)) {
+		return __PACKAGE__->new( x1 => $self->x1() - $c->x1(), y1 => $self->y1() - $c->y1(),
+								 x2 => $self->x2() - $c->x2(), y2 => $self->y2() - $c->y2(),
 							   );
 	}
-	# argument is a constant
-	return __PACKAGE__->new( x1 => $ca->x1() - $cb, y1 => $ca->y1() - $cb,
-							 x2 => $ca->x2() - $cb, y2 => $ca->y2() - $cb,
-						   );
+	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
 }
 
 
@@ -57,8 +59,9 @@ Trivial class to hold 2 points
            width : width
            height : heigth
     OR
-  input  : a Curses::Toolkit::Object::Coordinates
-  output : the coordinates object
+  input  : a Curses::Toolkit::Object::Coordinates object
+
+  output : a Curses::Toolkit::Object::Coordinates object
 
 =cut
 
@@ -74,15 +77,15 @@ sub new {
 	}
 	my %params = @_;
 	if (exists $params{width} || exists $params{height}) {
-		validate(@_, { x1 => { type => SCALAR }, x2 => { type => SCALAR },
+		validate(@_, { x1 => { type => SCALAR }, y1 => { type => SCALAR },
 					   width => { type => SCALAR }, height => { type => SCALAR },
 					 }
 				);
 		$params{x2} = $params{x1} + $params{width};
 		$params{y2} = $params{y1} + $params{height};
 	} else {
-		validate(@_, { x1 => { type => SCALAR }, x2 => { type => SCALAR },
-					   y1 => { type => SCALAR }, y2 => { type => SCALAR },
+		validate(@_, { x1 => { type => SCALAR }, y1 => { type => SCALAR },
+					   x2 => { type => SCALAR }, y2 => { type => SCALAR },
 					 }
 				);
 	}
@@ -90,6 +93,56 @@ sub new {
 	$params{y1} < $params{y2} or ($params{y1}, $params{y2}) = ($params{y2}, $params{y1});
 	my $self = bless \%params, $class;
 	return $self; 
+}
+
+=head2 new_zero
+
+Creates a new coordinates with all zero
+
+  input  : none
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub new_zero {
+	my ($class) = @_;
+	return $class->new( x1 => 0, y1 => 0,
+						x2 => 0, y2 => 0 );
+}
+
+=head1 METHODS
+
+=head2 clone
+
+clone an coordinates object
+
+  input  : none
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub clone {
+	my ($self) = @_;
+	return ref($self)->new($self);
+}
+
+=head2 set
+
+set attributes of the coordinate
+
+  input  : one or more of x1, x2, y1, y2, width, height
+  output : the coordinate object
+
+=cut
+
+sub set {
+	my $self = shift;
+	my %params = validate(@_, { x1 => { type => SCALAR, optional => 1 }, y1 => { type => SCALAR, optional => 1 },
+								x2 => { type => SCALAR, optional => 1 }, y2 => { type => SCALAR, optional => 1 },
+							  });
+	keys %params or die "One of (x1, y1, x2, y2) argument must be passed";
+	@{$self}{keys %params} = values %params;
+	return $self;
 }
 
 =head2 width

@@ -38,12 +38,25 @@ Add a widget
 sub add_widget {
 	my $self = shift;
 	my ($child_widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
-#	$child_widget->_set_curses_handler($self->_get_curses_handler);
 	push @{$self->{children}}, $child_widget;
 	$child_widget->_set_parent($self);
 	my $coordinates = $self->_get_available_space();
 	$child_widget->_set_relatives_coordinates($coordinates);
 	return $self;
 }
+
+# overload Widget's method : after setting relatives coordinates, needs to
+# propagate to the children
+sub _set_relatives_coordinates {
+	my $self = shift;
+	$self->SUPER::_set_relatives_coordinates(@_);
+	# TODO : rework for n children
+	my $coordinates = $self->_get_available_space();
+	foreach my $child_widget ($self->get_children()) {
+		$child_widget->_set_relatives_coordinates($coordinates);
+	}
+	return $self;
+}
+
 
 1;

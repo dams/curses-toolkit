@@ -34,12 +34,16 @@ sub VLINE { ACS_VLINE; }
 
 sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
+	my $name = $self->{widget}->get_name();
+	print STDERR "$name : draw_hline $x1, $y1, $width\n";
 	$self->_get_curses_handler()->hline($y1, $x1, HLINE(), $width);
 	return $self;
 }
 
 sub draw_vline {
 	my ($self, $x1, $y1, $width) = @_;
+	my $name = $self->{widget}->get_name();
+	print STDERR "$name : draw_vline $x1, $y1, $width\n";
 	$self->_get_curses_handler()->vline($y1, $x1, VLINE(), $width);
 	return $self;
 }

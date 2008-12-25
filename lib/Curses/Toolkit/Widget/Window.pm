@@ -38,6 +38,10 @@ sub set_coordinates {
 	my $self = shift;
 	use Curses::Toolkit::Object::Coordinates;
 	$self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
+#  	my $rc = $self->{coordinates}->clone();
+# 	$rc->set( x1 => 0, y1 => 0,
+# 			  x2 => $rc->width(), y2 => $rc->height(),
+# 			);
 	$self->_set_relatives_coordinates($self->{coordinates});
 	return $self;
 }

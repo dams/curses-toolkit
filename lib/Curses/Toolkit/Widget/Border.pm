@@ -46,9 +46,12 @@ sub draw {
 
 sub _get_available_space {
 	my ($self) = @_;
-	my $rc = $self->get_relative_coordinates();
-	my $coordinates = $rc-1;
-	return $coordinates;
+	my $rc = $self->get_relatives_coordinates();
+	use Curses::Toolkit::Object::Coordinates;
+	return Curses::Toolkit::Object::Coordinates->new(
+		x1 => 1, y1 => 1,
+        x2 => $rc->width()-2, y2 => $rc->height()-2,
+	);
 }
 
 1;

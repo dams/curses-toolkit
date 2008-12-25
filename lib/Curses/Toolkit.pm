@@ -128,7 +128,8 @@ sub init_root_window {
 DESTROY {
     my ($obj) = @_;
     # ending Curses
-    Curses::endwin;
+    ref($obj) eq 'Curses::Toolkit' and
+	  Curses::endwin;
 }
 
 =head2 add_window
