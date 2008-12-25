@@ -58,5 +58,20 @@ sub _set_relatives_coordinates {
 	return $self;
 }
 
+# Returns the relative rectangle that a child widget can occupy.
+# This is the default method, returns the whole widget space.
+#
+# input : none
+# output : a Curses::Toolkit::Object::Coordinates object
+
+sub _get_available_space {
+	my ($self) = @_;
+	my $rc = $self->get_relatives_coordinates();
+	use Curses::Toolkit::Object::Coordinates;
+	return Curses::Toolkit::Object::Coordinates->new(
+		x1 => 0, y1 => 0,
+        x2 => $rc->width()-1, y2 => $rc->height()-1,
+	);
+}
 
 1;
