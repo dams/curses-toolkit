@@ -46,14 +46,24 @@ sub add_widget {
 }
 
 # overload Widget's method : after setting relatives coordinates, needs to
-# propagate to the children
+# propagate to the children.
+# This is the default behaviour : "pack" all the widgets vertically, with full
+# horizontal width.
 sub _set_relatives_coordinates {
 	my $self = shift;
 	$self->SUPER::_set_relatives_coordinates(@_);
-	# TODO : rework for n children
-	my $coordinates = $self->_get_available_space();
+	my $available_space = $self->_get_available_space();
 	foreach my $child_widget ($self->get_children()) {
-		$child_widget->_set_relatives_coordinates($coordinates);
+		# Given the available space, how much does the widget want ?
+		my $child_space = $child_widget->get_desired_space($available_space->clone());
+		# Make sure it's not bigger than what is available
+		$child_space->restrict_to($available_space);
+		# Force the child space to be as large as the available space
+		$child_space->set(x1 => $available_space->x1(), x2 => $available_space->x2() );
+		# At the end, we grant it this space
+		$child_widget->_set_relatives_coordinates($child_space);
+		# now diminish the available space
+		$available_space = $available_space->add( y1 => $child_space->y2() + 1 );
 	}
 	return $self;
 }

@@ -54,4 +54,10 @@ sub _get_available_space {
 	);
 }
 
+sub get_desired_space {
+	my ($self, $available_space) = @_;
+	my $desired_space = $available_space->clone();
+	return $desired_space;
+}
+
 1;

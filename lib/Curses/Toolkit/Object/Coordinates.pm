@@ -9,31 +9,13 @@ use Params::Validate qw(:all);
 
 use overload
   '+' => 'add',
-  '-' => 'substract';
+  '-' => 'substract',
+  '""' => 'stringify';
 
-sub add {
-	my ($self, $c) = @_;
-	return __PACKAGE__->new( x1 => $self->x1() + $c->x1(), y1 => $self->y1() + $c->y1(),
-							 x2 => $self->x2() + $c->x2(), y2 => $self->y2() + $c->y2(),
-						   );
+sub stringify {
+	my ($self) = @_;
+	return ref($self);
 }
-
-sub substract {
-	my ($self, $c) = @_;
-	# argument is a constant
-	ref $c or
-	  return __PACKAGE__->new( x1 => $self->x1() - $c, y1 => $self->y1() - $c,
-							   x2 => $self->x2() - $c, y2 => $self->y2() - $c,
-							 );
-	# argument is a Coordinates object
-	if ($c->isa(__PACKAGE__)) {
-		return __PACKAGE__->new( x1 => $self->x1() - $c->x1(), y1 => $self->y1() - $c->y1(),
-								 x2 => $self->x2() - $c->x2(), y2 => $self->y2() - $c->y2(),
-							   );
-	}
-	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
-}
-
 
 =head1 NAME
 
@@ -89,8 +71,7 @@ sub new {
 					 }
 				);
 	}
-	$params{x1} < $params{x2} or ($params{x1}, $params{x2}) = ($params{x2}, $params{x1});
-	$params{y1} < $params{y2} or ($params{y1}, $params{y2}) = ($params{y2}, $params{y1});
+	%params = _normalize(%params);
 	my $self = bless \%params, $class;
 	return $self; 
 }
@@ -137,12 +118,30 @@ set attributes of the coordinate
 
 sub set {
 	my $self = shift;
-	my %params = validate(@_, { x1 => { type => SCALAR, optional => 1 }, y1 => { type => SCALAR, optional => 1 },
-								x2 => { type => SCALAR, optional => 1 }, y2 => { type => SCALAR, optional => 1 },
+	my %params = validate(@_, { x1 => { type => SCALAR, optional => 1, default => 0 }, y1 => { type => SCALAR, optional => 1, default => 0 },
+								x2 => { type => SCALAR, optional => 1, default => 0 }, y2 => { type => SCALAR, optional => 1, default => 0 },
 							  });
 	keys %params or die "One of (x1, y1, x2, y2) argument must be passed";
+	%params = _normalize(%params);
 	@{$self}{keys %params} = values %params;
 	return $self;
+}
+
+# make sure the coordinate is positive
+sub _normalize {
+	my (%params) = @_;
+#	print STDERR Dumper(\@_); use Data::Dumper;
+
+# 	foreach my $i (0...10) {
+# 		no warnings;
+# 		my ($package, $filename, $line, $subroutine, $hasargs,
+# 			$wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
+# 		print STDERR "$i  --  $filename | $line | $subroutine\n";
+# 	}
+
+	$params{x1} < $params{x2} or ($params{x1}, $params{x2}) = ($params{x2}, $params{x1});
+	$params{y1} < $params{y2} or ($params{y1}, $params{y2}) = ($params{y2}, $params{y1});
+	return %params;
 }
 
 =head2 width
@@ -177,5 +176,157 @@ sub x1 { shift->{x1} }
 sub y1 { shift->{y1} }
 sub x2 { shift->{x2} }
 sub y2 { shift->{y2} }
+
+=head2 add
+
+Add to the coordinate (also overloads '+').
+
+If the argument is a constant, it's added to all the components of the
+coordinate.
+If it's a Curses::Toolkit::Object::Coordinates, it's added side by side
+If it's a hashref, it's added side by side
+
+  input  : a CONSTANT
+OR
+  input  : a Curses::Toolkit::Object::Coordinates
+OR
+  input  : a HASHREF of 'x1', 'x2', 'y1', 'y2'
+
+output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub add {
+	my ($self, $c) = @_;
+	# argument is a constant
+
+	ref $c or
+	  return __PACKAGE__->new( x1 => $self->x1() + $c, y1 => $self->y1() + $c,
+							   x2 => $self->x2() + $c, y2 => $self->y2() + $c,
+							 );
+
+	# argument is a coordinate object
+	ref $c eq __PACKAGE__ and 
+	  return __PACKAGE__->new( x1 => $self->x1() + $c->x1(), y1 => $self->y1() + $c->y1(),
+							   x2 => $self->x2() + $c->x2(), y2 => $self->y2() + $c->y2(),
+							 );
+	# argument is a hash
+	ref $c eq 'HASH' and
+	  return __PACKAGE__->new( x1 => $self->x1() + $c->{x1}, y1 => $self->y1() + $c->{y1},
+							   x2 => $self->x2() + $c->{x2}, y2 => $self->y2() + $c->{y2},
+							 );
+
+	die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
+}
+
+# sub add {
+# 	my ($self, $c) = @_;
+# 	# argument is a constant
+# 	ref $c or
+# 	  return $self->set( x1 => $self->x1() + $c, y1 => $self->y1() + $c,
+# 							   x2 => $self->x2() + $c, y2 => $self->y2() + $c,
+# 							 );
+
+# 	# argument is a coordinate object
+# 	ref $c eq $self and 
+# 	  return $self->set( x1 => $self->x1() + $c->x1(), y1 => $self->y1() + $c->y1(),
+# 							   x2 => $self->x2() + $c->x2(), y2 => $self->y2() + $c->y2(),
+# 							 );
+# 	# argument is a hash
+# 	ref $c eq 'HASH' and
+# 	  return $self->set( x1 => $self->x1() + $c->{x1}, y1 => $self->y1() + $c->{y1},
+# 							   x2 => $self->x2() + $c->{x2}, y2 => $self->y2() + $c->{y2},
+# 							 );
+	
+# 	die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
+# }
+
+=head2 substract
+
+Substract from the coordinate (also overloads '-').
+
+If the argument is a constant, it's substracted from all the components of the
+coordinate.
+If it's a Curses::Toolkit::Object::Coordinates, it's substracted side by side
+If it's a hashref, it's substracted side by side
+
+  input  : a CONSTANT
+OR
+  input  : a Curses::Toolkit::Object::Coordinates
+OR
+  input  : a HASHREF of 'x1', 'x2', 'y1', 'y2'
+
+output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub substract {
+	my ($self, $c) = @_;
+	# argument is a constant
+	ref $c or
+	  return __PACKAGE__->new( x1 => $self->x1() - $c, y1 => $self->y1() - $c,
+							   x2 => $self->x2() - $c, y2 => $self->y2() - $c,
+							 );
+	# argument is a Coordinates object
+	if ($c->isa($self)) {
+		return __PACKAGE__->new( x1 => $self->x1() - $c->x1(), y1 => $self->y1() - $c->y1(),
+								 x2 => $self->x2() - $c->x2(), y2 => $self->y2() - $c->y2(),
+							   );
+	}
+	# argument is a hash
+	ref $c eq 'HASH' and
+	  return __PACKAGE__->new( x1 => $self->x1() - $c->{x1}, y1 => $self->y1() - $c->{y1},
+							   x2 => $self->x2() - $c->{x2}, y2 => $self->y2() - $c->{y2},
+							 );
+	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
+}
+
+# sub substract {
+# 	my ($self, $c) = @_;
+# 	# argument is a constant
+# 	ref $c or
+# 	  return $self->set( x1 => $self->x1() - $c, y1 => $self->y1() - $c,
+# 							   x2 => $self->x2() - $c, y2 => $self->y2() - $c,
+# 							 );
+# 	# argument is a Coordinates object
+# 	if ($c->isa($self)) {
+# 		return $self->set( x1 => $self->x1() - $c->x1(), y1 => $self->y1() - $c->y1(),
+# 								 x2 => $self->x2() - $c->x2(), y2 => $self->y2() - $c->y2(),
+# 							   );
+# 	}
+# 	# argument is a hash
+# 	ref $c eq 'HASH' and
+# 	  return $self->set( x1 => $self->x1() - $c->{x1}, y1 => $self->y1() - $c->{y1},
+# 							   x2 => $self->x2() - $c->{x2}, y2 => $self->y2() - $c->{y2},
+# 							 );
+# 	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
+# }
+
+=head2 restrict_to
+
+Force the coordinate to be inside the passed coordinate.
+
+  input  : a Curses::Toolkit::Object::Coordinates object
+  output : the object
+
+=cut
+
+sub restrict_to {
+	my $self = shift;
+	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+	$self->{x1} < $c->{x1} and $self->{x1} = $c->{x1};
+	$self->{x1} > $c->{x2} and $self->{x1} = $c->{x2};
+
+	$self->{x2} > $c->{x2} and $self->{x2} = $c->{x2};
+	$self->{x2} < $c->{x1} and $self->{x2} = $c->{x1};
+
+	$self->{y1} < $c->{y1} and $self->{y1} = $c->{y1};
+	$self->{y1} > $c->{y2} and $self->{y1} = $c->{y2};
+
+	$self->{y2} > $c->{y2} and $self->{y2} = $c->{y2};
+	$self->{y2} < $c->{y1} and $self->{y2} = $c->{y1};
+
+	return $self;
+}
 
 1;

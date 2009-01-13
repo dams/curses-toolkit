@@ -98,4 +98,13 @@ sub draw_corner_lr {
 	return @ret;
 }
 
+sub draw_strinf {
+	my $self = shift;
+	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
+	my @ret = $self->SUPER::draw_text(@_);
+	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
+	return @ret;
+}
+
+
 1;

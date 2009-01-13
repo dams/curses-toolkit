@@ -72,6 +72,11 @@ sub draw_corner_lr {
 	return $self;
 }
 
+sub draw_string {
+	my ($self, $x1, $y1, $text) = @_;
+	$self->_get_curses_handler()->addstr($y1, $x1, $text);
+	return $self;
+}
 # sub set_root_background {
 # 	curs_bkgd();
 # }

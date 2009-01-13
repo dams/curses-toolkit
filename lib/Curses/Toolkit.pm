@@ -203,6 +203,9 @@ Draw everything on the screen
 
 sub render {
     my ($self) = @_;
+	my ($screen_h, $screen_w);
+	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
+	$self->{curses_handler}->erase();
 	foreach my $window (sort { $b->{stack} <=> $a->{stack} } $self->get_windows()) {
 		$window->render();
 	}
