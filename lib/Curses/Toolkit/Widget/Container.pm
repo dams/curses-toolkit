@@ -63,7 +63,7 @@ sub _set_relatives_coordinates {
 		# At the end, we grant it this space
 		$child_widget->_set_relatives_coordinates($child_space);
 		# now diminish the available space
-		$available_space = $available_space->add( y1 => $child_space->y2() + 1 );
+		$available_space = $available_space->add( { y1 => $child_space->y2() + 1 } );
 	}
 	return $self;
 }

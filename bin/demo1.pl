@@ -40,6 +40,7 @@ print STDERR "\n";
 	  ->render()
 	  ->display();
 
+sleep 3;
 	use Time::HiRes qw(usleep);
 	use Curses::Toolkit::Object::Coordinates;
 #	while (1) {

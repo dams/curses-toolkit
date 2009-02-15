@@ -13,7 +13,8 @@ sub main {
 	use Curses::Toolkit::Widget::Border;
 	use Curses::Toolkit::Widget::Label;
 
-print STDERR "\n";
+local $| = 1;
+print STDERR "\n\n\n--------------------\n\n";
 
 # 	my $root = Curses::Toolkit
 # 	  ->init_root_window(clear => 0)
@@ -46,10 +47,10 @@ print STDERR "\n";
 			my $border1 = Curses::Toolkit::Widget::Border
 			  ->new()
 		      ->set_name('border1')
- 			  ->add_widget(
- 				my $border2 = Curses::Toolkit::Widget::Border
- 				  ->new()
- 				  ->set_name('border2')
+  			  ->add_widget(
+  				my $border2 = Curses::Toolkit::Widget::Border
+  				  ->new()
+  				  ->set_name('border2')
  			      ->add_widget(
  				    my $border3 = Curses::Toolkit::Widget::Border
  				      ->new()
@@ -61,7 +62,7 @@ print STDERR "\n";
 #						->set_justify('left')
 					)
  			    )
- 			  )
+  			  )
 		  )
 	  )
 	  ->render()
