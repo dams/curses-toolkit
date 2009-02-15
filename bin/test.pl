@@ -41,8 +41,6 @@ print STDERR "\n\n\n--------------------\n\n";
 	    my $window = Curses::Toolkit::Widget::Window
 		  ->new()
 		  ->set_name('main_window')
-		  ->set_coordinates(x1 => 0,   y1 => 0,
-							x2 => 40,  y2 => 20)
 		  ->add_widget(
 			my $border1 = Curses::Toolkit::Widget::Border
 			  ->new()
@@ -58,12 +56,15 @@ print STDERR "\n\n\n--------------------\n\n";
 					  ->add_widget(
 						my $label1 = Curses::Toolkit::Widget::Label
 						->new()
-						->set_text('This is just a test with 8 words')
+						->set_text('This is just a test of a left justified label wrapped within 3 borders')
 #						->set_justify('left')
 					)
  			    )
   			  )
 		  )
+		  ->set_coordinates(x1 => 0,   y1 => 0,
+							x2 => 20,  y2 => 20)
+
 	  )
 	  ->render()
 	  ->display();

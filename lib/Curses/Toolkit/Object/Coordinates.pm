@@ -269,7 +269,7 @@ output : the Curses::Toolkit::Object::Coordinates object
 
 =cut
 
-sub add {
+sub substract {
 	my ($self, $c) = @_;
 
 	if (!ref $c) {
