@@ -28,7 +28,7 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new();
 	$self->{text} = '';
-	$self->{justification} = 'center';
+	$self->{justification} = 'left';
 	$self->{wrap_method} = 'word';
 	return $self;
 }
@@ -71,7 +71,7 @@ sub get_text {
 
 Set the text justification inside the label widget.
 
-  input  : STRING, one of 'left', 'right', 'center', 'fill'
+  input  : STRING, one of 'left', 'right', 'center'
   output : the label object
 
 =cut
@@ -88,7 +88,7 @@ sub set_justify {
 Get the text justification inside the label widget.
 
   input  : none
-  output : STRING, one of 'left', 'right', 'center', 'fill'
+  output : STRING, one of 'left', 'right', 'center'
 
 =cut
 
@@ -142,10 +142,22 @@ sub draw {
 	my @text = _textwrap($text, $c->width());
 
 	foreach my $y (0..$c->height() - 1) {
-		$theme->draw_string($c->{x1}, $c->{y1} + $y, $text[$y]);
+		my $t = $text[$y];
+		$t =~ s/^\s+//g;
+		if ($justify eq 'left') {
+			$theme->draw_string($c->{x1}, $c->{y1} + $y, $t);
+		}
+		if ($justify eq 'center') {
+			$theme->draw_string($c->{x1} + ($c->width() - length $t ) / 2,
+								$c->{y1} + $y,
+								$t);
+		}
+		if ($justify eq 'right') {
+			$theme->draw_string($c->{x1} + $c->width() - length $t,
+								$c->{y1} + $y,
+								$t);
+		}
 	}
-# 	if ($justify eq 'left') {
-		
 # 	} elsif ($justify eq 'right') {
 
 # 	} elsif ($justify eq 'center') {
@@ -218,7 +230,8 @@ The Label desires the minimum space that let's it display entirely
 sub get_desired_space {
 	my ($self, $available_space) = @_;
 	my $desired_space = $available_space->clone();
-	my @text = _textwrap($self->get_text(), $available_space->width());
+	use List::Util qw(max);
+	my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
 	$desired_space->set( y2 => $desired_space->y1() + $#text );
 	return $desired_space;
 }

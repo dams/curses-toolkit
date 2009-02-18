@@ -27,13 +27,15 @@ sub new {
     $class eq __PACKAGE__ and die "abstract class";
 	use Curses::Toolkit::Object::Flags;
 	return bless { flags => Curses::Toolkit::Object::Flags->new(),
-				   children => [],
 				   parent => undef,
 				   name => 'unknown',
  				   relatives_coordinates => Curses::Toolkit::Object::Coordinates
  				                            ->new_zero(),
+				   properties => {},
 				 }, $class;
 }
+
+=head1 METHODS
 
 =head2 set_name
 
@@ -66,10 +68,52 @@ sub get_name {
 	return $self->{name};
 }
 
-=head1 METHODS
+=head2 set_property
+
+  $widget->set_property('group name', 'property name', 'value');
+  $widget->set_property('group name', { name1 => 'value1', ... });
+
+Sets a single property or a whole group of property
+
+properties are arbitrary caracteristics of widgets. They are grouped iby
+groups. To set a property, you need to specify the group name, then the
+property name, then the value name. However you can specify the group name, and
+a has representing this group value.
+
+Returns the widget
+
+=cut
+
+sub set_property {
+	my ($self, $group_name, $property_name, $value) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' }, 1, 1, 0 );
+	if (defined $value) {
+		$self->{property}{$group_name}{$property_name} = $value;
+		return $self;
+	}
+	my $group_value = $property_name;
+	$self->{property}{$group_name} = $group_value;
+	return $self;
+}
+
+=head2 get_property
+
+  my $value = $widget->get_property('group name', 'property name');
+  my $group_hash = $widget->get_property('group name');
+
+=cut
+
+sub get_property {
+	my ($self, $group_name, $property_name) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' }, { optional => 0 }, { optional => 1} );
+	my $group = $self->{property}{$group_name};
+	if (defined $property_name) {
+		return $group->{$property_name};
+	}
+	return( { %$group } );
+}
 
 =head2 draw
 
+This is the method that draws the widget itself.
 Default drawing for the widget.
 This method doesn't draw anything
 
@@ -79,7 +123,7 @@ sub draw { return; }
 
 =head2 render
 
-Default rendering method for the widget.
+Default rendering method for the widget. Any rendre method should call draw
 
   input  : curses_handler
   output : the widget
@@ -88,25 +132,8 @@ Default rendering method for the widget.
 
 sub render {
 	my ($self) = @_;
-	foreach my $child ($self->get_children()) {
-		$child->render();
-	}
 	$self->draw();
     return;
-}
-
-=head2 get_children
-
-Returns the list of children of the widget
-
-  input : none
-  output : ARRAY of Curses::Toolkit::Widget
-
-=cut
-
-sub get_children {
-	my ($self) = @_;
-	return @{$self->{children}};
 }
 
 # Sets the parent of the widget
@@ -270,6 +297,31 @@ sub get_relatives_coordinates {
 	return $self->{relatives_coordinates};
 }
 
+=head2 rebuild_coordinates
+
+  $widget->rebuild_coordinates();
+
+Recompute all the relative coordinates accross the whole window
+
+  input  : none
+  output : the root window
+
+=cut
+
+sub rebuild_all_coordinates {
+	my ($self) = @_;
+	my $widget = $self;
+	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
+		$widget = $widget->get_parent();
+		# if the when going through all parent we don't find a window, just
+		# return : we can't rebiuld the coordinates
+		defined $widget or return $self;
+	}
+	my $window = $widget;
+	$window->_rebuild_children_coordinates();
+	return $self;	
+}
+
 # sets the relatives coordinates, from the origin of the parent widget
 #  input  : any Curses::Toolkit::Object::Coordinates costructor input
 #  output : the widget
@@ -280,8 +332,7 @@ sub _set_relatives_coordinates {
 	return $self;
 }
 
-# Sets the Curses object to the widget. Typically done when adding a child
-# widget.
+# Sets the Curses object to the widget.
 #
 #  input  : a Curses object
 #  output : the current widget

@@ -24,47 +24,58 @@ This widget can contain 0 or more other widgets.
 
 =cut
 
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	$self->{children} = [];
+	return $self;
+}
+
 =head1 METHODS
 
-=head2 add_widget
+=head2 render
 
-Add a widget
+Default rendering method for the widget. Any rendre method should call draw
 
-  input  : the child widget
-  output : the current widget (not the child widget)
+  input  : curses_handler
+  output : the widget
 
 =cut
 
-sub add_widget {
-	my $self = shift;
-	my ($child_widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
+sub render {
+	my ($self) = @_;
+	foreach my $child ($self->get_children()) {
+		$child->render();
+	}
+	$self->draw();
+    return;
+}
+
+=head2 get_children
+
+Returns the list of children of the widget
+
+  input : none
+  output : ARRAY of Curses::Toolkit::Widget
+
+=cut
+
+sub get_children {
+	my ($self) = @_;
+	return @{$self->{children}};
+}
+
+sub _add_child {
+	my ($self, $child_widget) = @_;
 	push @{$self->{children}}, $child_widget;
-	$child_widget->_set_parent($self);
-	my $coordinates = $self->_get_available_space();
-	$child_widget->_set_relatives_coordinates($coordinates);
 	return $self;
 }
 
 # overload Widget's method : after setting relatives coordinates, needs to
 # propagate to the children.
-# This is the default behaviour : "pack" all the widgets vertically, with full
-# horizontal width.
 sub _set_relatives_coordinates {
 	my $self = shift;
 	$self->SUPER::_set_relatives_coordinates(@_);
-	my $available_space = $self->_get_available_space();
-	foreach my $child_widget ($self->get_children()) {
-		# Given the available space, how much does the widget want ?
-		my $child_space = $child_widget->get_desired_space($available_space->clone());
-		# Make sure it's not bigger than what is available
-		$child_space->restrict_to($available_space);
- 		# Force the child space to be as large as the available space
- 		$child_space->set(x1 => $available_space->x1(), x2 => $available_space->x2() );
-		# At the end, we grant it this space
-		$child_widget->_set_relatives_coordinates($child_space);
-		# now diminish the available space
-		$available_space->add( { y1 => $child_space->y2() + 1 } );
-	}
 	return $self;
 }
 

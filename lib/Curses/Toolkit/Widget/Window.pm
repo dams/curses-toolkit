@@ -22,6 +22,14 @@ This is a window widget
 
 =cut
 
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	# set window stack by default
+	$self->set_property('window', 'stack', -1);
+	return $self;
+}
+
 =head2 set_coordinates
 
 Set the coordinates (see L<Curses::Toolkit::Object::Coordinates> )
@@ -43,6 +51,8 @@ sub set_coordinates {
 # 			  x2 => $rc->width(), y2 => $rc->height(),
 # 			);
 	$self->_set_relatives_coordinates($self->{coordinates});
+	# needs to take care of rebuilding coordinates from top to bottom
+	$self->rebuild_all_coordinates();
 	return $self;
 }
 

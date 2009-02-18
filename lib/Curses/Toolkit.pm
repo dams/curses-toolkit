@@ -194,7 +194,7 @@ sub show_all {
 
   $root->render();
 
-Draw everything on the screen
+Build everything in the buffer. Call draw after that to display it
 
   input : none
   output : the root window
@@ -206,20 +206,28 @@ sub render {
 	my ($screen_h, $screen_w);
 	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
 	$self->{curses_handler}->erase();
-	foreach my $window (sort { $b->{stack} <=> $a->{stack} } $self->get_windows()) {
+	foreach my $window (sort { $b->get_property('window', 'stack') <=> $a->get_property('window', 'stack') } $self->get_windows()) {
 		$window->render();
 	}
 	return $self;
 }
+
+=head2 display
+
+  $root->display();
+
+Refresh the screen.
+
+  input  : none
+  output : the root window
+
+=cut
 
 sub display {
 	my ($self) = @_;
 	$self->{curses_handler}->refresh();
 	return $self;
 }
-
-
-
 
 #    my ($screen_w, $screen_h);
 #    $self->{curses_handler}->getmaxyx($screen_h, $screen_w);

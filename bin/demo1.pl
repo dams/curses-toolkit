@@ -41,8 +41,8 @@ print STDERR "\n";
 	  ->display();
 
 sleep 3;
-	use Time::HiRes qw(usleep);
-	use Curses::Toolkit::Object::Coordinates;
+#	use Time::HiRes qw(usleep);
+#	use Curses::Toolkit::Object::Coordinates;
 #	while (1) {
 #		foreach (1..10) {
 #			usleep(40000);
