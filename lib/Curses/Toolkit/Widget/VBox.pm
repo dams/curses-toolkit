@@ -69,9 +69,8 @@ sub pack_start {
 										padding => { type => INTEGER, default => 0, regex => qr/^\d+$/ },
 									  }
 						  );
-	$child_widget->{properties}{pack}
 	$self->_add_child($child_widget);
-	$child->set_property(packing => \%options);
+	$child_widget->set_property(packing => \%options);
 	return $self;
 }
 
@@ -83,7 +82,56 @@ sub _add_child {
 	return;
 }
 
-sub {
+sub _rebuild_children_coordinates {
+	my ($self) = @_;
+	my $available_space = $self->_get_available_space();
+	my @child_widgets = $self->get_children();
+
+	# Given the available space, how much does the child widget want ?
+	my $child_space = $child_widget->get_desired_space($available_space->clone());
+	# Make sure it's not bigger than what is available
+	$child_space->restrict_to($available_space);
+# 		# Force the child space to be as large as the available space
+# 		$child_space->set(x1 => $available_space->x1(), x2 => $available_space->x2() );
+	# At the end, we grant it this space
+	$child_widget->_set_relatives_coordinates($child_space);
+	$child_widget->can('_rebuild_children_coordinates') and
+	  $child_widget->_rebuild_children_coordinates();
+	# now diminish the available space
+	$available_space->add( { y1 => $child_space->y2() + 1 } );
+	return $self;
+}
+
+=head2 get_desired_space
+
+Given a coordinate representing the available space, returns the space desired
+The VBox desires all the space available, so it returns the available space
+
+  input : a Curses::Toolkit::Object::Coordinates object
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub get_desired_space {
+	my ($self, $available_space) = @_;
+	my $desired_space = $available_space->clone();
+	return $desired_space;
+}
+
+=head2 get_minimum_space
+
+Given a coordinate representing the available space, returns the minimum space
+needed to properly display itself
+
+  input : a Curses::Toolkit::Object::Coordinates object
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub get_desired_space {
+	my ($self, $available_space) = @_;
+	my $desired_space = $available_space->clone();
+	return $desired_space;
 }
 
 1;

@@ -6,6 +6,7 @@ use strict;
 use parent qw(Curses::Toolkit::Widget);
 
 use Params::Validate qw(:all);
+use List::Util qw(min max);
 
 =head1 NAME
 
@@ -30,6 +31,7 @@ sub new {
 	$self->{text} = '';
 	$self->{justification} = 'left';
 	$self->{wrap_method} = 'word';
+	$self->{wrap_mode} = 'active';
 	return $self;
 }
 
@@ -97,20 +99,52 @@ sub get_justify {
 	return $self->{justification};
 }
 
+=head2 set_wrap_mode
+
+Set the wrap mode. 'never' means the label stay on one line (cut if not enough
+space is available), paragraphs are not interpreted. 'active' means the label tries to occupy space vertically
+(thus wrapping instead of extending to the right). 'lazy' means the label wraps
+if it is obliged to (not enough space to display on the same line), and on paragraphs
+
+  input  : STRING, one of 'never', 'active', 'lazy'
+  output : the label widget
+
+=cut
+
+sub set_wrap_mode {
+	my $self = shift;
+	my ($wrap_mode) = validate_pos( @_, { regex => qr/^(?:never|active|lazy)$/ } );
+	$self->{wrap_mode} = $wrap_mode;
+	return $self;
+}
+
+=head2 get_wrap_mode
+
+Get the text wrap mode ofthe label widget.
+
+  input  : none
+  output : STRING, one of 'never', 'active', 'lazy'
+
+=cut
+
+sub get_wrap_mode {
+	my ($self) = @_;
+	return $self->{wrap_mode};
+}
+
 =head2 set_wrap_method
 
 Set the wrap method used. 'word' (the default) wraps on word. 'letter' makes
-the label wrap but at any point. 'none' makes the label stay on one line (cut
-if not enough space is available)
+the label wrap but at any point.
 
-  input  : STRING, one of 'word', 'letter', 'none'
-  output : the label object
+  input  : STRING, one of 'word', 'letter'
+  output : the label widget
 
 =cut
 
 sub set_wrap_method {
 	my $self = shift;
-	my ($wrap_method) = validate_pos( @_, { regex => qr/^(?:word|letter|none)$/ } );
+	my ($wrap_method) = validate_pos( @_, { regex => qr/^(?:word|letter)$/ } );
 	$self->{wrap_method} = $wrap_method;
 	return $self;
 }
@@ -120,7 +154,7 @@ sub set_wrap_method {
 Get the text wrap method inside the label widget.
 
   input  : none
-  output : STRING, one of 'word', 'letter', 'none'
+  output : STRING, one of 'word', 'letter'
 
 =cut
 
@@ -139,11 +173,16 @@ sub draw {
 
 	my $wrap_method = $self->get_wrap_method();
 
+			{ open my $f, ">>/tmp/__foo__"; print $f " ------------- \n"; }
+
 	my @text = _textwrap($text, $c->width());
 
-	foreach my $y (0..$c->height() - 1) {
+			{ open my $f, ">>/tmp/__foo__"; print $f " text : " . scalar(@text) . " \n"; }
+
+	foreach my $y ( 0..min($#text, $c->height() - 1) ) {
 		my $t = $text[$y];
 		$t =~ s/^\s+//g;
+		$t =~ s/\s+$//g;
 		if ($justify eq 'left') {
 			$theme->draw_string($c->{x1}, $c->{y1} + $y, $t);
 		}
@@ -220,7 +259,7 @@ sub _textwrap {
 =head2 get_desired_space
 
 Given a coordinate representing the available space, returns the space desired
-The Label desires the minimum space that let's it display entirely
+The Label desires the minimum space that lets it display entirely
 
   input : a Curses::Toolkit::Object::Coordinates object
   output : a Curses::Toolkit::Object::Coordinates object
@@ -228,11 +267,54 @@ The Label desires the minimum space that let's it display entirely
 =cut
 
 sub get_desired_space {
+	my $self = shift;
+	return $self->get_minimum_space(@_);
+}
+
+=head2 get_minimum_space
+
+Given a coordinate representing the available space, returns the minimum space
+needed to properly display itself
+
+  input : a Curses::Toolkit::Object::Coordinates object
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub get_minimum_space {
 	my ($self, $available_space) = @_;
-	my $desired_space = $available_space->clone();
-	use List::Util qw(max);
-	my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
-	$desired_space->set( y2 => $desired_space->y1() + $#text );
-	return $desired_space;
+
+	my $minimum_space = $available_space->clone();
+	my $wrap_mode = $self->get_wrap_mode();
+	my $text = $self->get_text();
+	if ($wrap_mode eq 'never') {
+		$text =~ s/\n(\s)/$1/g;
+		$text =~ s/\n/ /g;
+		$minimum_space->set( x2 => $available_space->x1() + length $text,
+							 y2 => $available_space->y1(),
+						   );
+		return $minimum_space;
+	} elsif ($wrap_mode eq 'active') {
+		my $width = 1;
+		while (1) {
+			{ open my $f, ">>/tmp/__foo__"; print $f " width = $width \n"; }
+			my @text = _textwrap($self->get_text(), $width);
+			{ open my $f, ">>/tmp/__foo__"; print $f " text : " . scalar(@text) . "\n"; }
+			if (@text < 1  || @text > $available_space->height()) {
+				$width++;
+				next;
+			}
+			{ open my $f, ">>/tmp/__foo__"; print $f " setting to : " . ( $minimum_space->x1() + max(map { length } @text )) . "\n      - " . ($minimum_space->y1() + $#text) . "\n"; }
+			$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) + 1,
+								 y2 => $minimum_space->y1() + $#text );
+			last;
+		}
+		return $minimum_space;
+	} elsif ($wrap_mode eq 'lazy') {
+		my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
+		$minimum_space->set( y2 => $minimum_space->y1() + $#text );
+		return $minimum_space;
+	}
+	die;
 }
 1;

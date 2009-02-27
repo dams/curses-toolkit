@@ -75,10 +75,10 @@ sub get_name {
 
 Sets a single property or a whole group of property
 
-properties are arbitrary caracteristics of widgets. They are grouped iby
+properties are arbitrary caracteristics of widgets. They are grouped by
 groups. To set a property, you need to specify the group name, then the
 property name, then the value name. However you can specify the group name, and
-a has representing this group value.
+a hash representing this group value.
 
 Returns the widget
 
@@ -99,6 +99,8 @@ sub set_property {
 
   my $value = $widget->get_property('group name', 'property name');
   my $group_hash = $widget->get_property('group name');
+
+Return the property or the group of property of a widget.
 
 =cut
 
@@ -313,8 +315,8 @@ sub rebuild_all_coordinates {
 	my $widget = $self;
 	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
 		$widget = $widget->get_parent();
-		# if the when going through all parent we don't find a window, just
-		# return : we can't rebiuld the coordinates
+		# if when going through all parent we don't find a window, just
+		# return : we can't rebuild the coordinates
 		defined $widget or return $self;
 	}
 	my $window = $widget;
