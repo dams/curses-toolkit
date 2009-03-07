@@ -39,66 +39,123 @@ pack_start multiple time to add more widgets.
 
 The hash containing options can contain :
 
-  expand : TRUE if the new child is to be given extra space allocated to box.
-  The extra space will be divided evenly between all children of box that use
-  this option
+expand : TRUE if the new child is to be given extra space allocated to box.
+The extra space will be divided evenly between all children of box that use
+this option
 
-  fill : TRUE if space given to child by the expand option is actually
-  allocated to child, rather than just padding it. This parameter has no effect
-  if expand is set to FALSE. A child is always allocated the full height of a
-  GtkHBox and the full width of a GtkVBox. This option affects the other
-  dimension
+fill : TRUE if space given to child by the expand option is actually
+allocated to child, rather than just padding it. This parameter has no effect
+if expand is set to FALSE. A child is always allocated the full height of a
+GtkHBox and the full width of a GtkVBox. This option affects the other
+dimension
 
-  padding : extra space in pixels to put between this child and its neighbors,
-  over and above the global amount specified by "spacing" property. If child is
-  a widget at one of the reference ends of box, then padding pixels are also
-  put between child and the reference edge of box
+padding : extra space in pixels to put between this child and its neighbors,
+over and above the global amount specified by "spacing" property. If child is
+a widget at one of the reference ends of box, then padding pixels are also
+put between child and the reference edge of box
 
 =cut
 
 sub pack_start {
 	my $self = shift;
-    my ($child_widget, $options) = validate( @_,
-								   {
-									{ isa => 'Curses::Toolkit::Widget' },
-									{ type => HASHREF, default => {} },
-								   }
-								 );
-	my %options = validate( $options, { expand  => { type => BOOLEAN, default => 0, can => [ 0, 1] },
-										fill    => { type => BOOLEAN, default => 0, can => [ 0, 1] },
-										padding => { type => INTEGER, default => 0, regex => qr/^\d+$/ },
+    my ($child_widget, $options) = validate_pos( @_,
+								     { isa => 'Curses::Toolkit::Widget' },
+									 { type => HASHREF, default => {} },
+								   );
+	my @array = ($options);
+	my %options = validate( @array, { expand  => { type => BOOLEAN, default => 0 },
+										fill    => { type => BOOLEAN, default => 0 },
+										padding => { type => SCALAR, default => 0, regex => qr/^\d+$/ },
 									  }
 						  );
-	$self->_add_child($child_widget);
+	unshift @{$self->{children}}, $child_widget;
+	$child_widget->_set_parent($self);
 	$child_widget->set_property(packing => \%options);
 	return $self;
 }
 
-# overload _add_child from Container to pack at start
-
-sub _add_child {
-	my ($self, $child) = @_;
-	unshift @{$self->{children}}, $child_widget;
-	return;
+sub pack_end {
+	my $self = shift;
+    my ($child_widget, $options) = validate_pos( @_,
+								     { isa => 'Curses::Toolkit::Widget' },
+									 { type => HASHREF, default => {} },
+								   );
+	my @array = ($options);
+	my %options = validate( @array, { expand  => { type => BOOLEAN, default => 0 },
+										fill    => { type => BOOLEAN, default => 0 },
+										padding => { type => SCALAR, default => 0, regex => qr/^\d+$/ },
+									  }
+						  );
+	push @{$self->{children}}, $child_widget;
+	$child_widget->_set_parent($self);
+	$child_widget->set_property(packing => \%options);
+	return $self;
 }
 
 sub _rebuild_children_coordinates {
 	my ($self) = @_;
 	my $available_space = $self->_get_available_space();
-	my @child_widgets = $self->get_children();
 
-	# Given the available space, how much does the child widget want ?
-	my $child_space = $child_widget->get_desired_space($available_space->clone());
-	# Make sure it's not bigger than what is available
-	$child_space->restrict_to($available_space);
-# 		# Force the child space to be as large as the available space
-# 		$child_space->set(x1 => $available_space->x1(), x2 => $available_space->x2() );
-	# At the end, we grant it this space
-	$child_widget->_set_relatives_coordinates($child_space);
-	$child_widget->can('_rebuild_children_coordinates') and
-	  $child_widget->_rebuild_children_coordinates();
-	# now diminish the available space
-	$available_space->add( { y1 => $child_space->y2() + 1 } );
+	my @children_heights;
+
+	my $desired_space = $available_space->clone();
+	my $remaining_space = $available_space->clone();
+
+	# first, compute how high all the non expanding children are
+	my @children = $self->get_children();
+
+	my $height = 0;
+	my $idx = 0;
+	foreach my $child (@children) {
+		if ( $child->get_property('packing', 'expand') ) {
+			$idx++;
+		} else {
+			my $space = $child->get_minimum_space($remaining_space);
+			my $h = $space->height();
+			$height += $h;
+			$remaining_space->substract( { y2 => $h } );			
+			$children_heights[$idx] = $h;
+			$idx++;
+		}
+	}
+
+	# add to it the height of the expanding children, restricted
+	my $count = scalar(grep { $_->get_property('packing', 'expand') } @children);
+
+	$idx = 0;
+	foreach my $child (@children) {
+		if ( ! $child->get_property('packing', 'expand') ) {
+			$idx++;
+		} else {
+			my $avg_height = int($remaining_space->height() / $count);
+			my $avg_space = $remaining_space->clone();
+			$avg_space->set( y2 => $avg_space->y1() + $avg_height);
+			my $space = $child->get_desired_space($avg_space);
+			my $h = $space->height();
+			$remaining_space->substract( { y2 => $h } );
+			$height += $h;
+			$children_heights[$idx] = $h;
+			$count--;
+			$idx++;
+		}
+	}
+
+	$idx = 0;
+	my $y1 = 0;
+	my $y2 = 0;
+	foreach my $child (@children) {
+		my $child_space = $available_space->clone();
+		$y2 = $y1 + $children_heights[$idx];
+		$child_space->set(y1 => $y1, y2 => $y2);
+		$child_space->restrict_to($available_space);
+		$child->_set_relatives_coordinates($child_space);
+		$child->can('_rebuild_children_coordinates') and
+		  $child->_rebuild_children_coordinates();
+
+		$y1 = $y2;
+		$idx++;
+	}
+
 	return $self;
 }
 
@@ -114,8 +171,39 @@ The VBox desires all the space available, so it returns the available space
 
 sub get_desired_space {
 	my ($self, $available_space) = @_;
+
 	my $desired_space = $available_space->clone();
+	my $remaining_space = $available_space->clone();
+
+	# first, compute how high all the non expanding children are
+	my @children = $self->get_children();
+	my $height = 0;
+	foreach my $child (grep { ! $_->get_property('packing', 'expand') } @children) {
+		my $space = $child->get_minimum_space($remaining_space);
+		my $h = $space->height();
+		$height += $h;
+		$remaining_space->substract( { y2 => $h } );
+	}
+
+	# add to it the height of the expanding children, restricted
+	my @expanding_children = grep { $_->get_property('packing', 'expand') } @children;
+
+	my $count = @expanding_children;
+	foreach my $child (@expanding_children) {
+		my $avg_height = int($remaining_space->height() / $count);
+		my $avg_space = $remaining_space->clone();
+		$avg_space->set( y2 => $avg_space->y1() + $avg_height);
+		my $space = $child->get_desired_space($avg_space);
+		my $h = $space->height();
+		$remaining_space->substract( { y2 => $h } );
+		$height += $h;
+		$count--;
+	}
+
+	$desired_space->set( y2 => $desired_space->y1() + $height );
+
 	return $desired_space;
+
 }
 
 =head2 get_minimum_space
@@ -128,10 +216,26 @@ needed to properly display itself
 
 =cut
 
-sub get_desired_space {
+sub get_minimum_space {
 	my ($self, $available_space) = @_;
-	my $desired_space = $available_space->clone();
-	return $desired_space;
+
+	my $minimum_space = $available_space->clone();
+	my $remaining_space = $available_space->clone();
+
+	# compute how high all the children are
+	my @children = $self->get_children();
+	my $height = 0;
+	foreach my $child (@children) {
+		my $space = $child->get_minimum_space($remaining_space);
+		my $h = $space->height();
+		$height += $h;
+		$remaining_space->substract( { y2 => $h } );
+	}
+
+	$minimum_space->set( y2 => $minimum_space->y1() + $height );
+
+	return $minimum_space;
+
 }
 
 1;

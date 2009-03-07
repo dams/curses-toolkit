@@ -31,7 +31,7 @@ sub new {
 	$self->{text} = '';
 	$self->{justification} = 'left';
 	$self->{wrap_method} = 'word';
-	$self->{wrap_mode} = 'active';
+	$self->{wrap_mode} = 'lazy';
 	return $self;
 }
 
@@ -173,11 +173,7 @@ sub draw {
 
 	my $wrap_method = $self->get_wrap_method();
 
-			{ open my $f, ">>/tmp/__foo__"; print $f " ------------- \n"; }
-
 	my @text = _textwrap($text, $c->width());
-
-			{ open my $f, ">>/tmp/__foo__"; print $f " text : " . scalar(@text) . " \n"; }
 
 	foreach my $y ( 0..min($#text, $c->height() - 1) ) {
 		my $t = $text[$y];
@@ -291,7 +287,7 @@ sub get_minimum_space {
 		$text =~ s/\n(\s)/$1/g;
 		$text =~ s/\n/ /g;
 		$minimum_space->set( x2 => $available_space->x1() + length $text,
-							 y2 => $available_space->y1(),
+							 y2 => $available_space->y1() + 1,
 						   );
 		return $minimum_space;
 	} elsif ($wrap_mode eq 'active') {
@@ -306,13 +302,13 @@ sub get_minimum_space {
 			}
 			{ open my $f, ">>/tmp/__foo__"; print $f " setting to : " . ( $minimum_space->x1() + max(map { length } @text )) . "\n      - " . ($minimum_space->y1() + $#text) . "\n"; }
 			$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) + 1,
-								 y2 => $minimum_space->y1() + $#text );
+								 y2 => $minimum_space->y1() + scalar(@text) );
 			last;
 		}
 		return $minimum_space;
 	} elsif ($wrap_mode eq 'lazy') {
 		my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
-		$minimum_space->set( y2 => $minimum_space->y1() + $#text );
+		$minimum_space->set( y2 => $minimum_space->y1() + scalar(@text) );
 		return $minimum_space;
 	}
 	die;

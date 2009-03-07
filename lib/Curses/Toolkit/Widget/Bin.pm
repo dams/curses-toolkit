@@ -76,6 +76,7 @@ sub _rebuild_children_coordinates {
 	my ($self) = @_;
 	my $available_space = $self->_get_available_space();
 	my ($child_widget) = $self->get_children();
+	defined $child_widget or return;
 
 	# Given the available space, how much does the child widget want ?
 	my $child_space = $child_widget->get_desired_space($available_space->clone());

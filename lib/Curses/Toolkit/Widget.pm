@@ -107,6 +107,7 @@ Return the property or the group of property of a widget.
 sub get_property {
 	my ($self, $group_name, $property_name) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' }, { optional => 0 }, { optional => 1} );
 	my $group = $self->{property}{$group_name};
+	defined $group or $group = {};
 	if (defined $property_name) {
 		return $group->{$property_name};
 	}
@@ -125,7 +126,7 @@ sub draw { return; }
 
 =head2 render
 
-Default rendering method for the widget. Any rendre method should call draw
+Default rendering method for the widget. Any render method should call draw
 
   input  : curses_handler
   output : the widget

@@ -91,7 +91,7 @@ sub _get_available_space {
 	use Curses::Toolkit::Object::Coordinates;
 	return Curses::Toolkit::Object::Coordinates->new(
 		x1 => 0, y1 => 0,
-        x2 => $rc->width()-1, y2 => $rc->height()-1,
+        x2 => $rc->width(), y2 => $rc->height(),
 	);
 }
 

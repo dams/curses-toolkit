@@ -152,7 +152,7 @@ returns the width represented by the coordinates
 
 sub width {
 	my ($self) = @_;
-	return $self->{x2} - $self->{x1} + 1;
+	return $self->{x2} - $self->{x1};
 }
 
 =head2 height
@@ -163,7 +163,7 @@ returns the height represented by the coordinates
 
 sub height {
 	my ($self) = @_;
-	return $self->{y2} - $self->{y1} + 1;
+	return $self->{y2} - $self->{y1};
 }
 
 =head2 x1, x2, y1, y2
