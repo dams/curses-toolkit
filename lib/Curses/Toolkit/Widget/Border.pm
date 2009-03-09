@@ -88,8 +88,8 @@ sub get_minimum_space {
 	my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
 	if (defined $child) {
 		my $child_available_space = $available_space->clone();
-		$child_available_space->set( x1 => $child_available_space->x1() + 1, y1 => $available_space->y1() + 1,
-									 x2 => $child_available_space->x2() - 1, y2 => $available_space->y1() - 1,
+		$child_available_space->set( x1 => $available_space->x1() + 1, y1 => $available_space->y1() + 1,
+									 x2 => $available_space->x2() - 1, y2 => $available_space->y2() - 1,
 								   );
 		$child_space = $child->get_minimum_space($child_available_space);
 	}

@@ -296,6 +296,12 @@ sub get_minimum_space {
 			{ open my $f, ">>/tmp/__foo__"; print $f " width = $width \n"; }
 			my @text = _textwrap($self->get_text(), $width);
 			{ open my $f, ">>/tmp/__foo__"; print $f " text : " . scalar(@text) . "\n"; }
+			{ open my $f, ">>/tmp/__foo__"; print $f " HEIGHT: " . $available_space->height() . "\n"; }
+			if ($width >= length($self->get_text())) {
+				$minimum_space->set( x2 => $minimum_space->x1() + length($self->get_text()) + 1,
+									 y2 => $minimum_space->y1() + 1 );
+				last;
+			}
 			if (@text < 1  || @text > $available_space->height()) {
 				$width++;
 				next;
