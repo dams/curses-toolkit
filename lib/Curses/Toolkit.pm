@@ -22,6 +22,15 @@ our $VERSION = '0.01';
 This module tries to be a modern curses toolkit, based on the Curses module, to
 build "graphical" console user interfaces easily.
 
+However, please consider using L<POE::Component::Curses>, which is probably
+what you want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a
+mainloop and handles keyboard, mouse, timer and other events, whereas
+Curses::Toolkit is just the drawing library.
+
+However if you already have a mainloop or if you don't need it, you might want
+to use Curses::Toolkit directly. But again, it's probably not what you want to
+use.
+
   use Curses::Toolkit;
 
   my $root = Curses::Toolkit->init_root_window();
@@ -40,7 +49,9 @@ Initialize the Curses environment, and return an object representing it. This
 is not really a constructor, because you can't have more than one
 Curses::Toolkit object for one Curses environment.
 
-  input : clear_background : optional, boolean, default 1 : if true, clears background
+  input  : clear_background  : optional, boolean, default 1 : if true, clears background
+           theme_name        : optional, the name of them to use as default diosplay theme
+           mainloop          : optional, the mainloop object that will be used for event handling
   output : a Curses::Toolkit object
 
 =cut
@@ -54,6 +65,8 @@ sub init_root_window {
 								theme_name => { type => SCALAR,
 												optional => 1,
 											   },
+								mainloop => { optional => 1
+												},
 							  }
                          );
 
@@ -121,8 +134,29 @@ sub init_root_window {
                        curses_handler => $curses_handler,
                        windows => [],
 					   theme_name => $params{theme_name},
+					   mainloop => $params{mainloop},
                      }, $class;
     return $self;
+}
+
+=head2 set_mainloop
+
+  my $root->set_mainloop($mainloop)
+
+Sets the mainloop object to be used by the Curses::Toolkit root object. The
+mainloop object will be called when a new event has to be registered. The
+mainloop object is in charge to listen to the events and call $root->dispatch_event()
+
+  input  : a mainloop object
+  output : the Curses::Toolkit object
+
+=cut
+
+sub set_mainloop {
+	my $self = shift;
+	my ($mainloop) = validate_pos( @_, { optional => 0 } );
+	$self->{mainloop} = $mainloop;
+	return $self;
 }
 
 DESTROY {
@@ -194,7 +228,7 @@ sub show_all {
 
   $root->render();
 
-Build everything in the buffer. Call draw after that to display it
+Build everything in the buffer. You need to call 'display' after that to display it
 
   input : none
   output : the root window
