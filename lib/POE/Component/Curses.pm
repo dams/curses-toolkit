@@ -7,8 +7,6 @@ use warnings;
 
 our $VERSION = '0.01';
 
-use Curses;
-use Curses::Toolkit;
 
 use POE qw(Session);
 use POE qw(Wheel::Curses);
@@ -22,13 +20,7 @@ sub spawn {
 						  );
 
 	# setup mainloop and root toolkit object
-	my $mainloop = POE::Component::Curses::MainLoop->new();
-	my $toolkit_root = Curses::Toolkit->init_root_window(clear => 0,
-														 mainloop => $mainloop);
-	$mainloop
-	  ->set_session_name($params{alias})
-		->set_toolkit_root($toolkit_root);
-
+	my $mainloop = POE::Component::Curses::MainLoop->new(session_name => $params{alias});
 	POE::Session->create(
 		inline_states => {
 			_start => sub {
@@ -37,7 +29,6 @@ sub spawn {
 				$kernel->alias_set($params{alias});
 
 				$heap->{mainloop} = $mainloop;
-				$heap->{toolkit_root} = $toolkit_root;
 
 				# now listen to the keys
 				$_[HEAP]{console} = POE::Wheel::Curses->new(
@@ -46,6 +37,7 @@ sub spawn {
 			},
 			key_handler => sub {
 				my ($kernel, $heap, $keystroke) = @_[ KERNEL, HEAP, ARG0];
+				use Curses; # for keyname and unctrl
 				if ($keystroke ne -1) {
 					if ($keystroke lt ' ') {
 						print STDERR " %%% 1 [$keystroke]\n";
@@ -57,9 +49,14 @@ sub spawn {
 					print STDERR "handler got $keystroke\n";
 				}
 			},
+			draw => sub {
+				my ($kernel, $heap) = @_[KERNEL, HEAP];
+				$heap->{mainloop}->get_toolkit_root()
+				  ->draw();
+			},
         }
 	);
-	return $toolkit_root;
+	return $mainloop->get_toolkit_root();
 }
 
 1;

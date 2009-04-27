@@ -159,6 +159,24 @@ sub set_mainloop {
 	return $self;
 }
 
+=head2 get_mainloop
+
+  my $mainloop = $root->get_mainloop()
+
+Return the mainloop object associated to the root object. Might be undef if no
+mainloop were associated.
+
+  input : none
+  output : the mainloop object, or undef
+
+=cut
+
+sub get_mainloop {
+	my ($self) = @_;
+	return $self->{mainloop};
+}
+
+
 DESTROY {
     my ($obj) = @_;
     # ending Curses
@@ -183,6 +201,7 @@ sub add_window {
     my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
 	$window->_set_curses_handler($self->{curses_handler});
 	$window->set_theme_name($self->{theme_name});
+	$window->set_root_window($self);
     push @{$self->{windows}}, $window;
     return $self;
 }
@@ -239,7 +258,7 @@ sub render {
     my ($self) = @_;
 	my ($screen_h, $screen_w);
 	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-	$self->{curses_handler}->erase();
+#	$self->{curses_handler}->erase();
 	foreach my $window (sort { $b->get_property('window', 'stack') <=> $a->get_property('window', 'stack') } $self->get_windows()) {
 		$window->render();
 	}

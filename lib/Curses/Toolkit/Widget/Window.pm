@@ -56,4 +56,33 @@ sub set_coordinates {
 	return $self;
 }
 
+=head2 set_root_window
+
+Sets the root window ( the root toolkit object) to which this window is added 
+
+  input  : the root toolkit object (Curses::Toolkit)
+  output : the window
+
+=cut
+
+sub set_root_window {
+	my ($self, $root_window) = @_;
+	$self->{root_window} = $root_window;
+	return $self;
+}
+
+=head2 get_root_window
+
+Get the root window
+
+  input  : none
+  output : the root toolkit object (Curses::Toolkit)
+
+=cut
+
+sub get_root_window {
+	my ($self) = @_;
+	return $self->{root_window};
+}
+
 1;

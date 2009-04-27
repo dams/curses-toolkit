@@ -316,12 +316,21 @@ sub rebuild_all_coordinates {
 	my $widget = $self;
 	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
 		$widget = $widget->get_parent();
-		# if when going through all parent we don't find a window, just
-		# return : we can't rebuild the coordinates
+		# if when going through all parent we don't find a window, just return
+		# : we can't rebuild the coordinates. We were probably during the
+		# construction of a complicated window, and widgets were created before
+		# being added to the window
 		defined $widget or return $self;
 	}
 	my $window = $widget;
 	$window->_rebuild_children_coordinates();
+	my $root_window = $window->get_root_window();
+	if (defined $root_window) {
+		my $mainloop = $root_window->get_mainloop();
+		if (defined $mainloop) {
+			$mainloop->needs_redraw();
+		}
+	}
 	return $self;	
 }
 

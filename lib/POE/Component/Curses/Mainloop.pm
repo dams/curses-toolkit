@@ -6,6 +6,8 @@ use warnings;
 use POE qw(Session);
 use Params::Validate qw(:all);
 
+use Curses::Toolkit;
+
 =head1 NAME
 
 POE::Component::Curses::MainLoop
@@ -27,27 +29,50 @@ Please look at L<POE::Component::Curses>. Thanks !
 sub new {
 	my $class = shift;
 
-	my %params = validate( @_, { toolkit_root => { optional => 1, isa => 'Curses::Toolkit' },
-								 session_name => { optional => 1, type => SCALAR },
+	my %params = validate( @_, { session_name => { optional => 1, type => SCALAR },
 							   }
 						 );
-	# maybe ugly ?
-	my $self = bless \%params, $class;
-
-	return $self;
-}
-
-sub set_toolkit_root {
-	my $self = shift;
-    my ($toolkit_root) = validate_pos( @_, { isa => 'Curses::Toolkit' } );
-	$self->{toolkit_root} = $toolkit_root;
+	my $toolkit_root = Curses::Toolkit->init_root_window();
+	my $self = bless( { toolkit_root => $toolkit_root,
+						session_name => $params{session_name},
+					  }, $class);
+	$toolkit_root->set_mainloop($self);
 	return $self;
 }
 
 sub set_session_name {
-	my ($self) = shift;
+	my $self = shift;
 	my ($session_name) = validate_pos( @_, { type => SCALAR } );
 	return $self;
+}
+
+sub get_toolkit_root {
+	my ($self) = @_;
+	return $self->{toolkit_root};
+}
+
+
+#### Now implement the Mainloop API ####
+
+## methods called by the Curses::Toolkit objects ##
+
+sub needs_redraw {
+	my ($self) = @_;
+	# if redraw is already stacked, just quit
+	$self->{needs_redraw_bool} and return;
+	$poe_kernel->post($self->{session_name}, 'draw');
+	return $self;
+}
+
+
+## methods called by the POE Component session ##
+
+sub event_redraw {
+	my ($self) = @_;
+	# set his to 0 so redraw requests will be granted
+	$self->{needs_redraw_bool} = 0;
+	$self->{toolkit_root}->render();
+	$self->{toolkit_root}->display();
 }
 
 1;

@@ -39,3 +39,4 @@ sub main {
       ->render()
       ->display();
 }
+
