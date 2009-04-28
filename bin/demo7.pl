@@ -16,7 +16,7 @@ sub main {
 	my $root = POE::Component::Curses->spawn();
 
 	local $| = 1;
-	print STDERR "\n\n\n--------------------\n\n";
+	print STDERR "\n\n\n--- starting demo7 -----------------\n\n";
 
 	$root->add_window(
         my $window = Curses::Toolkit::Widget::Window
@@ -30,13 +30,14 @@ sub main {
 			    my $label1 = Curses::Toolkit::Widget::Label
 				  ->new()
 				  ->set_name('label1')
-                  ->set_text('Seom text')
+                  ->set_text('Some text')
               ),
 		  )
           ->set_coordinates(x1 => 0,   y1 => 0,
                             x2 => 40,  y2 => 30)
-      )
-      ->render()
-      ->display();
+      );
+#      ->render()
+#      ->display();
+	POE::Kernel->run();
 }
 

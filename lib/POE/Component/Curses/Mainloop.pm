@@ -60,7 +60,8 @@ sub needs_redraw {
 	my ($self) = @_;
 	# if redraw is already stacked, just quit
 	$self->{needs_redraw_bool} and return;
-	$poe_kernel->post($self->{session_name}, 'draw');
+	$self->{needs_redraw_bool} = 1;
+	$poe_kernel->post($self->{session_name}, 'redraw');
 	return $self;
 }
 
@@ -69,7 +70,8 @@ sub needs_redraw {
 
 sub event_redraw {
 	my ($self) = @_;
-	# set his to 0 so redraw requests will be granted
+	# set his to 0 so redraw requests that may appear in the mean time will be
+	# granted
 	$self->{needs_redraw_bool} = 0;
 	$self->{toolkit_root}->render();
 	$self->{toolkit_root}->display();

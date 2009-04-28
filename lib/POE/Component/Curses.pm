@@ -47,12 +47,15 @@ sub spawn {
 						$keystroke = '<' . uc(keyname($keystroke)) . '>';
 					}
 					print STDERR "handler got $keystroke\n";
+
+					if ($keystroke eq 'q') {
+						exit();
+					}
 				}
 			},
-			draw => sub {
+			redraw => sub {
 				my ($kernel, $heap) = @_[KERNEL, HEAP];
-				$heap->{mainloop}->get_toolkit_root()
-				  ->draw();
+				$heap->{mainloop}->event_redraw();
 			},
         }
 	);

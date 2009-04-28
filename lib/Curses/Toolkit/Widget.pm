@@ -314,6 +314,7 @@ Recompute all the relative coordinates accross the whole window
 sub rebuild_all_coordinates {
 	my ($self) = @_;
 	my $widget = $self;
+	print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 1\n";
 	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
 		$widget = $widget->get_parent();
 		# if when going through all parent we don't find a window, just return
@@ -322,12 +323,17 @@ sub rebuild_all_coordinates {
 		# being added to the window
 		defined $widget or return $self;
 	}
+	print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 2\n";
 	my $window = $widget;
 	$window->_rebuild_children_coordinates();
 	my $root_window = $window->get_root_window();
+	print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 3\n";
 	if (defined $root_window) {
+		print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 4\n";
 		my $mainloop = $root_window->get_mainloop();
 		if (defined $mainloop) {
+			print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 5\n";
+			print STDERR "-_-_--_-_--_-_--_-_--_-_- mainloop need redraw\n";
 			$mainloop->needs_redraw();
 		}
 	}

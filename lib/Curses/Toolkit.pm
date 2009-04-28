@@ -203,7 +203,11 @@ sub add_window {
 	$window->set_theme_name($self->{theme_name});
 	$window->set_root_window($self);
     push @{$self->{windows}}, $window;
-    return $self;
+	my $mainloop = $self->get_mainloop();
+	if (defined $mainloop) {
+		$mainloop->needs_redraw();
+	}
+	return $self;
 }
 
 =head2 get_windows
