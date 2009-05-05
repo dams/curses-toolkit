@@ -25,34 +25,61 @@ sub spawn {
 		inline_states => {
 			_start => sub {
 				my ($kernel, $session, $heap) = @_[KERNEL, SESSION, HEAP];
+
+				# save the mainloop
+				$heap->{mainloop} = $mainloop;
+
 				# give a name to the session
 				$kernel->alias_set($params{alias});
 
-				$heap->{mainloop} = $mainloop;
+				# listen for window resize signals
+				$kernel->sig(WINCH => 'window_resize');
 
 				# now listen to the keys
 				$_[HEAP]{console} = POE::Wheel::Curses->new(
 				  InputEvent => 'key_handler',
 				);
+
 			},
 			key_handler => sub {
 				my ($kernel, $heap, $keystroke) = @_[ KERNEL, HEAP, ARG0];
 				use Curses; # for keyname and unctrl
 				if ($keystroke ne -1) {
 					if ($keystroke lt ' ') {
-						print STDERR " %%% 1 [$keystroke]\n";
 						$keystroke = '<' . uc(unctrl($keystroke)) . '>';
 					} elsif ($keystroke =~ /^\d{2,}$/) {
-						print STDERR " %%% 2 [$keystroke]\n";
 						$keystroke = '<' . uc(keyname($keystroke)) . '>';
 					}
-					print STDERR "handler got $keystroke\n";
+					if ($keystroke eq '<KEY_RESIZE>') {
+						# don't handle this here, it's handled in window_resize
+						return;
+					}
 
+					if ($keystroke eq 'j') {
+						$kernel->post($params{alias}, 'window_resize');
+					}
 					if ($keystroke eq 'q') {
 						exit();
 					}
 				}
 			},
+			window_resize => sub { 
+				my ($kernel, $heap) = @_[ KERNEL, HEAP];
+
+# 				$class->restart_curses();
+# 				my %sessions = $class->get_sessions();
+# 				my @sessions_names = keys(%sessions);
+# 				# send the window_resize to all sessions (including root)
+# 				foreach my $name (@sessions_names) {
+# 					# window resize signal provided by default (see Session.pm)
+# 					$kernel->call($name, '__window_resize');
+# 				}
+
+				$heap->{mainloop}->event_resize();
+
+			},
+
+			# Now the Mainloop signals
 			redraw => sub {
 				my ($kernel, $heap) = @_[KERNEL, HEAP];
 				$heap->{mainloop}->event_redraw();

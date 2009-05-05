@@ -180,29 +180,19 @@ sub draw {
 		$t =~ s/^\s+//g;
 		$t =~ s/\s+$//g;
 		if ($justify eq 'left') {
-			$theme->draw_string($c->{x1}, $c->{y1} + $y, $t);
+			$theme->draw_string($c->x1(), $c->y1() + $y, $t);
 		}
 		if ($justify eq 'center') {
-			$theme->draw_string($c->{x1} + ($c->width() - length $t ) / 2,
-								$c->{y1} + $y,
+			$theme->draw_string($c->x1() + ($c->width() - length $t ) / 2,
+								$c->y1() + $y,
 								$t);
 		}
 		if ($justify eq 'right') {
-			$theme->draw_string($c->{x1} + $c->width() - length $t,
-								$c->{y1} + $y,
+			$theme->draw_string($c->x1() + $c->width() - length $t,
+								$c->y1() + $y,
 								$t);
 		}
 	}
-# 	} elsif ($justify eq 'right') {
-
-# 	} elsif ($justify eq 'center') {
-
-# 	} elsif ($justify eq 'fille') {
-
-# 	}
-
-#	$theme->draw_string($c->{x1}, $c->{y1}, $text);
-
 }
 
 

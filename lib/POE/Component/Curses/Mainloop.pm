@@ -54,7 +54,8 @@ sub get_toolkit_root {
 
 #### Now implement the Mainloop API ####
 
-## methods called by the Curses::Toolkit objects ##
+## Methods called by the Curses::Toolkit objects ##
+## They usually returns $self, or a return value
 
 sub needs_redraw {
 	my ($self) = @_;
@@ -66,15 +67,29 @@ sub needs_redraw {
 }
 
 
-## methods called by the POE Component session ##
+## Methods called by the POE Component session ##
+## They usually return nothing
 
+# POE::Component::Curses ordered a redraw
 sub event_redraw {
 	my ($self) = @_;
 	# set his to 0 so redraw requests that may appear in the mean time will be
 	# granted
 	$self->{needs_redraw_bool} = 0;
+
 	$self->{toolkit_root}->render();
 	$self->{toolkit_root}->display();
+	return;
+}
+
+# POE::Component::Curses iformed on a window resize event
+sub event_resize {
+	my ($self) = @_;
+
+	use Curses::Toolkit::Event::Shape;
+	my $event = Curses::Toolkit::Event::Shape->new( type => 'change' );
+	$self->{toolkit_root}->dispatch_event($event);
+	return;
 }
 
 1;

@@ -3,8 +3,6 @@ package Curses::Toolkit::Theme;
 use warnings;
 use strict;
 
-use parent qw(Curses::Toolkit);
-
 use Params::Validate qw(:all);
 
 =head1 NAME

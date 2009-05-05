@@ -3,8 +3,6 @@ package Curses::Toolkit::Object;
 use warnings;
 use strict;
 
-use parent qw(Curses::Toolkit);
-
 =head1 NAME
 
 Curses::Toolkit::Object - base class for objects

@@ -34,7 +34,9 @@ sub main {
               ),
 		  )
           ->set_coordinates(x1 => 0,   y1 => 0,
-                            x2 => 40,  y2 => 30)
+                            x2 => sub { print STDERR " ____ returning : " . $root->get_shape()->x2() * 50 / 100 . "\n"; $root->get_shape()->x2() * 50 / 100 },
+							y2 => sub { $root->get_shape()->y2() * 50 / 100 },
+						   )
       );
 #      ->render()
 #      ->display();

@@ -41,6 +41,11 @@ Trivial class to hold 2 points
            width : width
            height : heigth
     OR
+  input  : x1 : sub { ... } # returns top left x
+           y1 : sub { ... } # returns top left y
+           x2 : sub { ... } # returns right bottom x
+           y2 : sub { ... } # returns right bottom y
+    OR
   input  : a Curses::Toolkit::Object::Coordinates object
 
   output : a Curses::Toolkit::Object::Coordinates object
@@ -52,8 +57,8 @@ sub new {
 
 	if (ref($_[0]) eq __PACKAGE__) {
 		my $c = $_[0];
-		my $self = { x1 => $c->x1(), y1 => $c->y1(),
-					 x2 => $c->x2(), y2 => $c->y2(),
+		my $self = { x1 => $c->{x1}, y1 => $c->{y1},
+					 x2 => $c->{x2}, y2 => $c->{y2},
 				   };
 		return bless $self, $class;
 	}
@@ -66,8 +71,8 @@ sub new {
 		$params{x2} = $params{x1} + $params{width};
 		$params{y2} = $params{y1} + $params{height};
 	} else {
-		validate(@_, { x1 => { type => SCALAR }, y1 => { type => SCALAR },
-					   x2 => { type => SCALAR }, y2 => { type => SCALAR },
+		validate(@_, { x1 => { type => SCALAR | CODEREF }, y1 => { type => SCALAR | CODEREF },
+					   x2 => { type => SCALAR | CODEREF }, y2 => { type => SCALAR | CODEREF },
 					 }
 				);
 	}
@@ -118,8 +123,8 @@ set attributes of the coordinate
 
 sub set {
 	my $self = shift;
-	my %params = validate(@_, { x1 => { type => SCALAR, optional => 1 }, y1 => { type => SCALAR, optional => 1 },
-								x2 => { type => SCALAR, optional => 1 }, y2 => { type => SCALAR, optional => 1 },
+	my %params = validate(@_, { x1 => { type => SCALAR | CODEREF, optional => 1 }, y1 => { type => SCALAR | CODEREF, optional => 1 },
+								x2 => { type => SCALAR | CODEREF, optional => 1 }, y2 => { type => SCALAR | CODEREF, optional => 1 },
 							  });
 	keys %params or die "One of (x1, y1, x2, y2) argument must be passed";
 	@{$self}{keys %params} = values %params;
@@ -139,8 +144,8 @@ sub _normalize {
 # 		print STDERR "$i  --  $filename | $line | $subroutine\n";
 # 	}
 
-	$self->{x1} < $self->{x2} or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
-	$self->{y1} < $self->{y2} or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
+	$self->x1() < $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
+	$self->y1() < $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
 	return;
 }
 
@@ -152,7 +157,7 @@ returns the width represented by the coordinates
 
 sub width {
 	my ($self) = @_;
-	return $self->{x2} - $self->{x1};
+	return $self->x2() - $self->x1();
 }
 
 =head2 height
@@ -163,7 +168,7 @@ returns the height represented by the coordinates
 
 sub height {
 	my ($self) = @_;
-	return $self->{y2} - $self->{y1};
+	return $self->y2() - $self->y1();
 }
 
 =head2 x1, x2, y1, y2
@@ -172,10 +177,10 @@ These are helpers to retrieve the coordinates values
 
 =cut
 
-sub x1 { shift->{x1} }
-sub y1 { shift->{y1} }
-sub x2 { shift->{x2} }
-sub y2 { shift->{y2} }
+sub x1 { my $x1 = shift->{x1}; ref $x1 eq 'CODE' ? $x1->() : $x1 }
+sub y1 { my $y1 = shift->{y1}; ref $y1 eq 'CODE' ? $y1->() : $y1 }
+sub x2 { my $x2 = shift->{x2}; ref $x2 eq 'CODE' ? $x2->() : $x2 }
+sub y2 { my $y2 = shift->{y2}; ref $y2 eq 'CODE' ? $y2->() : $y2 }
 
 =head2 add
 
@@ -212,7 +217,7 @@ sub add {
 	} elsif (ref $c eq 'HASH') {
 		# argument is a hash
 		while ( my ($k, $v) = each %$c) {
-			$self->{$k} += $v;
+			$self->{$k} = $self->$k() + $v;
 		}
 	} else {
 		die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
@@ -285,7 +290,7 @@ sub substract {
 	} elsif (ref $c eq 'HASH') {
 		# argument is a hash
 		while ( my ($k, $v) = each %$c) {
-			$self->{$k} -= $v;
+			$self->{$k} = $self->$k() - $v;
 		}
 	} else {
 		die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
@@ -334,17 +339,17 @@ Force the coordinate to be inside the passed coordinate.
 sub restrict_to {
 	my $self = shift;
 	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
-	$self->{x1} < $c->{x1} and $self->{x1} = $c->{x1};
-	$self->{x1} > $c->{x2} and $self->{x1} = $c->{x2};
+	$self->x1() < $c->x1() and $self->{x1} = $c->{x1};
+	$self->x1() > $c->x2() and $self->{x1} = $c->{x2};
 
-	$self->{x2} > $c->{x2} and $self->{x2} = $c->{x2};
-	$self->{x2} < $c->{x1} and $self->{x2} = $c->{x1};
+	$self->x2() > $c->x2() and $self->{x2} = $c->{x2};
+	$self->x2() < $c->x1() and $self->{x2} = $c->{x1};
 
-	$self->{y1} < $c->{y1} and $self->{y1} = $c->{y1};
-	$self->{y1} > $c->{y2} and $self->{y1} = $c->{y2};
+	$self->y1() < $c->y1() and $self->{y1} = $c->{y1};
+	$self->y1() > $c->y2() and $self->{y1} = $c->{y2};
 
-	$self->{y2} > $c->{y2} and $self->{y2} = $c->{y2};
-	$self->{y2} < $c->{y1} and $self->{y2} = $c->{y1};
+	$self->y2() > $c->y2() and $self->{y2} = $c->{y2};
+	$self->y2() < $c->y1() and $self->{y2} = $c->{y1};
 
 	return $self;
 }

@@ -136,8 +136,20 @@ sub init_root_window {
 					   theme_name => $params{theme_name},
 					   mainloop => $params{mainloop},
                      }, $class;
+	$self->_recompute_shape();
     return $self;
 }
+
+# destroyer
+DESTROY {
+    my ($obj) = @_;
+    # ending Curses
+    ref($obj) eq 'Curses::Toolkit' and
+	  Curses::endwin;
+}
+
+
+=head1 METHODS
 
 =head2 set_mainloop
 
@@ -176,12 +188,21 @@ sub get_mainloop {
 	return $self->{mainloop};
 }
 
+=head2 get_shape
 
-DESTROY {
-    my ($obj) = @_;
-    # ending Curses
-    ref($obj) eq 'Curses::Toolkit' and
-	  Curses::endwin;
+  my $coordinate = $root->get_shape();
+
+Returns a coordinate object that represents the size of the root window.
+
+  input  : none
+  output : a Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub get_shape {
+	my ($self) = @_;
+print STDERR " ------> returning " . Dumper($self->{shape}) . "\n"; use Data::Dumper;
+	return $self->{shape};
 }
 
 =head2 add_window
@@ -260,9 +281,7 @@ Build everything in the buffer. You need to call 'display' after that to display
 
 sub render {
     my ($self) = @_;
-	my ($screen_h, $screen_w);
-	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-#	$self->{curses_handler}->erase();
+	$self->{curses_handler}->erase();
 	foreach my $window (sort { $b->get_property('window', 'stack') <=> $a->get_property('window', 'stack') } $self->get_windows()) {
 		$window->render();
 	}
@@ -282,43 +301,106 @@ Refresh the screen.
 
 sub display {
 	my ($self) = @_;
+	print STDERR " RREFRESH\n";
 	$self->{curses_handler}->refresh();
 	return $self;
 }
 
-#    my ($screen_w, $screen_h);
-#    $self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-#    return $self->render_rectangle(0, 0, $screen_h, $screen_w);
+=head2 dispatch_event
 
-# =head2 render
+  my $event = Curses::Toolkit::Event::SomeEvent->new(...)
+  $root->dispatch_event($event);
 
-#   $root->render(10, 10, 50, 20);
+Given an event, dispatch it to the appropriate widgets / windows, or to the root window.
 
-# Draw only a rectangle
+  input  : a Curses::Toolkit::Event
+  output : none
 
-#   input : position1 x
-#           position1 y
-#           position2 x
-#           position2 y
-#   output : the root window
+=cut
 
-# =cut
+sub dispatch_event {
+	my $self = shift;
+	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
+	# if the event can be sent to widget(s) of the current window
+	if ($event->spread_to_widgets()) {
 
-# sub render_rectangle {
-#     my $self = shift;
-#     my ($pos1x, $pos1y, $pos2x, $pos2y) =
-#       validate_pos( @_, { type => SCALAR,}, { type => SCALAR },
-#                         { type => SCALAR }, { type => SCALAR },
-#                   );
-#     $pos1x <= $pos2x or ($pos1x, $pos2x) = ($pos2x, $pos1x);
-#     $pos1y <= $pos2y or ($pos1y, $pos2y) = ($pos2y, $pos1y);
-#     foreach my $window ($self->get_windows()) {
-#         if ($window->is_in_rectangle($pos1x, $pos1y, $pos2x, $pos2y)) {
-#             $window->draw_rectangle($pos1x, $pos1y, $pos2x, $pos2y);
-#         }
-#     }
-# }
+	}
+	# if the event can be sent to widget(s) of the current window
+	if ($event->spread_to_windows()) {
+		
+	}
+	if ($event->spread_to_root_window()) {
+		$self->_handle_event($event)
+	}
+}
 
+## Private methods ##
+
+# event_handling
+
+my @supported_events = (qw(Curses::Toolkit::Event::Shape));
+sub _handle_event {
+	my ($self, $event) = @_;
+	use List::MoreUtils qw(any);
+	if ( any { $event->isa($_) } @supported_events ) {
+		my $method_name = '_event_' . lc( (split('::|_', ref($event)))[-1] ) . '_' .  $event->get_type();
+		if ($self->can($method_name)) {
+			return $self->$method_name();
+		}
+	}
+	# event failed being applied
+	return 0;
+}
+
+# core event handling for Curses::Toolkit::Event::Shape event of type 'change'
+sub _event_shape_change {
+	my ($self) = @_;
+	
+	print STDERR __PACKAGE__ . " in _event_shape_change\n";
+
+	my ($screen_h, $screen_w);
+	$self->_recompute_shape();
+
+
+# temporarily rebuild all coordinates
+ 	foreach my $window ( $self->get_windows() ) {
+		$window->rebuild_all_coordinates();
+ 	}
+
+# temporarily rebuild everything
+	my $mainloop = $self->get_mainloop();
+	if (defined $mainloop) {
+		print STDERR __PACKAGE__ . " REDRAWING\n";
+		$mainloop->needs_redraw();
+	}
+
+# 	return $self;
+
+
+	# event failed being applied
+	return 0;
+
+}
+
+sub _recompute_shape {
+	my ($self) = @_;
+	use Curses::Toolkit::Object::Coordinates;
+	my ($screen_h, $screen_w);
+    use Curses;
+	endwin;
+	refresh;
+#	$self->{curses_handler} = Curses->new();
+#	$self->{curses_handler}->refresh();
+	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
+print STDERR " ------> $screen_w | $screen_h \n";
+	$self->{shape} = Curses::Toolkit::Object::Coordinates->new(
+		x1 => 0,
+		y1 => 0,
+		x2 => $screen_w,
+		y2 => $screen_h,
+	);
+	return $self;
+}
 
 =head1 AUTHOR
 
