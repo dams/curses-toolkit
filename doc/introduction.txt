@@ -1,0 +1,49 @@
+
+Introduction -
+
+
+1 Event Loop, Renderer
+
+By itself the Curses::Toolkit Perl module is only what I would call the
+Renderer. 
+
+The Renderer it in charge of building the widgets, and rendering them. It is
+also in charge of processing and emitting events. However it is not
+responsible for listening to them.
+
+The event Loop is in charge of listening to system events, and pass them to the
+Renderer. It's also in charge of getting output events from the Renderer, and
+handle them when possible.
+
+Why do so ?
+Existing Curses modules mix the event loop with the renderer. That means it's
+reinvented, and in real life it lacks features. Seperating them means that one
+can use any Event Loop, provided you build the matching thin wrapper so that
+the event communcation is compatible
+
+1.1 The Renderer
+
+concepts : 
+
+1.2 Events
+
+1.2.1 System events
+The main system events are : keys pressed, root window resized, mouse interaction,
+timers.
+
+1.2.2 Toolkit events
+Widgets interactions : clicks, window resizing, panes resizing, dragdrop, etc
+Special event : redraw event.
+
+1.3 The Event Loop
+The goal is to provide Curses::Toolkit with at least one working Event Loop, so
+that it's functional straight away, and later on, develop the connection to
+other Event Loop.
+
+For the start, Curses::Toolkit will use POE as Event Loop. It's probably the
+best thing around these days, and is very easy to use.
+
+POE 
+
+(Event Loop) || (Renderer)
+
