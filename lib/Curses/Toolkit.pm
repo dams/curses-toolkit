@@ -75,10 +75,10 @@ sub init_root_window {
     my $curses_handler = Curses->new();
 	if (has_colors) {
 		start_color();
-		print STDERR "color is supported\n";
-		print STDERR "colors number : " . COLORS . "\n";
-		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+# 		print STDERR "color is supported\n";
+# 		print STDERR "colors number : " . COLORS . "\n";
+# 		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
+# 		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
 
 #  	my $pair_nb = 1;
 #  	foreach my $bg_nb (0..COLORS()-1) {
@@ -201,7 +201,6 @@ Returns a coordinate object that represents the size of the root window.
 
 sub get_shape {
 	my ($self) = @_;
-print STDERR " ------> returning " . Dumper($self->{shape}) . "\n"; use Data::Dumper;
 	return $self->{shape};
 }
 
@@ -301,7 +300,6 @@ Refresh the screen.
 
 sub display {
 	my ($self) = @_;
-	print STDERR " RREFRESH\n";
 	$self->{curses_handler}->refresh();
 	return $self;
 }
@@ -355,27 +353,26 @@ sub _handle_event {
 # core event handling for Curses::Toolkit::Event::Shape event of type 'change'
 sub _event_shape_change {
 	my ($self) = @_;
-	
-	print STDERR __PACKAGE__ . " in _event_shape_change\n";
 
 	my ($screen_h, $screen_w);
 	$self->_recompute_shape();
 
-
-# temporarily rebuild all coordinates
+# for now we rebuild all coordinates
  	foreach my $window ( $self->get_windows() ) {
 		$window->rebuild_all_coordinates();
  	}
 
-# temporarily rebuild everything
+# for now rebuild everything
 	my $mainloop = $self->get_mainloop();
 	if (defined $mainloop) {
-		print STDERR __PACKAGE__ . " REDRAWING\n";
 		$mainloop->needs_redraw();
 	}
 
 # 	return $self;
 
+	$self->_recompute_shape();
+
+	$mainloop->needs_redraw();
 
 	# event failed being applied
 	return 0;
@@ -388,14 +385,11 @@ sub _recompute_shape {
 	my ($screen_h, $screen_w);
     use Curses;
 	endwin;
-	refresh;
-#	$self->{curses_handler} = Curses->new();
-#	$self->{curses_handler}->refresh();
 	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-print STDERR " ------> $screen_w | $screen_h \n";
-	$self->{shape} = Curses::Toolkit::Object::Coordinates->new(
-		x1 => 0,
-		y1 => 0,
+
+	use Curses::Toolkit::Object::Shape;
+	$self->{shape} ||= Curses::Toolkit::Object::Shape->new_zero();
+	$self->{shape}->_set(
 		x2 => $screen_w,
 		y2 => $screen_h,
 	);

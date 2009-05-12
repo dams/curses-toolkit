@@ -177,10 +177,10 @@ These are helpers to retrieve the coordinates values
 
 =cut
 
-sub x1 { my $x1 = shift->{x1}; ref $x1 eq 'CODE' ? $x1->() : $x1 }
-sub y1 { my $y1 = shift->{y1}; ref $y1 eq 'CODE' ? $y1->() : $y1 }
-sub x2 { my $x2 = shift->{x2}; ref $x2 eq 'CODE' ? $x2->() : $x2 }
-sub y2 { my $y2 = shift->{y2}; ref $y2 eq 'CODE' ? $y2->() : $y2 }
+sub x1 { my ($self) = @_; my $x1 = $self->{x1}; ref $x1 eq 'CODE' ? $x1->($self) : $x1 }
+sub y1 { my ($self) = @_; my $y1 = $self->{y1}; ref $y1 eq 'CODE' ? $y1->($self) : $y1 }
+sub x2 { my ($self) = @_; my $x2 = $self->{x2}; ref $x2 eq 'CODE' ? $x2->($self) : $x2 }
+sub y2 { my ($self) = @_; my $y2 = $self->{y2}; ref $y2 eq 'CODE' ? $y2->($self) : $y2 }
 
 =head2 add
 
