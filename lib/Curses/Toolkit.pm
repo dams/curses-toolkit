@@ -222,6 +222,9 @@ sub add_window {
 	$window->_set_curses_handler($self->{curses_handler});
 	$window->set_theme_name($self->{theme_name});
 	$window->set_root_window($self);
+	# in case the window has proportional coordinates depending on the root window
+	# TODO : do that only if window has proportional coordinates, not always
+	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
 	my $mainloop = $self->get_mainloop();
 	if (defined $mainloop) {
@@ -363,19 +366,13 @@ sub _event_shape_change {
  	}
 
 # for now rebuild everything
-	my $mainloop = $self->get_mainloop();
-	if (defined $mainloop) {
-		$mainloop->needs_redraw();
-	}
+#	my $mainloop = $self->get_mainloop();
+#	if (defined $mainloop) {
+#		$mainloop->needs_redraw();
+#	}
 
-# 	return $self;
-
-	$self->_recompute_shape();
-
-	$mainloop->needs_redraw();
-
-	# event failed being applied
-	return 0;
+	# event suceeded
+	return 1;
 
 }
 
@@ -386,7 +383,7 @@ sub _recompute_shape {
     use Curses;
 	endwin;
 	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-
+print STDERR " # : $screen_h x $screen_w\n";
 	use Curses::Toolkit::Object::Shape;
 	$self->{shape} ||= Curses::Toolkit::Object::Shape->new_zero();
 	$self->{shape}->_set(

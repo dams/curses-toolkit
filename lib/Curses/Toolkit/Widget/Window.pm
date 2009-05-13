@@ -65,16 +65,22 @@ sub set_coordinates {
 		foreach my $x (qw(x1 x2)) {
 			if ($params{$x} =~ /^(.+)%$/ ) {
 				my $percent = $1;
-				$params{$x} = sub { $self->get_root_window() and $self->get_root_window()->get_shape()->width() * $percent / 100 };
+				$params{$x} = sub { return $self->get_root_window()
+									  ? $self->get_root_window()->get_shape()->width() * $percent / 100
+									  : 0;
+								   };
 			}
 		}
 		foreach my $y (qw(y1 y2)) {
 			if ($params{$y} =~ /^(.+)%$/ ) {
 				my $percent = $1;
-				$params{$y} = sub { $self->get_root_window() and $self->get_root_window()->get_shape()->height() * $percent / 100 };
+				$params{$y} = sub { return $self->get_root_window()
+									  ? $self->get_root_window()->get_shape()->height() * $percent / 100
+								      : 0;
+								  };
 			}
 		}
-		if ($params{width} =~ /^(.+)%$/ ) {
+		if (defined $params{width} && $params{width} =~ /^(.+)%$/ ) {
 			my $percent = $1;
 			$params{x2} = sub {
 				my ($coord) = @_;
@@ -82,7 +88,7 @@ sub set_coordinates {
 			};
 			delete $params{width};
 		}
-		if ($params{height} =~ /^(.+)%$/ ) {
+		if (defined $params{height} && $params{height} =~ /^(.+)%$/ ) {
 			my $percent = $1;
 			$params{y2} = sub {
 				my ($coord) = @_;

@@ -8,17 +8,17 @@ main() unless caller;
 
 sub main {
 
-	use POE::Component::Curses;
+	use Curses::Toolkit;
 	use Curses::Toolkit::Widget::Window;
 	use Curses::Toolkit::Widget::Border;
 	use Curses::Toolkit::Widget::Label;
 
-	my $root = POE::Component::Curses->spawn();
-
 	local $| = 1;
-	print STDERR "\n\n\n--- starting demo7 -----------------\n\n";
+	print STDERR "\n\n\n--- starting demo8 -----------------\n\n";
 
-	$root->add_window(
+    my $root = Curses::Toolkit
+      ->init_root_window(clear => 0)
+      ->add_window(
         my $window = Curses::Toolkit::Widget::Window
           ->new()
           ->set_name('main_window')
@@ -30,16 +30,16 @@ sub main {
 			    my $label1 = Curses::Toolkit::Widget::Label
 				  ->new()
 				  ->set_name('label1')
-                  ->set_text('This demonstrates the use of Curses::Toolkit used with its POE Event Loop : POE::Component::Curses. Keyboard events and window resizing are supported')
+                  ->set_text('Some text')
               ),
 		  )
           ->set_coordinates(x1 => 0,   y1 => 0,
-                            x2 => '100%',
-							y2 => '100%',
+                            x2 => '10%',
+							y2 => '50%',
 						   )
-      );
-#      ->render()
-#      ->display();
-	POE::Kernel->run();
+      )
+      ->render()
+      ->display();
+	sleep 4;
 }
 

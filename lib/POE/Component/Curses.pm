@@ -33,13 +33,12 @@ sub spawn {
 				$kernel->alias_set($params{alias});
 
 				# listen for window resize signals
-				$kernel->sig(WINCH => 'window_resize');
+				$kernel->sig(WINCH => 'pre_window_resize');
 
 				# now listen to the keys
 				$_[HEAP]{console} = POE::Wheel::Curses->new(
 				  InputEvent => 'key_handler',
 				);
-
 			},
 			key_handler => sub {
 				my ($kernel, $heap, $keystroke) = @_[ KERNEL, HEAP, ARG0];
@@ -62,6 +61,13 @@ sub spawn {
 						exit();
 					}
 				}
+			},
+			pre_window_resize => sub {
+				# This is a hack : it seems the window resize is one event
+				# late, so we issue an additional one a bit later
+				my ($kernel, $heap) = @_[ KERNEL, HEAP];
+				$kernel->yield('window_resize');
+				$kernel->delay(window_resize => 1/10);
 			},
 			window_resize => sub { 
 				my ($kernel, $heap) = @_[ KERNEL, HEAP];

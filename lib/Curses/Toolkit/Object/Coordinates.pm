@@ -144,8 +144,8 @@ sub _normalize {
 # 		print STDERR "$i  --  $filename | $line | $subroutine\n";
 # 	}
 
-	$self->x1() < $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
-	$self->y1() < $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
+	$self->x1() <= $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
+	$self->y1() <= $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
 	return;
 }
 
