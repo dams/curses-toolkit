@@ -35,7 +35,7 @@ sub new {
 
 =head2 render
 
-Default rendering method for the widget. Any rendre method should call draw
+Default rendering method for the widget. All render() method should call draw()
 
   input  : curses_handler
   output : the widget
@@ -71,8 +71,7 @@ sub _add_child {
 	return $self;
 }
 
-# overload Widget's method : after setting relatives coordinates, needs to
-# propagate to the children.
+# overload Widget's method : not sure why
 sub _set_relatives_coordinates {
 	my $self = shift;
 	$self->SUPER::_set_relatives_coordinates(@_);
@@ -82,7 +81,7 @@ sub _set_relatives_coordinates {
 # Returns the relative rectangle that a child widget can occupy.
 # This is the default method, returns the whole widget space.
 #
-# input : none
+# input  : none
 # output : a Curses::Toolkit::Object::Coordinates object
 
 sub _get_available_space {

@@ -3,8 +3,6 @@ package Curses::Toolkit::Widget;
 use warnings;
 use strict;
 
-use parent qw(Curses::Toolkit);
-
 use Params::Validate qw(:all);
 
 =head1 NAME
@@ -307,7 +305,7 @@ sub get_relatives_coordinates {
 Recompute all the relative coordinates accross the whole window
 
   input  : none
-  output : the root window
+  output : the widget
 
 =cut
 
@@ -316,12 +314,22 @@ sub rebuild_all_coordinates {
 	my $widget = $self;
 	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
 		$widget = $widget->get_parent();
-		# if when going through all parent we don't find a window, just
-		# return : we can't rebuild the coordinates
+		# if when going through all parent we don't find a window, just return
+		# : we can't rebuild the coordinates. We were probably during the
+		# construction of a complicated window, and widgets were created before
+		# being added to the window
 		defined $widget or return $self;
 	}
 	my $window = $widget;
 	$window->_rebuild_children_coordinates();
+	my $root_window = $window->get_root_window();
+	if (defined $root_window) {
+		my $mainloop = $root_window->get_mainloop();
+		if (defined $mainloop) {
+			print STDERR __PACKAGE__ . " : mainloop need redraw\n";
+			$mainloop->needs_redraw();
+		}
+	}
 	return $self;	
 }
 
