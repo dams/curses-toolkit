@@ -32,79 +32,23 @@ sub new {
 	  die "Cannot create a '" .  __PACKAGE__ . "' object : color is not supported";
 	# pair 1 : yellow on blue
 	init_pair(1, COLOR_YELLOW, COLOR_BLUE);
+	init_pair(2, COLOR_WHITE, COLOR_RED);
 	return $class->SUPER::new(@_);
 }
 
-# pair 1 : yellow on blue
+sub HLINE_NORMAL   { shift->_attron(COLOR_PAIR(1)) }
+sub HLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2)) }
+sub HLINE_CLICKED  { shift->_attron(COLOR_PAIR(1)) }
+				   
+sub VLINE_NORMAL   { shift->_attron(COLOR_PAIR(1)) }
+sub VLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2)) }
+sub VLINE_CLICKED  { shift->_attron(COLOR_PAIR(1)) }
 
-#  	my $pair_nb = 1;
-#  	foreach my $bg_nb (0..COLORS()-1) {
-#  		foreach my $fg_nb (0..COLORS()-1) {
-#  #			print STDERR "color pairing : $pair_nb, $fg_nb, $bg_nb \n";
-#  			init_pair($pair_nb, $fg_nb, $bg_nb);
-#  			$pair_nb++;
-#  		}
-#  	}
+sub CORNER_NORMAL  { shift->_attron(COLOR_PAIR(1)) }
+sub CORNER_FOCUSED { shift->_attron(COLOR_PAIR(2)) }
+sub CORNER_CLICKED { shift->_attron(COLOR_PAIR(1)) }
 
-#init_pair(1, 2, 4);#COLOR_YELLOW, COLOR_BLUE);
-
-#sub HLINE { ACS_HLINE; }
-
-sub draw_hline {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_hline(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_vline {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_vline(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_corner_ul {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_corner_ul(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_corner_ll {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_corner_ll(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_corner_ur {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_corner_ur(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_corner_lr {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_corner_lr(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
-
-sub draw_strinf {
-	my $self = shift;
-	$self->_get_curses_handler()->attrset(COLOR_PAIR(1));
-	my @ret = $self->SUPER::draw_text(@_);
-	$self->_get_curses_handler()->attroff(COLOR_PAIR(1));
-	return @ret;
-}
+# STRING as parent
 
 
 1;

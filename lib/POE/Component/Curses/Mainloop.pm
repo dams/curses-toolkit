@@ -23,7 +23,7 @@ Please look at L<POE::Component::Curses>. Thanks !
 
 =cut
 
-# OK so this creates the mainlopp object. IT's the bridge between the POE
+# OK so this creates the mainlopp object. It's the bridge between the POE
 # Component and the Curses Toolkit root object.
 
 sub new {
@@ -82,12 +82,22 @@ sub event_redraw {
 	return;
 }
 
-# POE::Component::Curses iformed on a window resize event
+# POE::Component::Curses informed on a window resize event
 sub event_resize {
 	my ($self) = @_;
 
 	use Curses::Toolkit::Event::Shape;
 	my $event = Curses::Toolkit::Event::Shape->new( type => 'change' );
+	$self->{toolkit_root}->dispatch_event($event);
+	return;
+}
+
+# POE::Component::Curses informed on a window resize event
+sub event_key {
+	my ($self) = @_;
+
+	use Curses::Toolkit::Event::Shape;
+	my $event = Curses::Toolkit::Event::Key->new( type => 'stroke' );
 	$self->{toolkit_root}->dispatch_event($event);
 	return;
 }

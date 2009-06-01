@@ -71,6 +71,7 @@ sub pack_start {
 	unshift @{$self->{children}}, $child_widget;
 	$child_widget->_set_parent($self);
 	$child_widget->set_property(packing => \%options);
+	$self->rebuild_all_coordinates();
 	return $self;
 }
 
@@ -89,6 +90,7 @@ sub pack_end {
 	push @{$self->{children}}, $child_widget;
 	$child_widget->_set_parent($self);
 	$child_widget->set_property(packing => \%options);
+	$self->rebuild_all_coordinates();
 	return $self;
 }
 

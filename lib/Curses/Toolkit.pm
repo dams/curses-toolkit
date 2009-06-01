@@ -226,10 +226,27 @@ sub add_window {
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
+	$self->needs_redraw();
+	return $self;
+}
+
+=head2 needs_redraw
+
+  $root->needs_redraw()
+
+When called, signify to the root window that a redraw is needed. Has an effect
+only if a mainloop is active ( see POE::Component::Curses )
+
+  input : none
+  output : the root window
+
+=cut
+
+sub needs_redraw {
+	my ($self) = @_;
 	my $mainloop = $self->get_mainloop();
-	if (defined $mainloop) {
-		$mainloop->needs_redraw();
-	}
+	defined $mainloop or return $self;
+	$mainloop->needs_redraw();
 	return $self;
 }
 

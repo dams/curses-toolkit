@@ -53,12 +53,18 @@ sub spawn {
 						# don't handle this here, it's handled in window_resize
 						return;
 					}
+					print STDERR " GOT [$keystroke]\n";
 
 					if ($keystroke eq 'j') {
 						$kernel->post($params{alias}, 'window_resize');
-					}
-					if ($keystroke eq 'q') {
+					} elsif ($keystroke eq '<^I>') {
+						$kernel->post($params{alias}, 'window_resize');
+					} elsif ($keystroke eq 'q') {
 						exit();
+					} else {
+						$heap->{mainloop}->event( type => 'key',
+												  keystroke => $keystroke
+												);
 					}
 				}
 			},

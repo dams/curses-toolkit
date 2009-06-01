@@ -32,49 +32,67 @@ sub LRCORNER { ACS_LRCORNER; }
 sub HLINE { ACS_HLINE; }
 sub VLINE { ACS_VLINE; }
 
+sub STRING_NORMAL  { }
+sub STRING_FOCUSED { shift->_attron(A_BOLD) }
+sub STRING_CLICKED { shift->_attron(A_REVERSE) }
+
+sub HLINE_NORMAL   { }
+sub HLINE_FOCUSED  { shift->_attron(A_BOLD) }
+sub HLINE_CLICKED  { shift->_attron(A_REVERSE) }
+				   
+sub VLINE_NORMAL   { }
+sub VLINE_FOCUSED  { shift->_attron(A_BOLD) }
+sub VLINE_CLICKED  { shift->_attron(A_REVERSE) }
+
+sub CORNER_NORMAL  { }
+sub CORNER_FOCUSED { shift->_attron(A_BOLD) }
+sub CORNER_CLICKED { shift->_attron(A_REVERSE) }
+
 sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
-	my $name = $self->{widget}->get_name();
+	my $name = $self->get_widget()->get_name();
 	print STDERR "$name : draw_hline $x1, $y1, $width\n";
-	$self->_get_curses_handler()->hline($y1, $x1, HLINE(), $width);
+
+	$self->curses->hline($y1, $x1, HLINE(), $width);
+
 	return $self;
 }
 
 sub draw_vline {
 	my ($self, $x1, $y1, $width) = @_;
-	my $name = $self->{widget}->get_name();
+	my $name = $self->get_widget()->get_name();
 	print STDERR "$name : draw_vline $x1, $y1, $width\n";
-	$self->_get_curses_handler()->vline($y1, $x1, VLINE(), $width);
+	$self->curses->vline($y1, $x1, VLINE(), $width);
 	return $self;
 }
 
 sub draw_corner_ul {
 	my ($self, $x1, $y1) = @_;
- 	$self->_get_curses_handler()->addch($y1, $x1, ULCORNER());
+ 	$self->curses->addch($y1, $x1, ULCORNER());
 	return $self;
 }
 
 sub draw_corner_ll {
 	my ($self, $x1, $y1) = @_;
- 	$self->_get_curses_handler()->addch($y1, $x1, LLCORNER());
+ 	$self->curses->addch($y1, $x1, LLCORNER());
 	return $self;
 }
 
 sub draw_corner_ur {
 	my ($self, $x1, $y1) = @_;
- 	$self->_get_curses_handler()->addch($y1, $x1, URCORNER());
+ 	$self->curses->addch($y1, $x1, URCORNER());
 	return $self;
 }
 
 sub draw_corner_lr {
 	my ($self, $x1, $y1) = @_;
- 	$self->_get_curses_handler()->addch($y1, $x1, LRCORNER());
+ 	$self->curses->addch($y1, $x1, LRCORNER());
 	return $self;
 }
 
 sub draw_string {
 	my ($self, $x1, $y1, $text) = @_;
-	$self->_get_curses_handler()->addstr($y1, $x1, $text);
+	$self->curses->addstr($y1, $x1, $text);
 	return $self;
 }
 # sub set_root_background {

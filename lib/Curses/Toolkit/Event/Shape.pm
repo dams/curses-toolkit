@@ -90,3 +90,4 @@ sub get_params_definition {
 	return $types{type};
 }
 
+1;
