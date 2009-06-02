@@ -53,6 +53,9 @@ sub _compute_attributes {
 	my ($self, $type) = @_;
 	my $method = $type . '_NORMAL';
 	$self->$method();
+# 	if ( ! $self->get_widget()->is_visible() ) {
+# 		$method = $type . '_INVISIBLE';
+# 	}
 	if ( $self->get_widget()->isa('Curses::Toolkit::Role::Focusable') &&
 		 $self->get_widget()->is_focused() ) {
 		$method = $type . '_FOCUSED';

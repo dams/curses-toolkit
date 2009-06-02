@@ -32,6 +32,7 @@ sub new {
 					   properties => {},
 					 }, $class;
 	$self->set_sensitive(1);
+	$self->set_visible(1);
 	return $self;
 }
 
@@ -73,7 +74,7 @@ sub get_name {
   $widget->set_sensitive(1); # set this widget to be sensitive
   $widget->set_sensitive(0); # set this widget to be non sensitive
 
-Sets the sensitivity on/off on the widget. non-sensiive can be seen as "greyed-out"
+Sets the sensitivity on/off on the widget. non-sensitive widgets can be seen as "greyed-out"
 
   input : a boolean
   output : the widget
@@ -83,7 +84,7 @@ Sets the sensitivity on/off on the widget. non-sensiive can be seen as "greyed-o
 sub set_sensitive {
 	my $self = shift;
 	my ($sensitiveness) = validate_pos( @_, { type => BOOLEAN } );
-	$self->set_property(basic => 'sensitive', $sensitiveness);
+	$self->set_property(basic => 'sensitive', $sensitiveness ? 1 : 0);
 	return $self;
 }
 
@@ -99,6 +100,39 @@ Retrieves the sensitivity setting of the widget.
 sub is_sensitive {
 	my ($self) = @_;
 	return $self->get_property(basic => 'sensitive');
+}
+
+=head2 set_visible
+
+  $widget->set_visible(1); # set this widget to be visible
+  $widget->set_visible(0); # set this widget to be non visible
+
+Sets the visibility on/off on the widget. non-visible widgets are not displayed, but they still take space
+
+  input : a boolean
+  output : the widget
+
+=cut
+
+sub set_visible {
+	my $self = shift;
+	my ($visibility) = validate_pos( @_, { type => BOOLEAN } );
+	$self->set_property(basic => 'visible', $visibility ? 1 : 0);
+	return $self;
+}
+
+=head2 is_visible
+
+Retrieves the visibility setting of the widget.
+
+  input : none
+  output : true if the widget is visible, or false if not
+
+=cut
+
+sub is_visible {
+	my ($self) = @_;
+	return $self->get_property(basic => 'visible');
 }
 
 =head2 set_property

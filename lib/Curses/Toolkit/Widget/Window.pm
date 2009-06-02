@@ -117,8 +117,6 @@ Sets the root window ( the root toolkit object) to which this window is added
 
 sub set_root_window {
 	my ($self, $root_window) = @_;
-	print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 55 1 : $root_window \n";
-
 	$self->{root_window} = $root_window;
 	return $self;
 }
@@ -134,7 +132,6 @@ Get the root window
 
 sub get_root_window {
 	my ($self) = @_;
-	print STDERR "-_-_--_-_--_-_--_-_--_-_- RC 55 2 : " . $self->{root_window} . "\n";
 	return $self->{root_window};
 }
 

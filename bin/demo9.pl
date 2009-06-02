@@ -13,6 +13,8 @@ sub main {
 	use Curses::Toolkit::Widget::Window;
 	use Curses::Toolkit::Widget::Border;
 	use Curses::Toolkit::Widget::Label;
+	use Curses::Toolkit::Widget::VBox;
+	use Curses::Toolkit::Widget::HBox;
 	use Curses::Toolkit::Widget::Button;
 
 	my $root = POE::Component::Curses->spawn();
@@ -23,18 +25,43 @@ sub main {
 	print STDERR "\n\n\n--- starting demo9 -----------------\n\n";
 
 	$root->add_window(
-        my $window = Curses::Toolkit::Widget::Window
-          ->new()
-          ->set_name('main_window')
+        Curses::Toolkit::Widget::Window->new()
           ->add_widget(
-            my $border1 = Curses::Toolkit::Widget::Border
-              ->new()
-              ->set_name('border1')
+            Curses::Toolkit::Widget::Border->new()
               ->add_widget(
-			    my $button1 = Curses::Toolkit::Widget::Button
-				  ->new_with_label('This button is focused !')
-				  ->set_name('button1')
-              ),
+            Curses::Toolkit::Widget::Border->new() # space
+              ->set_visible(0)
+              ->add_widget(
+                Curses::Toolkit::Widget::VBox->new()
+                  ->pack_end(
+                     Curses::Toolkit::Widget::Border->new()
+                       ->add_widget(
+                         Curses::Toolkit::Widget::Label->new()
+                           ->set_text('expanding border with a label (this text) in it')
+					   ),
+				       { expand => 1 }
+				  )
+                  ->pack_end(
+ 				    Curses::Toolkit::Widget::HBox->new()
+ 					  ->pack_end(
+			            my $button1 = Curses::Toolkit::Widget::Button
+				          ->new_with_label('This button is focused !')
+				          ->set_name('button1'),
+				       { expand => 1 }
+
+  					  )
+
+ 					  ->pack_end(
+ 			            my $button2 = Curses::Toolkit::Widget::Button
+ 				          ->new_with_label('This button is not focused !')
+ 				          ->set_name('button2'),
+				       { expand => 1 }
+
+ 					  ),
+				       { expand => 1 }
+				  )
+			  )
+              )
 		  )
           ->set_coordinates(x1 => 0,   y1 => 0,
                             x2 => '100%',

@@ -46,11 +46,6 @@ sub new {
 
 =head1 METHODS
 
-=cut
-
-# This event applies to root window only
-sub spread_to_root_window { 1 }
-
 =head2 get_type
 
   my $type = $event->get_type();

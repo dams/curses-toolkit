@@ -50,6 +50,7 @@ sub CORNER_CLICKED { shift->_attron(A_REVERSE) }
 
 sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
+	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
 	print STDERR "$name : draw_hline $x1, $y1, $width\n";
 
@@ -60,6 +61,7 @@ sub draw_hline {
 
 sub draw_vline {
 	my ($self, $x1, $y1, $width) = @_;
+	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
 	print STDERR "$name : draw_vline $x1, $y1, $width\n";
 	$self->curses->vline($y1, $x1, VLINE(), $width);
@@ -68,30 +70,35 @@ sub draw_vline {
 
 sub draw_corner_ul {
 	my ($self, $x1, $y1) = @_;
+	$self->get_widget->is_visible() or return;
  	$self->curses->addch($y1, $x1, ULCORNER());
 	return $self;
 }
 
 sub draw_corner_ll {
 	my ($self, $x1, $y1) = @_;
+	$self->get_widget->is_visible() or return;
  	$self->curses->addch($y1, $x1, LLCORNER());
 	return $self;
 }
 
 sub draw_corner_ur {
 	my ($self, $x1, $y1) = @_;
+	$self->get_widget->is_visible() or return;
  	$self->curses->addch($y1, $x1, URCORNER());
 	return $self;
 }
 
 sub draw_corner_lr {
 	my ($self, $x1, $y1) = @_;
+	$self->get_widget->is_visible() or return;
  	$self->curses->addch($y1, $x1, LRCORNER());
 	return $self;
 }
 
 sub draw_string {
 	my ($self, $x1, $y1, $text) = @_;
+	$self->get_widget->is_visible() or return;
 	$self->curses->addstr($y1, $x1, $text);
 	return $self;
 }
