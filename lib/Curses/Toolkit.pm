@@ -17,7 +17,7 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 This module tries to be a modern curses toolkit, based on the Curses module, to
 build "graphical" console user interfaces easily.
