@@ -24,13 +24,16 @@ sub new {
     # TODO : use Exception;
     $class eq __PACKAGE__ and die "abstract class";
 	use Curses::Toolkit::Object::Flags;
-	return bless { flags => Curses::Toolkit::Object::Flags->new(),
-				   parent => undef,
-				   name => 'unknown',
- 				   relatives_coordinates => Curses::Toolkit::Object::Coordinates
- 				                            ->new_zero(),
-				   properties => {},
-				 }, $class;
+	my $self = bless { flags => Curses::Toolkit::Object::Flags->new(),
+					   parent => undef,
+					   name => 'unknown',
+					   relatives_coordinates => Curses::Toolkit::Object::Coordinates
+					   ->new_zero(),
+					   properties => {},
+					 }, $class;
+	$self->set_sensitive(1);
+	$self->set_visible(1);
+	return $self;
 }
 
 =head1 METHODS
@@ -64,6 +67,72 @@ Get the name of a widget
 sub get_name {
 	my ($self) = @_;
 	return $self->{name};
+}
+
+=head2 set_sensitive
+
+  $widget->set_sensitive(1); # set this widget to be sensitive
+  $widget->set_sensitive(0); # set this widget to be non sensitive
+
+Sets the sensitivity on/off on the widget. non-sensitive widgets can be seen as "greyed-out"
+
+  input : a boolean
+  output : the widget
+
+=cut
+
+sub set_sensitive {
+	my $self = shift;
+	my ($sensitiveness) = validate_pos( @_, { type => BOOLEAN } );
+	$self->set_property(basic => 'sensitive', $sensitiveness ? 1 : 0);
+	return $self;
+}
+
+=head2 is_sensitive
+
+Retrieves the sensitivity setting of the widget.
+
+  input : none
+  output : true if the widget is sensitive, or false if not
+
+=cut
+
+sub is_sensitive {
+	my ($self) = @_;
+	return $self->get_property(basic => 'sensitive');
+}
+
+=head2 set_visible
+
+  $widget->set_visible(1); # set this widget to be visible
+  $widget->set_visible(0); # set this widget to be non visible
+
+Sets the visibility on/off on the widget. non-visible widgets are not displayed, but they still take space
+
+  input : a boolean
+  output : the widget
+
+=cut
+
+sub set_visible {
+	my $self = shift;
+	my ($visibility) = validate_pos( @_, { type => BOOLEAN } );
+	$self->set_property(basic => 'visible', $visibility ? 1 : 0);
+	return $self;
+}
+
+=head2 is_visible
+
+Retrieves the visibility setting of the widget.
+
+  input : none
+  output : true if the widget is visible, or false if not
+
+=cut
+
+sub is_visible {
+	my ($self) = @_;
+	return $self->get_property(basic => 'visible');
 }
 
 =head2 set_property
@@ -163,25 +232,6 @@ sub get_parent {
 	return $self->{parent};
 }
 
-# =head2 render_border
-
-# Render the border of the widget
-
-#   input  : curses_handler
-#   output : the widget
-
-# =cut
-
-# sub render_border {
-# 	my $self = shift;
-#     my ($curses_handler) = validate_pos( @_, { isa => 'Curses' } );
-# 	$self->get_theme()->draw_border( curses_handler => $curses_handler,
-# 									 coordinates => $self->{coordinates},
-# 									 flags => $self->{flags},
-# 								   );
-# 	return;
-# }
-
 =head2 set_theme_name
 
 Set a specific display theme name.
@@ -239,7 +289,27 @@ sub get_theme {
 	return $self->{theme};
 }
 
+=head2 get_window
 
+  my $window = $widget->get_window();
+
+If the widget has been added in a window, get_window() will return this window.
+If the widget is not part of window, undef is returned.
+
+  input  : none
+  output : the window in which the widget is (Curses::Toolkit::Widget::Window), or undef
+
+=cut
+
+sub get_window {
+	my ($self) = @_;
+	my $widget = $self;
+	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
+		$widget = $widget->get_parent();
+		defined $widget or return;
+	}
+	return $widget;
+}
 # =head2 set_border_width
 
 # Sets the border width
@@ -312,25 +382,40 @@ Recompute all the relative coordinates accross the whole window
 sub rebuild_all_coordinates {
 	my ($self) = @_;
 	my $widget = $self;
-	while ( ! $widget->isa('Curses::Toolkit::Widget::Window') ) {
-		$widget = $widget->get_parent();
-		# if when going through all parent we don't find a window, just return
-		# : we can't rebuild the coordinates. We were probably during the
-		# construction of a complicated window, and widgets were created before
-		# being added to the window
-		defined $widget or return $self;
+
+	my $window = $widget->get_window();
+	if ( ! defined $window ) {
+		# if the widget is not part of a window, just return : we can't rebuild
+		# the coordinates. We were probably called during the construction of a
+		# complicated window, and widgets were created before being added to
+		# the window
+		return $self;
 	}
-	my $window = $widget;
 	$window->_rebuild_children_coordinates();
-	my $root_window = $window->get_root_window();
-	if (defined $root_window) {
-		my $mainloop = $root_window->get_mainloop();
-		if (defined $mainloop) {
-			print STDERR __PACKAGE__ . " : mainloop need redraw\n";
-			$mainloop->needs_redraw();
-		}
-	}
+	$self->needs_redraw();
 	return $self;	
+}
+
+=head2 needs_redraw
+
+  $widget->needs_redraw()
+
+When called, signify to the root window that a redraw is needed. Has an effect
+only if a mainloop is active ( see POE::Component::Curses )
+
+  input : none
+  output : the widget
+
+=cut
+
+sub needs_redraw {
+	my ($self) = @_;
+	my $window = $self->get_window();
+	defined $window or return $self;
+	my $root_window = $window->get_root_window();
+	defined $root_window or return $self;
+	$root_window->needs_redraw();
+	return $self;
 }
 
 # sets the relatives coordinates, from the origin of the parent widget

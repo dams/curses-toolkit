@@ -137,7 +137,36 @@ sub init_root_window {
 					   mainloop => $params{mainloop},
                      }, $class;
 	$self->_recompute_shape();
+
+	use Curses::Toolkit::EventListener;
+	# add a default listener that listen to any Shape event
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Shape',
+			conditional_code => sub { 1; },
+			code => sub {
+				my ($screen_h, $screen_w);
+				$self->_recompute_shape();
+				# for now we rebuild all coordinates
+				foreach my $window ( $self->get_windows() ) {
+					$window->rebuild_all_coordinates();
+				}
+			},
+		)
+	);
     return $self;
+}
+
+sub add_event_listener {
+	my $self = shift;
+	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
+	push @{$self->{event_listeners}}, $listener;
+	return $self;
+}
+
+sub get_event_listeners {
+	my ($self) = @_;
+	return @{$self->{event_listeners}};
 }
 
 # destroyer
@@ -226,10 +255,27 @@ sub add_window {
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
+	$self->needs_redraw();
+	return $self;
+}
+
+=head2 needs_redraw
+
+  $root->needs_redraw()
+
+When called, signify to the root window that a redraw is needed. Has an effect
+only if a mainloop is active ( see POE::Component::Curses )
+
+  input : none
+  output : the root window
+
+=cut
+
+sub needs_redraw {
+	my ($self) = @_;
 	my $mainloop = $self->get_mainloop();
-	if (defined $mainloop) {
-		$mainloop->needs_redraw();
-	}
+	defined $mainloop or return $self;
+	$mainloop->needs_redraw();
 	return $self;
 }
 
@@ -315,43 +361,51 @@ sub display {
 Given an event, dispatch it to the appropriate widgets / windows, or to the root window.
 
   input  : a Curses::Toolkit::Event
-  output : none
+  output : true if the event were handled, false if not
 
 =cut
 
 sub dispatch_event {
 	my $self = shift;
 	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
-	# if the event can be sent to widget(s) of the current window
-	if ($event->spread_to_widgets()) {
 
-	}
-	# if the event can be sent to widget(s) of the current window
-	if ($event->spread_to_windows()) {
-		
-	}
-	if ($event->spread_to_root_window()) {
-		$self->_handle_event($event)
-	}
-}
-
-## Private methods ##
-
-# event_handling
-
-my @supported_events = (qw(Curses::Toolkit::Event::Shape));
-sub _handle_event {
-	my ($self, $event) = @_;
-	use List::MoreUtils qw(any);
-	if ( any { $event->isa($_) } @supported_events ) {
-		my $method_name = '_event_' . lc( (split('::|_', ref($event)))[-1] ) . '_' .  $event->get_type();
-		if ($self->can($method_name)) {
-			return $self->$method_name();
+	my $widget = $self; #$self->get_focused_widget();
+	foreach my $listener ($widget->get_event_listeners()) {
+		if ($listener->can_handle($event)) {
+			$listener->send_event($event);
+			return 1;
+		} else {
+			if ($widget->isa('Curses::Toolkit::Widget::Window')) {
+				$widget = $widget->get_root_window();
+			} elsif ($widget->isa('Curses::Toolkit::Widget')) {
+				$widget = $widget->get_parent();
+			} else {
+				return;
+			}
+			defined $widget or return;
 		}
 	}
-	# event failed being applied
-	return 0;
+	return;
 }
+
+
+# ## Private methods ##
+
+# # event_handling
+
+# my @supported_events = (qw(Curses::Toolkit::Event::Shape));
+# sub _handle_event {
+# 	my ($self, $event) = @_;
+# 	use List::MoreUtils qw(any);
+# 	if ( any { $event->isa($_) } @supported_events ) {
+# 		my $method_name = '_event_' . lc( (split('::|_', ref($event)))[-1] ) . '_' .  $event->get_type();
+# 		if ($self->can($method_name)) {
+# 			return $self->$method_name();
+# 		}
+# 	}
+# 	# event failed being applied
+# 	return 0;
+# }
 
 # core event handling for Curses::Toolkit::Event::Shape event of type 'change'
 sub _event_shape_change {

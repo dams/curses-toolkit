@@ -31,10 +31,4 @@ sub get_type {
 	return $self->{type};
 }
 
-# by default, an event doesn't apply to nothing. Children classes wil override his
-
-sub spread_to_root_window { 0 }
-sub spread_to_windows { 0 }
-sub spread_to_widgets { 0 }
-
 1;
