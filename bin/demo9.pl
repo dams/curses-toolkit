@@ -34,6 +34,24 @@ sub main {
               ->add_widget(
                 Curses::Toolkit::Widget::VBox->new()
                   ->pack_end(
+ 				    Curses::Toolkit::Widget::HBox->new()
+ 					  ->pack_end(
+			            my $button01 = Curses::Toolkit::Widget::Button
+				          ->new_with_label('This button is focused !')
+				          ->set_name('button1'),
+				       { expand => 1 }
+  					  )
+
+ 					  ->pack_end(
+ 			            my $button02 = Curses::Toolkit::Widget::Button
+ 				          ->new_with_label('This button is not focused !')
+ 				          ->set_name('button2'),
+				       { expand => 1 }
+ 					  ),
+
+				       { expand => 1 }
+				  )
+                  ->pack_end(
                      Curses::Toolkit::Widget::Border->new()
                        ->add_widget(
                          Curses::Toolkit::Widget::Label->new()
@@ -48,7 +66,6 @@ sub main {
 				          ->new_with_label('This button is focused !')
 				          ->set_name('button1'),
 				       { expand => 1 }
-
   					  )
 
  					  ->pack_end(
@@ -56,8 +73,8 @@ sub main {
  				          ->new_with_label('This button is not focused !')
  				          ->set_name('button2'),
 				       { expand => 1 }
-
  					  ),
+
 				       { expand => 1 }
 				  )
 			  )

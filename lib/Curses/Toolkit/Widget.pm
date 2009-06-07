@@ -30,6 +30,7 @@ sub new {
 					   relatives_coordinates => Curses::Toolkit::Object::Coordinates
 					   ->new_zero(),
 					   properties => {},
+					   event_listeners => [],
 					 }, $class;
 	$self->set_sensitive(1);
 	$self->set_visible(1);
@@ -179,6 +180,41 @@ sub get_property {
 		return $group->{$property_name};
 	}
 	return( { %$group } );
+}
+
+=head2 add_event_listener
+
+  $widget->add_event_listener($event_listener);
+
+Adds an event listener to the widget. That allows the widget to respond to some
+events
+
+  input : a Curses::Toolkit::EventListener
+  output : the root window
+
+=cut
+
+sub add_event_listener {
+	my $self = shift;
+	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
+	push @{$self->{event_listeners}}, $listener;
+	return $self;
+}
+
+=head2 get_event_listeners
+
+  my @listeners = $widget->get_event_listener();
+
+Returns the list of listeners connected to this widget.
+
+  input : none
+  output : an ARRAY of Curses::Toolkit::EventListener
+
+=cut
+
+sub get_event_listeners {
+	my ($self) = @_;
+	return @{$self->{event_listeners}};
 }
 
 =head2 draw
@@ -453,6 +489,26 @@ sub _get_curses_handler {
 	defined $parent and
 	  return $parent->_get_curses_handler();
 	die "couldn't get Curses object from widget (name '" . $self->get_name() . "' type '" . ref($self) ."')";
+}
+
+# set forward / backward iterators for transversal travelling
+
+sub _set_iterator {
+	my ($self, $iterator) = @_;
+	print STDERR "<<<<<<<< SETTING ITERATOR : $iterator\n"; use Data::Dumper;
+	$self->{iterator} = $iterator;
+	return $self;
+}
+
+sub _get_brother {
+	my ($self) = @_;
+	my $iterator = $self->{iterator};
+	defined $iterator or return; # there is not brothers
+	$iterator->next();
+	my $brother_widget = $iterator->value(); # might be undef
+	$iterator->prev();
+	defined $brother_widget and return $brother_widget;
+	return;
 }
 
 1;

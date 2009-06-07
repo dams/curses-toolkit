@@ -5,6 +5,8 @@ use strict;
 
 use parent qw(Curses::Toolkit::Widget::Bin);
 
+use Params::Validate qw(:all);
+
 =head1 NAME
 
 Curses::Toolkit::Widget::Window - a window
@@ -26,7 +28,8 @@ sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
 	# set window stack by default
-	$self->set_property('window', 'stack', -1);
+	$self->set_property(window => 'stack', -1);
+#	$self->set_focused_widget($self);
 	return $self;
 }
 
@@ -133,6 +136,51 @@ Get the root window
 sub get_root_window {
 	my ($self) = @_;
 	return $self->{root_window};
+}
+
+=head2 set_focused_widget
+
+  $window->set_focused_widget($widget);
+
+Set the widget that has focus.
+
+  input : a Curses::Toolkit::Widget that is into this window
+  output : the window
+
+=cut
+
+sub set_focused_widget {
+	my $self = shift;
+	my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget',
+									   callbacks => { 'must be focusable' => sub { $_[0]->isa('Curses::Toolkit::Role::Focusable') }
+													}
+									 } );
+	my $current_focused_widget = $self->get_focused_widget();
+	if (defined $current_focused_widget && $current_focused_widget->can('set_focus')) {
+		$current_focused_widget->set_focus(0);
+	}
+	$self->{focused_widget} = $widget;
+	return $self;
+}
+
+=head2 get_focused_widget
+
+  my $widget = $window->get_focused_widget();
+
+Gets the focused widget.
+
+  input : none
+  output : the focused Curses::Toolkit::Widget
+
+=cut
+
+sub get_focused_widget {
+	my ($self) = @_;
+	my $focused_widget = $self->{focused_widget};
+	if (defined $focused_widget && $focused_widget->can('is_focused') && $focused_widget->is_focused()) {
+		return $self->{focused_widget};
+	}
+	return;
 }
 
 1;

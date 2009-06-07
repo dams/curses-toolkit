@@ -9,11 +9,11 @@ use Params::Validate qw(:all);
 
 =head1 NAME
 
-Curses::Toolkit::Event::Shape - events that are related to root window shape change
+Curses::Toolkit::Event::Shape - event that is related to root window shape change
 
 =head1 DESCRIPTION
 
-Base class for events
+Event that is related to root window shape change
 
 =head1 CONSTRUCTOR
 
@@ -37,10 +37,12 @@ sub new {
 						   params => 0,
 						 }
 					   );
+	$args{params} ||= {};
 	my @args = $args{params};
-	my ($params) = validate_pos( @args, $self->get_params_definition($args{type}) ),
+	my $definition = $self->get_params_definition($args{type});
+	my %params = validate( @args, $definition ),
 	$self->{type}   = $args{type};
-	$self->{params} = $params;
+	$self->{params} = \%params;
 	return $self;
 }
 
@@ -61,10 +63,10 @@ Returns the types that this Event Class supports
 
 =cut
 
-my %types = ( change => 0,
-			  hide => 0,
-			  show => 0,
-			  destroy => 0,
+my %types = ( change => { },
+			  hide => {},
+			  show => {},
+			  destroy => {},
 			);
 sub get_types {
 	my ($self) = @_;
@@ -82,7 +84,7 @@ Returns the parameter definition for a given type, as specified in Params::Valid
 
 sub get_params_definition {
 	my ($self, $type) = @_;
-	return $types{type};
+	return $types{$type};
 }
 
 1;

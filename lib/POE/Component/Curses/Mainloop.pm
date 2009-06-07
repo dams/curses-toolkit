@@ -87,18 +87,29 @@ sub event_resize {
 	my ($self) = @_;
 
 	use Curses::Toolkit::Event::Shape;
-	my $event = Curses::Toolkit::Event::Shape->new( type => 'change' );
+	my $event = Curses::Toolkit::Event::Shape->new( type => 'change', );
 	$self->{toolkit_root}->dispatch_event($event);
 	return;
 }
 
 # POE::Component::Curses informed on a window resize event
 sub event_key {
-	my ($self) = @_;
+	my $self = shift;
 
-	use Curses::Toolkit::Event::Shape;
-	my $event = Curses::Toolkit::Event::Key->new( type => 'stroke' );
-	$self->{toolkit_root}->dispatch_event($event);
+	my %params = validate( @_, {
+								type => 1,
+								key => 1 ,
+							   }
+						 );
+
+	print STDERR " -------> params : " . Dumper(%params); use Data::Dumper;
+	if ($params{type} eq 'stroke') {
+		use Curses::Toolkit::Event::Key;
+		my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
+													  params => { key => $params{key}} );
+	print STDERR " -------> dispatching event  : " . Dumper($event); use Data::Dumper;
+		$self->{toolkit_root}->dispatch_event($event);
+	}
 	return;
 }
 

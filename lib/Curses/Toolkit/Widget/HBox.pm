@@ -68,7 +68,8 @@ sub pack_start {
 										padding => { type => SCALAR, default => 0, regex => qr/^\d+$/ },
 									  }
 						  );
-	unshift @{$self->{children}}, $child_widget;
+	$self->_add_child_at_beginning($child_widget);
+#	unshift @{$self->{children}}, $child_widget;
 	$child_widget->_set_parent($self);
 	$child_widget->set_property(packing => \%options);
 	$self->rebuild_all_coordinates();
@@ -87,7 +88,8 @@ sub pack_end {
 										padding => { type => SCALAR, default => 0, regex => qr/^\d+$/ },
 									  }
 						  );
-	push @{$self->{children}}, $child_widget;
+	$self->_add_child_at_end($child_widget);
+#	push @{$self->{children}}, $child_widget;
 	$child_widget->_set_parent($self);
 	$child_widget->set_property(packing => \%options);
 	$self->rebuild_all_coordinates();

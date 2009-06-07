@@ -55,16 +55,14 @@ sub spawn {
 					}
 					print STDERR " GOT [$keystroke]\n";
 
-					if ($keystroke eq 'j') {
+					if ($keystroke eq '<^L>') {
 						$kernel->post($params{alias}, 'window_resize');
-					} elsif ($keystroke eq '<^I>') {
-						$kernel->post($params{alias}, 'window_resize');
-					} elsif ($keystroke eq 'q') {
-						exit();
+ 					} elsif ($keystroke eq '<^C>') {
+ 						exit();
 					} else {
-						$heap->{mainloop}->event( type => 'key',
-												  keystroke => $keystroke
-												);
+ 						$heap->{mainloop}->event_key( type => 'stroke',
+													  key => $keystroke,
+													);
 					}
 				}
 			},

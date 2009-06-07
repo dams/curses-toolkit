@@ -27,7 +27,12 @@ This widget can contain 0 or more other widgets.
 sub new {
 	my $class = shift;
 	my $self = $class->SUPER::new(@_);
-	$self->{children} = [];
+
+	use Tie::Array::Iterable;
+	my @children = ();
+
+	$self->{children} = Tie::Array::Iterable->new( @children );
+
 	return $self;
 }
 
@@ -66,8 +71,23 @@ sub get_children {
 }
 
 sub _add_child {
+	my $self = shift;
+	return $self->_add_child_at_end(@_);
+}
+	
+sub _add_child_at_end {
 	my ($self, $child_widget) = @_;
 	push @{$self->{children}}, $child_widget;
+	my $iterator = $self->{children}->forward_from(@{$self->{children}} - 1);
+	$child_widget->_set_iterator($iterator);
+	return $self;
+}
+
+sub _add_child_at_beginning {
+	my ($self, $child_widget) = @_;
+	unshift @{$self->{children}}, $child_widget;
+	my $iterator = $self->{children}->forward_from(@{$self->{children}} - 1);
+	$child_widget->_set_iterator($iterator);	
 	return $self;
 }
 

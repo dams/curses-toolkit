@@ -135,6 +135,8 @@ sub init_root_window {
                        windows => [],
 					   theme_name => $params{theme_name},
 					   mainloop => $params{mainloop},
+					   last_stack => 0,
+					   event_listeners => [],
                      }, $class;
 	$self->_recompute_shape();
 
@@ -154,19 +156,39 @@ sub init_root_window {
 			},
 		)
 	);
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Key',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{type} eq 'stroke' or return 0;
+				lc $event->{params}{key} eq 'q' or return 0;
+			},
+			code => sub {
+				print STDERR "received Q, bailing out\n";
+				exit;
+			},
+		)
+	);
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Key',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{type} eq 'stroke' or return 0;
+				$event->{params}{key} eq '<^I>' or return 0;
+			},
+			code => sub {
+				my $focused_widget = $self->get_focused_widget();
+				if (defined $focused_widget) {
+					my $next_focused_widget = $focused_widget->get_next_focused_widget();
+					defined $next_focused_widget and 
+					  $next_focused_widget->set_focus(1);
+				}
+			},
+		)
+	);
     return $self;
-}
-
-sub add_event_listener {
-	my $self = shift;
-	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
-	push @{$self->{event_listeners}}, $listener;
-	return $self;
-}
-
-sub get_event_listeners {
-	my ($self) = @_;
-	return @{$self->{event_listeners}};
 }
 
 # destroyer
@@ -180,9 +202,82 @@ DESTROY {
 
 =head1 METHODS
 
+=head2 add_event_listener
+
+  $root->add_event_listener($event_listener);
+
+Adds an event listener to the root window. That allows the root window to
+respond to some events
+
+  input : a Curses::Toolkit::EventListener
+  output : the root window
+
+=cut
+
+sub add_event_listener {
+	my $self = shift;
+	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
+	push @{$self->{event_listeners}}, $listener;
+	return $self;
+}
+
+=head2 get_event_listeners
+
+  my @listeners = $root->get_event_listener();
+
+Returns the list of listeners connected to the root window.
+
+  input : none
+  output : an ARRAY of Curses::Toolkit::EventListener
+
+=cut
+
+sub get_event_listeners {
+	my ($self) = @_;
+	return @{$self->{event_listeners}};
+}
+
+=head2 get_focused_widget
+
+  my $widget = $root->get_focused_widget();
+
+Returns the widget currently focused. Warning, the returned widget could well
+be a window.
+
+  input : none
+  output : a Curses::Toolkit::Widget or void
+
+=cut
+
+sub get_focused_widget {
+	my ($self) = @_;
+	my $window = $self->get_focused_window();
+	defined $window or return;
+	return $window->get_focused_widget();
+}
+
+=head2 get_focused_window
+
+  my $window = $root->get_focused_window();
+
+Returns the window currently focused.
+
+  input : none
+  output : a Curses::Toolkit::Widget::Window or void
+
+=cut
+
+sub get_focused_window {
+	my ($self) = @_;
+	my @windows = $self->get_windows();
+	@windows or return;
+	my $window = (sort { $b->get_property(window => 'stack') <=> $a->get_property(window => 'stack') } @windows)[0];
+	return $window;
+}
+
 =head2 set_mainloop
 
-  my $root->set_mainloop($mainloop)
+  $root->set_mainloop($mainloop)
 
 Sets the mainloop object to be used by the Curses::Toolkit root object. The
 mainloop object will be called when a new event has to be registered. The
@@ -251,6 +346,8 @@ sub add_window {
 	$window->_set_curses_handler($self->{curses_handler});
 	$window->set_theme_name($self->{theme_name});
 	$window->set_root_window($self);
+	$self->{last_stack} = $self->{last_stack} + 1;
+	$window->set_property(window => 'stack', $self->{last_stack});
 	# in case the window has proportional coordinates depending on the root window
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
@@ -330,7 +427,7 @@ Build everything in the buffer. You need to call 'display' after that to display
 sub render {
     my ($self) = @_;
 	$self->{curses_handler}->erase();
-	foreach my $window (sort { $b->get_property('window', 'stack') <=> $a->get_property('window', 'stack') } $self->get_windows()) {
+	foreach my $window (sort { $b->get_property(window => 'stack') <=> $a->get_property(window => 'stack') } $self->get_windows()) {
 		$window->render();
 	}
 	return $self;
@@ -369,21 +466,23 @@ sub dispatch_event {
 	my $self = shift;
 	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
 
-	my $widget = $self; #$self->get_focused_widget();
-	foreach my $listener ($widget->get_event_listeners()) {
-		if ($listener->can_handle($event)) {
-			$listener->send_event($event);
-			return 1;
-		} else {
-			if ($widget->isa('Curses::Toolkit::Widget::Window')) {
-				$widget = $widget->get_root_window();
-			} elsif ($widget->isa('Curses::Toolkit::Widget')) {
-				$widget = $widget->get_parent();
-			} else {
-				return;
+	my $widget = $self->get_focused_widget();
+	defined $widget or return;
+
+	while ( 1 ) {
+		foreach my $listener ($widget->get_event_listeners()) {
+			if ($listener->can_handle($event)) {
+				return $listener->send_event($event);
 			}
-			defined $widget or return;
 		}
+		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
+			$widget = $widget->get_root_window();
+		} elsif ($widget->isa('Curses::Toolkit::Widget')) {
+			$widget = $widget->get_parent();
+		} else {
+			return;
+		}
+		defined $widget or return;
 	}
 	return;
 }

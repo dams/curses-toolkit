@@ -31,6 +31,17 @@ sub new {
 	return bless { %params }, $class;
 }
 
+=head1 METHODS
+
+=head2 can_handle
+
+Given an event, returns true if the listener is capable of handling this event
+
+  input : a Curses::Toolkit::Event
+  output : true or false
+
+=cut
+
 sub can_handle {
 	my $self = shift;
 	my ($event) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' } );
@@ -38,6 +49,16 @@ sub can_handle {
 	$self->{conditional_code}->($event) or return;
 	return 1;
 }
+
+=head2 send_event
+
+Given an event, send it to the listener.
+Returns the result of the event code.
+
+  input : a Curses::Toolkit::Event
+  output : the result of the event code execution
+
+=cut
 
 sub send_event {
 	my $self = shift;
