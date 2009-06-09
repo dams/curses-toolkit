@@ -466,8 +466,13 @@ sub dispatch_event {
 	my $self = shift;
 	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
 
-	my $widget = $self->get_focused_widget();
-	defined $widget or return;
+	my $widget;
+	defined $widget or
+	  $widget = $self->get_focused_widget();
+	defined $widget or
+	  $widget = $self->get_focused_window();
+	defined $widget or
+	  $widget = $self;
 
 	while ( 1 ) {
 		foreach my $listener ($widget->get_event_listeners()) {

@@ -305,6 +305,8 @@ sub get_minimum_space {
 	} elsif ($wrap_mode eq 'lazy') {
 		my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
 		$minimum_space->set( y2 => $minimum_space->y1() + scalar(@text) );
+		$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) );
+		print STDERR "Debug : " . Dumper($minimum_space); use Data::Dumper;
 		return $minimum_space;
 	}
 	die;
