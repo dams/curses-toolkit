@@ -229,14 +229,17 @@ sub get_minimum_space {
 	# compute how high all the children are
 	my @children = $self->get_children();
 	my $width = 0;
+	my $height = 0;
 	foreach my $child (@children) {
 		my $space = $child->get_minimum_space($remaining_space);
 		my $w = $space->width();
 		$width += $w;
+		use List::Util qw(max);
+		$height = max $height, $space->height();
 		$remaining_space->substract( { x2 => $w } );
 	}
 
-	$minimum_space->set( x2 => $minimum_space->x1() + $width );
+	$minimum_space->set( x2 => $minimum_space->x1() + $width, y2 => $minimum_space->y1() + $height );
 
 	return $minimum_space;
 
