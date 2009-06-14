@@ -63,7 +63,6 @@ sub set_coordinates {
 	use Curses::Toolkit::Object::Coordinates;
 	use Data::Dumper;
 	if ( ! ref($_[0])) {
-		print STDERR Dumper(\@_);
 		my %params = @_;
 		foreach my $x (qw(x1 x2)) {
 			if ($params{$x} =~ /^(.+)%$/ ) {
