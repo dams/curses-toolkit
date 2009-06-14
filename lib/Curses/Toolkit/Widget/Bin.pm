@@ -88,8 +88,6 @@ sub _rebuild_children_coordinates {
 	$child_widget->_set_relatives_coordinates($child_space);
 	$child_widget->can('_rebuild_children_coordinates') and
 	  $child_widget->_rebuild_children_coordinates();
-	# now diminish the available space
-	$available_space->add( { y1 => $child_space->y2() + 1 } );
 	return $self;
 }
 
