@@ -49,7 +49,7 @@ sub main {
 				       { expand => 1 }
  					  ),
 
-				       { expand => 1 }
+				       { expand => 0 }
 				  )
                   ->pack_end(
                      Curses::Toolkit::Widget::Border->new()
@@ -65,17 +65,17 @@ sub main {
 			            my $button1 = Curses::Toolkit::Widget::Button
 				          ->new_with_label('This button is focused !')
 				          ->set_name('button1'),
-				       { expand => 1 }
+				       { expand => 0 }
   					  )
 
  					  ->pack_end(
  			            my $button2 = Curses::Toolkit::Widget::Button
  				          ->new_with_label('This button is not focused !')
  				          ->set_name('button2'),
-				       { expand => 1 }
+				       { expand => 0 }
  					  ),
 
-				       { expand => 1 }
+				       { expand => 0 }
 				  )
 			  )
               )
