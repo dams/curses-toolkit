@@ -111,6 +111,11 @@ sub init_root_window {
 		print STDERR "no color support\n";
 	}
 
+    eval { Curses->can('NCURSES_MOUSE_VERSION') && (NCURSES_MOUSE_VERSION() >= 1 ) };
+
+	my $old_mouse_mask;
+	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS, $old_mouse_mask); 
+
 
     # curses basic init
 #    Curses::noecho();
@@ -427,7 +432,7 @@ Build everything in the buffer. You need to call 'display' after that to display
 sub render {
     my ($self) = @_;
 	$self->{curses_handler}->erase();
-	foreach my $window (sort { $b->get_property(window => 'stack') <=> $a->get_property(window => 'stack') } $self->get_windows()) {
+	foreach my $window (sort { $a->get_property(window => 'stack') <=> $b->get_property(window => 'stack') } $self->get_windows()) {
 		$window->render();
 	}
 	return $self;

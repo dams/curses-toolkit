@@ -51,4 +51,12 @@ sub new_with_label {
 	return $self;
 }
 
+# The difference with Border is that we don't want to expand when not
+# necessary. Meaning, when asked for desired_space, we return the minimum space
+
+sub get_desired_space {
+	my $self = shift;
+	return $self->get_minimum_space(@_);
+}
+
 1;

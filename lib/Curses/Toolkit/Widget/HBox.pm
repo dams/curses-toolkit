@@ -179,7 +179,7 @@ sub get_desired_space {
 	my $desired_space = $available_space->clone();
 	my $remaining_space = $available_space->clone();
 
-	# first, compute how high all the non expanding children are
+	# first, compute how large all the non expanding children are
 	my @children = $self->get_children();
 	my $width = 0;
 	foreach my $child (grep { ! $_->get_property('packing', 'expand') } @children) {

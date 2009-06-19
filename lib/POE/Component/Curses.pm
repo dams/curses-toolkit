@@ -52,17 +52,71 @@ sub spawn {
 					if ($keystroke eq '<KEY_RESIZE>') {
 						# don't handle this here, it's handled in window_resize
 						return;
-					}
-					print STDERR " GOT [$keystroke]\n";
+					} elsif ($keystroke eq '<KEY_MOUSE>') {
 
-					if ($keystroke eq '<^L>') {
-						$kernel->post($params{alias}, 'window_resize');
- 					} elsif ($keystroke eq '<^C>') {
- 						exit();
+						use Curses;
+						my $mouse_curses_event = 0;
+						# stolen from Curses::UI. Thanks ! :)
+						getmouse($mouse_curses_event);
+
+						# $mouse_curses_event is a struct. From curses.h (note: this might change!):
+						#
+						# typedef struct
+						# {
+						#    short id;           /* ID to distinguish multiple devices */
+						#	 int x, y, z;        /* event coordinates (character-cell) */
+						#	 mmask_t bstate;     /* button state bits */
+						# } MEVENT;
+						#
+						# ---------------
+						# s signed short
+						# x null byte
+						# x null byte
+						# ---------------
+						# i integer
+						# ---------------
+						# i integer
+						# ---------------
+						# i integer
+						# ---------------
+						# l long
+						# ---------------
+						
+						
+						my ($id, $x, $y, $z, $bstate) = unpack("sx2i3l", $mouse_curses_event);
+# 						$heap->{mainloop}->event_mouse( type => 'click',
+# 														x => $x,
+# 														y => $y,
+														
+# 													  );
+						my @button_events = qw(
+												BUTTON1_PRESSED BUTTON1_RELEASED BUTTON1_CLICKED BUTTON1_DOUBLE_CLICKED
+												BUTTON1_TRIPLE_CLICKED BUTTON2_PRESSED BUTTON2_RELEASED BUTTON2_CLICKED
+												BUTTON2_DOUBLE_CLICKED BUTTON2_TRIPLE_CLICKED BUTTON3_PRESSED BUTTON3_RELEASED
+												BUTTON3_CLICKED BUTTON3_DOUBLE_CLICKED BUTTON3_TRIPLE_CLICKED BUTTON4_PRESSED
+												BUTTON4_RELEASED BUTTON4_CLICKED BUTTON4_DOUBLE_CLICKED BUTTON4_TRIPLE_CLICKED
+												BUTTON5_PRESSED BUTTON5_RELEASED BUTTON5_CLICKED BUTTON5_DOUBLE_CLICKED
+												BUTTON5_TRIPLE_CLICKED BUTTON_SHIFT BUTTON_CTRL BUTTON_ALT
+											 );
+						foreach my $possible_event_name (@button_events) {
+							my $possible_event = eval($possible_event_name);
+							if (!$@ && $bstate == $possible_event) {
+								print STDERR " -----> got : $possible_event_name\n";
+							}
+						}
+											
 					} else {
- 						$heap->{mainloop}->event_key( type => 'stroke',
-													  key => $keystroke,
-													);
+						print STDERR " GOT [$keystroke]\n";
+
+						if ($keystroke eq '<^L>') {
+							$kernel->post($params{alias}, 'window_resize');
+						} elsif ($keystroke eq '<^C>') {
+							exit();
+						} else {
+							$heap->{mainloop}->event_key( type => 'stroke',
+														  key => $keystroke,
+														);
+						}
 					}
 				}
 			},
