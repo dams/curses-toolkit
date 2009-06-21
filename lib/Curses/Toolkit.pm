@@ -471,13 +471,7 @@ sub dispatch_event {
 	my $self = shift;
 	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
 
-	my $widget;
-	defined $widget or
-	  $widget = $self->get_focused_widget();
-	defined $widget or
-	  $widget = $self->get_focused_window();
-	defined $widget or
-	  $widget = $self;
+	my $widget = $event->get_matching_widget();
 
 	while ( 1 ) {
 		foreach my $listener ($widget->get_event_listeners()) {
@@ -546,7 +540,6 @@ sub _recompute_shape {
     use Curses;
 	endwin;
 	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
-print STDERR " # : $screen_h x $screen_w\n";
 	use Curses::Toolkit::Object::Shape;
 	$self->{shape} ||= Curses::Toolkit::Object::Shape->new_zero();
 	$self->{shape}->_set(

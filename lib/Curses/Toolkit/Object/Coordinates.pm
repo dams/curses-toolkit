@@ -135,14 +135,6 @@ sub set {
 # make sure the coordinate is positive
 sub _normalize {
 	my ($self) = @_;
-#	print STDERR Dumper(\@_); use Data::Dumper;
-
-# 	foreach my $i (0...10) {
-# 		no warnings;
-# 		my ($package, $filename, $line, $subroutine, $hasargs,
-# 			$wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
-# 		print STDERR "$i  --  $filename | $line | $subroutine\n";
-# 	}
 
 	$self->x1() <= $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
 	$self->y1() <= $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
@@ -353,5 +345,24 @@ sub restrict_to {
 
 	return $self;
 }
+
+=head2 is_in_widget
+
+Return true if the coordinates is in side the give widget
+
+  input  : Curses::Toolkit::Widget : the widget
+  output : true or false
+
+=cut
+
+sub is_in_widget {
+	my ($self, $widget) = @_;
+	my $w_coord = $widget->get_coordinates();
+	return $w_coord->x1() <= $self->x1() &&
+	       $w_coord->x2() >= $self->x2() &&
+		   $w_coord->y1() <= $self->y1() &&
+		   $w_coord->y2() >= $self->y2();
+}
+
 
 1;

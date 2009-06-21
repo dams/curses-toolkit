@@ -24,6 +24,7 @@ sub main {
 	local $| = 1;
 	print STDERR "\n\n\n--- starting demo9 -----------------\n\n";
 
+	my $button02;
 	$root->add_window(
         Curses::Toolkit::Widget::Window->new()
           ->add_widget(
@@ -43,9 +44,22 @@ sub main {
   					  )
 
  					  ->pack_end(
- 			            my $button02 = Curses::Toolkit::Widget::Button
+ 			            $button02 = Curses::Toolkit::Widget::Button
  				          ->new_with_label('This button is not focused !')
- 				          ->set_name('button2'),
+ 				          ->set_name('button2')
+->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{button} eq 'button1' or return 0;
+				$event->{type} eq 'pressed' or return 0;
+			},
+			code => sub {
+				$button02->set_focus(1);
+			},
+		)
+	),
 				       { expand => 1 }
  					  ),
 

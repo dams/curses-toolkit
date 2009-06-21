@@ -92,7 +92,7 @@ sub event_resize {
 	return;
 }
 
-# POE::Component::Curses informed on a window resize event
+# POE::Component::Curses informed on a keyboard event
 sub event_key {
 	my $self = shift;
 
@@ -102,12 +102,42 @@ sub event_key {
 							   }
 						 );
 
-	print STDERR " -------> params : " . Dumper(%params); use Data::Dumper;
 	if ($params{type} eq 'stroke') {
 		use Curses::Toolkit::Event::Key;
 		my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
-													  params => { key => $params{key}} );
-	print STDERR " -------> dispatching event  : " . Dumper($event); use Data::Dumper;
+													  params => { key => $params{key}},
+													  root_window => $self->{toolkit_root}
+													);
+		$self->{toolkit_root}->dispatch_event($event);
+	}
+	return;
+}
+
+# POE::Component::Curses informed on a mouse event
+sub event_mouse {
+	my $self = shift;
+
+	my %params = validate( @_, {
+								type => 1,
+								type2 => 1,
+								button => 1 ,
+								x => 1,
+								y => 1,
+								z => 1,
+							   }
+						 );
+
+	if ($params{type} eq 'click') {
+		use Curses::Toolkit::Event::Mouse::Click;
+		$params{type} = delete $params{type2};
+		use Curses::Toolkit::Object::Coordinates;
+		$params{coordinates} = Curses::Toolkit::Object::Coordinates->new( x1 => $params{x},
+																		 x2 => $params{x},
+																		 y1 => $params{y},
+																		 y2 => $params{y},
+																	   );
+		delete @params{qw(x y z)};
+		my $event = Curses::Toolkit::Event::Mouse::Click->new( %params, root_window => $self->{toolkit_root} );
 		$self->{toolkit_root}->dispatch_event($event);
 	}
 	return;

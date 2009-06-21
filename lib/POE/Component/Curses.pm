@@ -84,11 +84,6 @@ sub spawn {
 						
 						
 						my ($id, $x, $y, $z, $bstate) = unpack("sx2i3l", $mouse_curses_event);
-# 						$heap->{mainloop}->event_mouse( type => 'click',
-# 														x => $x,
-# 														y => $y,
-														
-# 													  );
 						my @button_events = qw(
 												BUTTON1_PRESSED BUTTON1_RELEASED BUTTON1_CLICKED BUTTON1_DOUBLE_CLICKED
 												BUTTON1_TRIPLE_CLICKED BUTTON2_PRESSED BUTTON2_RELEASED BUTTON2_CLICKED
@@ -101,7 +96,14 @@ sub spawn {
 						foreach my $possible_event_name (@button_events) {
 							my $possible_event = eval($possible_event_name);
 							if (!$@ && $bstate == $possible_event) {
-								print STDERR " -----> got : $possible_event_name\n";
+								my ($button, $type2) = $possible_event_name =~ /^([^_]+)_(.+)$/;
+								$heap->{mainloop}->event_mouse( type => 'click',
+																type2 => lc($type2),
+																button => lc($button),
+																x => $x,
+																y => $y,
+																z => $z,
+															);
 							}
 						}
 											
