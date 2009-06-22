@@ -37,14 +37,14 @@ sub main {
  				    Curses::Toolkit::Widget::HBox->new()
  					  ->pack_end(
 			            my $button01 = Curses::Toolkit::Widget::Button
-				          ->new_with_label('This button is focused !')
+				          ->new_with_label('This is a button !')
 				          ->set_name('button1'),
 				       { expand => 1 }
   					  )
 
  					  ->pack_end(
  			            my $button02 = Curses::Toolkit::Widget::Button
- 				          ->new_with_label('This button is not focused !')
+ 				          ->new_with_label('This is another button !')
  				          ->set_name('button2'),
 				       { expand => 1 }
  					  ),
@@ -63,14 +63,14 @@ sub main {
  				    Curses::Toolkit::Widget::HBox->new()
  					  ->pack_end(
 			            my $button1 = Curses::Toolkit::Widget::Button
-				          ->new_with_label('This button is focused !')
+				          ->new_with_label('This button is there!')
 				          ->set_name('button1'),
 				       { expand => 0 }
   					  )
 
  					  ->pack_end(
  			            my $button2 = Curses::Toolkit::Widget::Button
- 				          ->new_with_label('This button is not focused !')
+ 				          ->new_with_label('Yet Another Button !')
  				          ->set_name('button2'),
 				       { expand => 0 }
  					  ),

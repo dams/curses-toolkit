@@ -26,6 +26,66 @@ sub new {
 	return bless { widget => $widget }, $class;
 }
 
+=head2 set_property
+
+  $theme->set_property('Toolkit::Curses::Widget::Class', 'property name', 'value');
+  $widget->set_property('Toolkit::Curses::Widget::Class', { name1 => 'value1', ... });
+
+Sets a single property or a whole group of property
+
+Properties are arbitrary caracteristics of widgets. For themes, they are
+grouped by Widgets class name. The property will be set for all widgets from
+this class using the theme. To set a property, you need to specify the class
+name of the widget you want to theme , then the property name, then the value
+name. However you can specify the class name, and a hash representing multiple names / values
+
+Returns the widget.
+
+=cut
+
+sub set_property {
+	my $self = shift;
+	my $class_name = shift;
+	my $definition = $class_name->_get_theme_properties_definition();
+	my ($property_name, $value) = @_;
+	my $parameters = {};
+	if (ref $property_name eq 'HASH' && !defined $value) {
+		$parameters = $property_name;
+	} elsif ( !ref $property_name eq 'HASH' && defined $value) {
+		$parameters = { $property_name => $value };
+	}
+
+	my @parameters = %$parameters;
+	my %params = validate(@parameters, $definition);
+
+	@{$self->{property}{$class_name}}{keys %params} = values %params;
+	return $self;
+}
+
+=head2 get_property
+
+  my $value = $widget->get_property('Toolkit::Curses::Widget::Class', 'property name');
+  my $hash = $widget->get_property('Toolkit::Curses::Widget::Class');
+
+Return the theme property or the hash of properties of a widget.
+
+=cut
+
+sub get_property {
+	my $self = shift;
+	my ($class_name, $property_name) = validate_pos( @_, 1, 0 );
+	my $properties = $self->{property}{$class_name};
+	defined $properties or $properties = {};
+	if (defined $property_name) {
+		return $properties->{$property_name};
+	}
+	return( { %$properties } );
+}
+
+
+
+
+
 sub get_widget {
 	my ($self) = @_;
 	return $self->{widget};

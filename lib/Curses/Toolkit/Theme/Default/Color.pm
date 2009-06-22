@@ -31,22 +31,22 @@ sub new {
 	has_colors() or
 	  die "Cannot create a '" .  __PACKAGE__ . "' object : color is not supported";
 	# pair 1 : yellow on blue
-	init_pair(1, COLOR_YELLOW, COLOR_BLUE);
-	init_pair(2, COLOR_WHITE, COLOR_RED);
+	init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(2, COLOR_RED, COLOR_BLACK);
 	return $class->SUPER::new(@_);
 }
 
 sub HLINE_NORMAL   { shift->_attron(COLOR_PAIR(1)) }
-sub HLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2)) }
-sub HLINE_CLICKED  { shift->_attron(COLOR_PAIR(1)) }
+sub HLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2) | A_BOLD) }
+sub HLINE_CLICKED  { shift->_attron(COLOR_PAIR(1) | A_REVERSE) }
 				   
 sub VLINE_NORMAL   { shift->_attron(COLOR_PAIR(1)) }
-sub VLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2)) }
-sub VLINE_CLICKED  { shift->_attron(COLOR_PAIR(1)) }
+sub VLINE_FOCUSED  { shift->_attron(COLOR_PAIR(2) | A_BOLD) }
+sub VLINE_CLICKED  { shift->_attron(COLOR_PAIR(1) | A_REVERSE) }
 
 sub CORNER_NORMAL  { shift->_attron(COLOR_PAIR(1)) }
-sub CORNER_FOCUSED { shift->_attron(COLOR_PAIR(2)) }
-sub CORNER_CLICKED { shift->_attron(COLOR_PAIR(1)) }
+sub CORNER_FOCUSED { shift->_attron(COLOR_PAIR(2) | A_BOLD) }
+sub CORNER_CLICKED { shift->_attron(COLOR_PAIR(1) | A_REVERSE) }
 
 # STRING as parent
 

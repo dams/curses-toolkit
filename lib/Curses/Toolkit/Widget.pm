@@ -146,20 +146,22 @@ Sets a single property or a whole group of property
 properties are arbitrary caracteristics of widgets. They are grouped by
 groups. To set a property, you need to specify the group name, then the
 property name, then the value name. However you can specify the group name, and
-a hash representing this group value.
+a hash representing this group values.
 
 Returns the widget
 
 =cut
 
 sub set_property {
-	my ($self, $group_name, $property_name, $value) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' }, 1, 1, 0 );
-	if (defined $value) {
+	my $self = shift;
+	my ($group_name, $property_name, $value) = validate_pos( @_, 1, 1, 0 );
+
+	if (ref $property_name eq 'HASH') {
+		my $group_value = $property_name;
+		$self->{property}{$group_name} = $group_value;
+	} else {
 		$self->{property}{$group_name}{$property_name} = $value;
-		return $self;
 	}
-	my $group_value = $property_name;
-	$self->{property}{$group_name} = $group_value;
 	return $self;
 }
 
@@ -180,6 +182,47 @@ sub get_property {
 		return $group->{$property_name};
 	}
 	return( { %$group } );
+}
+
+=head2 set_theme_property
+
+  $widget->set_theme_property('property name', 'value');
+  $widget->set_theme_property({ name1 => 'value1', ... });
+
+Sets a single theme property or a whole group of theme property
+
+Theme properties are arbitrary theme caracteristics of widgets. They are
+ specifically theme oriented properties. To set a theme property, you need to
+ specify the property name, then the value name. However you can specify a hash
+ representing the values.
+
+Returns the widget;
+
+=cut
+
+sub set_theme_property {
+	my $self = shift;
+	$self->get_theme->set_property(ref $self, @_);
+}
+
+=head2 get_property
+
+  my $value = $widget->get_theme_property('property name');
+  my $hash = $widget->get_theme_property();
+
+Return the theme property or the hash of theme properties of a widget.
+
+=cut
+
+sub get_theme_property {
+	my $self = shift;
+	$self->get_theme->get_property(ref $self, @_);
+}
+
+# Default theme properties : no theme properties
+sub _get_theme_properties_definition {
+	my ($self) = @_;
+	return {};
 }
 
 =head2 add_event_listener
