@@ -18,6 +18,7 @@ sub main {
 
 	$root->add_window(my $win1 = Curses::Toolkit::Widget::Window->new());
 
+	$win1->set_name("WIN1");
 	$win1->add_widget(
       Curses::Toolkit::Widget::Border
 	    ->new()
@@ -36,6 +37,7 @@ sub main {
 
 	$root->add_window(my $win2 = Curses::Toolkit::Widget::Window->new());
 
+	$win2->set_name("WIN2");
 	$win2->add_widget(
       Curses::Toolkit::Widget::Border
 	    ->new()

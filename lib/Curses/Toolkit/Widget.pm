@@ -538,7 +538,6 @@ sub _get_curses_handler {
 
 sub _set_iterator {
 	my ($self, $iterator) = @_;
-	print STDERR "<<<<<<<< SETTING ITERATOR : $iterator\n"; use Data::Dumper;
 	$self->{iterator} = $iterator;
 	return $self;
 }
