@@ -491,6 +491,30 @@ sub dispatch_event {
 	return;
 }
 
+=head2 add_delay
+
+Has an effect only if a mainloop is active ( see POE::Component::Curses )
+
+  $root_window->add_delay($seconds, \&code, @args)
+  $root_window->add_delay(5, sub { print "wow, 5 seconds wasted, dear $name\n"; }, $name);
+
+Add a timer that will execute the \&code once, in $seconds seconds. $seconds
+can be a fraction. @args will be passed to the code reference
+
+  input  : number of seconds
+           a code reference
+           an optional list of arguments to be passed to the code reference
+  output : a timer unique identifier or void
+
+=cut
+
+sub add_delay {
+	my $self = shift;
+	my $mainloop = $self->get_mainloop();
+	defined $mainloop or return;
+	$mainloop->add_delay(@_);
+	return;
+}
 
 # ## Private methods ##
 

@@ -25,6 +25,35 @@ This theme is used by default when rendering widgets.
 
 =cut
 
+# the values of this theme
+sub _get_default_properties {
+	my ($self, $class_name) = @_;
+	my %default = ( 'Curses::Toolkit::Widget::Window' => {
+			          title_width => 20,
+					  title_bar_position => 'top',
+					  title_position => 'left',
+					  title_brackets_characters => [ '[ ', ' ]' ],
+					  title_left_offset => 1,
+					  title_right_offset => 1,
+					  title_animation => 1,
+					  title_loop_duration => 2,
+					  title_loop_pause => 1/2,
+					  # inherited from Border
+					  border_width => 1,
+					},
+					'Curses::Toolkit::Widget::Border' => {
+					  border_width => 1,
+					},
+					'Curses::Toolkit::Widget::Button' => {
+					  # inherited from Border
+					  border_width => 1,
+					},
+				  );
+	return $default{$class_name} || {};
+}
+
+
+
 sub ULCORNER { ACS_ULCORNER; }
 sub LLCORNER { ACS_LLCORNER; }
 sub URCORNER { ACS_URCORNER; }
@@ -35,6 +64,10 @@ sub VLINE { ACS_VLINE; }
 sub STRING_NORMAL  { }
 sub STRING_FOCUSED { shift->_attron(A_BOLD) }
 sub STRING_CLICKED { shift->_attron(A_REVERSE) }
+
+sub TITLE_NORMAL  { }
+sub TITLE_FOCUSED { shift->_attron(A_BOLD) }
+sub TITLE_CLICKED { shift->_attron(A_REVERSE) }
 
 sub HLINE_NORMAL   { }
 sub HLINE_FOCUSED  { shift->_attron(A_BOLD) }
@@ -102,59 +135,13 @@ sub draw_string {
 	$self->curses->addstr($y1, $x1, $text);
 	return $self;
 }
-# sub set_root_background {
-# 	curs_bkgd();
-# }
 
-# sub draw_border {
-# 	my $self = shift;
-# 	my %params = validate(@_, { curses_handler => { isa => 'Curses' },
-# 								coordinates    => { isa => 'Curses::Toolkit::Object::Coordinates' },
-# 								flags          => { isa => 'Curses::Toolkit::Object::Flags' },
-# 							  }
-#                          );
-# 	my $c = $params{coordinates};
-# 	my $f = $params{flags};
-# 	my $curses = $params{curses_handler};
-# 	# draw lines
-# 	$curses->hline($c->y1(), $c->x1(), HLINE(), $c->width());
-# 	$curses->hline($c->y2(), $c->x1(), HLINE(), $c->width());
-# 	$curses->vline($c->y1(), $c->x1(), VLINE(), $c->height());
-# 	$curses->vline($c->y1(), $c->x2(), VLINE(), $c->height());
-# 	# draw corners
-# 	$curses->addch($c->y1(), $c->x1(), ULCORNER());
-# 	$curses->addch($c->y1(), $c->x2(), URCORNER());
-# 	$curses->addch($c->y2(), $c->x1(), LLCORNER());
-# 	$curses->addch($c->y2(), $c->x2(), LRCORNER());
-
-# 	my $pair_nb = 1;
-# 	foreach my $bg_nb (0..COLORS()-1) {
-# 		foreach my $fg_nb (0..COLORS()-1) {
-# #			print STDERR "color pairing : $pair_nb, $fg_nb, $bg_nb \n";
-# 			init_pair($pair_nb, $fg_nb, $bg_nb);
-# 			$pair_nb++;
-# 		}
-# 	}
-
-# 	foreach my $x (0..7) {
-# 		$curses->addstr(0, ($x+1)*3, $x);
-# 	}
-# 	foreach my $y (0..7) {
-# 		$curses->addstr($y+1, 0, $y);
-# 	}
-
-# 	my $pair = 1;
-# 	foreach my $x (0..7) {
-# 		foreach my $y (0..7) {
-# 			COLOR_PAIR($pair);
-# 			$curses->attrset(COLOR_PAIR($pair));
-# 			$curses->addstr($y+1, ($x+1)*3, "$x$y");
-# 			$pair++;
-# 		}
-# 	}
-
-	
-# }
+sub draw_title {
+	my ($self, $x1, $y1, $text) = @_;
+	$self->get_widget->is_visible() or return;
+	$self->curses->addstr($y1, $x1, $text);
+	return $self;
+}
 
 
 1;

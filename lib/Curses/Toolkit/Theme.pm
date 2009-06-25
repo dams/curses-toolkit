@@ -23,7 +23,9 @@ sub new {
     my $class = shift;
 	my ($widget) = validate_pos(@_, { isa => 'Curses::Toolkit::Widget' });
     $class eq __PACKAGE__ and die "abstract class";
-	return bless { widget => $widget }, $class;
+	my $self =  bless { widget => $widget }, $class;
+	$self->set_property(ref $widget, $self->_get_default_properties(ref $widget));
+	return $self;
 }
 
 =head2 set_property
@@ -51,7 +53,7 @@ sub set_property {
 	my $parameters = {};
 	if (ref $property_name eq 'HASH' && !defined $value) {
 		$parameters = $property_name;
-	} elsif ( !ref $property_name eq 'HASH' && defined $value) {
+	} elsif ( !ref $property_name) {
 		$parameters = { $property_name => $value };
 	}
 

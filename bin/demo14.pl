@@ -19,68 +19,69 @@ sub main {
 	use Curses::Toolkit::Widget::Label;
 
 	my $root = POE::Component::Curses->spawn();
+#	my $root = Curses::Toolkit->init_root_window();
 
 	local $| = 1;
-	print STDERR "\n\n\n--- starting demo9 -----------------\n\n";
+	print STDERR "\n\n\n--- starting demo14 -----------------\n\n";
 
-	$root->add_window(
-        Curses::Toolkit::Widget::Window->new()
-		  ->set_title('demo 14')
-          ->add_widget(
-            Curses::Toolkit::Widget::VBox->new()
-              ->pack_end(
- 			    Curses::Toolkit::Widget::HBox->new()
- 				  ->pack_end(
-			        my $button01 = Curses::Toolkit::Widget::Button
-					  ->new_with_label('This is a button !')
-				      ->set_name('button1'),
-				    { expand => 1 }
-  				  )
- 				  ->pack_end(
- 			        my $button02 = Curses::Toolkit::Widget::Button
- 				      ->new_with_label('This is another button !')
- 				      ->set_name('button2'),
-				    { expand => 1 }
- 				  ),
-				  { expand => 0 }
-			  )
-              ->pack_end(
-                Curses::Toolkit::Widget::Border->new()
-                  ->add_widget(
-                    Curses::Toolkit::Widget::Label->new()
-                      ->set_text('expanding border with a label (this text) in it')
-					),
-				{ expand => 1 }
-			  )
-              ->pack_end(
- 			    Curses::Toolkit::Widget::HBox->new()
- 				  ->pack_end(
-			        my $button1 = Curses::Toolkit::Widget::Button
-				      ->new_with_label('This button is there!')
-				      ->set_name('button1'),
-				    { expand => 0 }
-  				  )
-				  ->pack_end(
- 			        my $button2 = Curses::Toolkit::Widget::Button
- 				      ->new_with_label('Yet Another Button !')
- 				      ->set_name('button2'),
-				    { expand => 0 }
- 				  ),
-				  { expand => 0 }
-			  )
-		  )
-          ->set_coordinates(x1 => 0,   y1 => 0,
-                            x2 => '100%',
-							y2 => '100%',
-						   )
-      );
+	my $window = Curses::Toolkit::Widget::Window->new();
+	$root->add_window($window);
+	$window->set_title("A VERY LONG TITLE THAT DOESN'T FIT IN");
+#	$window->set_theme_property(title_position => 'center');
+
+	my $vbox = Curses::Toolkit::Widget::VBox->new();
+	$window->add_widget($vbox);
+	$vbox->pack_end( Curses::Toolkit::Widget::HBox->new()
+					 ->pack_end(
+								my $button01 = Curses::Toolkit::Widget::Button
+								->new_with_label('This is a button !')
+								->set_name('button1'),
+								{ expand => 1 }
+							   )
+					 ->pack_end(
+								my $button02 = Curses::Toolkit::Widget::Button
+								->new_with_label('This is another button !')
+								->set_name('button2'),
+								{ expand => 1 }
+							   ),
+					 { expand => 0 }
+				   );
+	$vbox->pack_end(
+					Curses::Toolkit::Widget::Border->new()
+					->add_widget(
+								 Curses::Toolkit::Widget::Label->new()
+								 ->set_text('expanding border with a label (this text) in it')
+								),
+					{ expand => 1 }
+				   );
+	$vbox->pack_end(
+					Curses::Toolkit::Widget::HBox->new()
+					->pack_end(
+							   my $button1 = Curses::Toolkit::Widget::Button
+							   ->new_with_label('This button is there!')
+							   ->set_name('button1'),
+							   { expand => 0 }
+							  )
+					->pack_end(
+							   my $button2 = Curses::Toolkit::Widget::Button
+							   ->new_with_label('Yet Another Button !')
+							   ->set_name('button2'),
+							   { expand => 0 }
+							  ),
+					{ expand => 0 }
+				   );
+	$window->set_coordinates(x1 => 0,   y1 => 0,
+							 x2 => '100%',
+							 y2 => '100%',
+							);
+
 	$button1->set_focus(1);
 #	$button1->register_event( type => keyboard
 
-#$root
-#      ->render()
-#      ->display();
-#sleep 5;
+# $root
+#       ->render()
+#       ->display();
+# sleep 5;
 	POE::Kernel->run();
 }
 

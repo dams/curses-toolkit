@@ -66,6 +66,12 @@ sub needs_redraw {
 	return $self;
 }
 
+sub add_delay {
+	my $self = shift;
+	my $seconds = shift;
+	my $code = shift;
+	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
+}
 
 ## Methods called by the POE Component session ##
 ## They usually return nothing
@@ -87,7 +93,8 @@ sub event_resize {
 	my ($self) = @_;
 
 	use Curses::Toolkit::Event::Shape;
-	my $event = Curses::Toolkit::Event::Shape->new( type => 'change', );
+	my $event = Curses::Toolkit::Event::Shape->new( type => 'change',
+													root_window => $self->{toolkit_root}, );
 	$self->{toolkit_root}->dispatch_event($event);
 	return;
 }
@@ -106,7 +113,7 @@ sub event_key {
 		use Curses::Toolkit::Event::Key;
 		my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
 													  params => { key => $params{key}},
-													  root_window => $self->{toolkit_root}
+													  root_window => $self->{toolkit_root},
 													);
 		$self->{toolkit_root}->dispatch_event($event);
 	}
@@ -137,7 +144,8 @@ sub event_mouse {
 																		 y2 => $params{y},
 																	   );
 		delete @params{qw(x y z)};
-		my $event = Curses::Toolkit::Event::Mouse::Click->new( %params, root_window => $self->{toolkit_root} );
+		my $event = Curses::Toolkit::Event::Mouse::Click->new( %params,
+															   root_window => $self->{toolkit_root} );
 		$self->{toolkit_root}->dispatch_event($event);
 	}
 	return;

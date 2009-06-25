@@ -8,6 +8,7 @@ use parent qw(Curses::Toolkit::Widget::Border);
 use Params::Validate qw(:all);
 
 use List::MoreUtils qw(any none);
+use List::Util qw(min sum max);
 
 =head1 NAME
 
@@ -34,6 +35,8 @@ sub new {
 	# set_default title
 	$self->set_title('');
 	$self->set_type('normal');
+	$self->{_title_offset} = 0;
+	$self->{_title_animation_direction} = '';
 #	$self->set_focused_widget($self);
 	return $self;
 }
@@ -219,24 +222,151 @@ sub get_focused_widget {
 	return;
 }
 
+
+# <--------------- w1 ----------->
+#  <-------------- w2 ---------->
+#            <---- w3 --->
+#              <-- w4 ->
+# |----------[ the title ]-------|
+#            w5         w6 
+#             |--- + ---|
+#                  = w7
+# --- o1 ----^ 
+#
+#        the complete title   <- the original title
+#        -- o2 ->lete title   <- the displayed title
+#
+# in case of left position :
+# |--------[ the title ]------------|
+#  -- o3 --^ 
+#
+# in case of right position :
+# |--------[ the title ]--------|
+#                      ^-- o4 --
+
+=head2 draw
+
+Draw the widget. You shouldn't use that, the mainloop will take care of it. If
+you are not using any mainloop, you should call draw() on the root window. See
+Curses::Toolkit
+
+=cut
+
 sub draw {
 	my ($self) = @_;
-	my $theme = $self->get_theme();
-	my $c = $self->get_coordinates();
-	$theme->draw_hline($c->x1(), $c->y1(), $c->width());
+	$self->SUPER::draw();
+
+	$self->get_theme_property('border_width') > 0 or return;
+
+	my ($c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4) = $self->_compute_draw_informations();
 
 	my $title = $self->get_title();
-	if (length $title) {
-		$theme->draw_string($c->x1(), $c->y1(), $self->get_title());
+	my @title_brackets_characters = @{$self->get_theme_property('title_brackets_characters')};
+	my $title_position = $self->get_theme_property('title_position');
+	
+
+ 	if ($w4 < length $title && $self->{_title_animation_direction} eq '') {
+		# no animation were in place, we put one
+		$self->{_title_animation_direction} = 'right';
+		$self->{_title_offset} = 0;
+		$self->_start_animation();
 	}
 
-	$theme->draw_hline($c->x1(), $c->y2() - 1, $c->width());
-	$theme->draw_vline($c->x1(), $c->y1(), $c->height());
-	$theme->draw_vline($c->x2() - 1, $c->y1(), $c->height());
-	$theme->draw_corner_ul($c->x1(), $c->y1());
-	$theme->draw_corner_ll($c->x1(), $c->y2() - 1);
-	$theme->draw_corner_ur($c->x2() - 1, $c->y1());
+	my $o2 = $self->{_title_offset};
+
+	my $title_to_display = substr($title, $o2, $w4 );
+	
+
+	my $o1 = 0;
+	if ($title_position eq 'center') {
+		$o1 = ($w1 - $w3) / 2;
+	} elsif ($title_position eq 'left') {
+		$o1 = 1 + $o3; # TODO : needs to change that with variable border width
+		$o1 = min($o1, $w1 - $w3 - 1)# TODO : needs to change that with variable border width
+	} else { # right
+		$o1 = $w1 - $w3 - 1 - $o4;  # TODO : needs to change that with variable border width
+		$o1 = max($o1, 1); # TODO : needs to change that with variable border width
+	}
+
+	my $theme = $self->get_theme();
+	if (length $title_to_display) {
+		$theme->draw_title($c->x1() + $o1, $c->y1(),
+						   join($title_to_display, @title_brackets_characters)
+						  );
+	}
+
 	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
+}
+
+sub _compute_draw_informations {
+	my ($self) = @_;
+
+	my $title_width = $self->get_theme_property('title_width');
+	my $c = $self->get_coordinates();
+	my $title = $self->get_title();
+	my @title_brackets_characters = @{$self->get_theme_property('title_brackets_characters')};
+
+	my $o3 = $self->get_theme_property('title_left_offset');
+	my $o4 = $self->get_theme_property('title_right_offset');
+
+	my $w1 = $c->width();
+	my $w2 = $w1 - 2; # TODO : needs to change that with variable border width
+	my ($w5, $w6) = map { length } @title_brackets_characters;
+	my $w7 = $w5 + $w6;
+	my $w3 = min ( length($title) + $w7, $w2 * $title_width / 100 );
+	my $w4 = $w3 - $w7;
+
+	return ($c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4);
+}
+
+sub _start_animation {
+	my ($self) = @_;
+	my $root_window = $self->get_root_window();
+
+	my $delay_sub;
+	$delay_sub = sub {
+		my ($c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4) = $self->_compute_draw_informations();
+		my $title = $self->get_title();
+
+		if ($w4 >= length $title) {
+			# stop the animation
+			$self->{_title_offset} = 0;
+			$self->{_title_animation_direction} = '';		
+			return;
+		}
+
+		# continue the animation
+		my $total_second = $self->get_theme_property('title_loop_duration') / 2; # TODO : reimplement
+		my $nb_step = length($title) - $w4 + 1;
+		my $delay = $total_second / $nb_step;
+		if ($self->{_title_animation_direction} eq 'right') {
+			# animation goes to the right
+			$self->{_title_offset}++;
+		} else {
+			# animation goes to the left
+			$self->{_title_offset}--;
+		}
+# 		# now check the boundaries
+ 		if ($self->{_title_offset} < 0) {
+ 			$self->{_title_animation_direction} = 'right';
+ 			$self->{_title_offset} = 0;
+			$delay = $self->get_theme_property('title_loop_pause');
+ 		}
+		print STDERR " ######### W4 : $w4 | length : " . length($title) . " | offset : " . $self->{_title_offset} . "\n";
+ 		if ($self->{_title_offset} > length($title) - $w4 + 1) {
+ 			$self->{_title_offset} = length($title) - $w4 + 1;
+ 			$self->{_title_animation_direction} = 'left';
+			$delay = $self->get_theme_property('title_loop_pause');
+ 		}
+		$self->needs_redraw();
+		my $root_window = $self->get_root_window();
+#		$delay = 1/4;
+		$root_window->add_delay($delay, $delay_sub);
+	};
+
+	# launch the animation in 1 second
+	$root_window->add_delay(1, $delay_sub);
+	return;
 }
 
 =head2 set_type
@@ -244,17 +374,18 @@ sub draw {
 Set the type of the window. Default is 'normal'.
 Can be : 
 
-  input  : SCALAR : the type, one of 'normal', 'invisible', 'left_title', 'right_title'
+  input  : SCALAR : the type, one of 'normal', 'menu'
   output : the window widget
 
 =cut
 
-my @possible_types = qw( normal invisible menu );
+my @possible_types = qw( normal menu );
 sub set_type {
 	my $self = shift;
 	my ($type) = validate_pos( @_, { type => SCALAR,
 									 callbacks => { "one of @possible_types" => sub {
-														any { $_[0] eq $_ } @possible_types;
+														my ($arg) = @_;
+														any { $arg eq $_ } @possible_types;
 													}
 												  }
 								   } );
@@ -288,6 +419,9 @@ Here is the list of properties related to the window, that can be changed in
 the associated theme. See the Curses::Toolkit::Theme class used for the default
 (default class to look at is Curses::Toolkit::Theme::Default)
 
+Don't forget to look at properties from the parent class, as these are also
+inherit of !
+
 =head2 title_width
 
 The width (or the height if the title is displayed vertically) of the window
@@ -297,12 +431,16 @@ Example :
   # the title can take up to 80% of the windows border
   $window->set_theme_property(title_width => 80 );
 
-=head2 title_position
+=head2 title_bar_position
 
-Can be 'top', 'bottom', 'left', 'right', sets the position of the title on the window border
+Can be 'top', 'bottom', 'left', 'right', sets the position of the title bar on the window border
 Example :
   # The title will appear on the left
   $window->set_theme_property(title_position => 'left');
+
+=head2 title_position
+
+Specifies if the title should be on the left/top, center or right/bottom on the title bar. Can be 'left', 'center' or 'right'
 
 =head2 title_brackets_characters
 
@@ -313,9 +451,35 @@ Example :
   # The title will appear <like that>
   $window->set_theme_property(title_brackets_characters => [ '<', '>' ]);
 
+=head2 title_left_offset
+
+If title_position is 'left', this offset will be used to move the title on the right
+
+=head2 title_right_offset
+
+If title_position is 'right', this offset will be used to move the title on the left
+
+=head2 title_animation
+
+If set to 1, when the title is too big to be displayed in the window title bar,
+an animation will make the title loop back and forth.
+
+=head2 title_loop_duration
+
+If the title is too big to be displayed in the window title bar, an animation
+will make the title loop back and forth. This properties let's you specify what
+should be the complete animation duration. It's in seconds, but fractions are
+accepted
+
+=head2 title_loop_pause
+
+This sets the duration the loop animation should pause before going to the
+other direction. It's in seconds, but fractions are accepted
+
 =cut
 
-my @title_positions = qw(top bottom left right);
+my @title_bar_positions = qw(top bottom left right);
+my @title_positions = qw(left center right);
 
 sub _get_theme_properties_definition {
 	my ($self) = @_;
@@ -325,22 +489,56 @@ sub _get_theme_properties_definition {
 			   callbacks => { "should be between 0 and 100 (percent)" => sub {
 								  $_[0] <= 100 && $_[0] >= 0;
 							  }
-							}			    
+							}
+			 },
+			 title_bar_position => {
+			   optional => 1,
+			   callbacks => { "should be one of @title_bar_positions" => sub {
+								  my ($arg) = @_;
+								  any { $arg eq $_ } @title_bar_positions;
+							  }
+							}
 			 },
 			 title_position => {
 			   optional => 1,
 			   callbacks => { "should be one of @title_positions" => sub {
-								  any { $_[0] eq $_ } @title_positions;
+								  my ($arg) = @_;
+								  any { $arg eq $_ } @title_positions;
 							  }
 							}
 			 },
 			 title_brackets_characters => {
 			   optional => 1,
-			   type => 'ARRAY',
+			   type => ARRAYREF,
 			   callbacks => { "should contain 2 strings" => sub {
-								  @{$_->[0]} == 2 && none { ref } @{$_->[0]};
+								  @{$_[0]} == 2 && none { ref } @{$_[0]};
 							  }
 							}
+			 },
+			 title_left_offset => {
+			   optional => 1,
+			   type => SCALAR,
+			   callbacks => { "positive integer" => sub { $_[0] >= 0 } }
+			 },
+			 title_right_offset => {
+			   optional => 1,
+			   type => SCALAR,
+			   callbacks => { "positive integer" => sub { $_[0] >= 0 } }
+			 },
+			 title_animation => {
+			   optional => 1,
+			   type => BOOLEAN,
+			   callbacks => { "1 or 0" => sub { $_[0] =~ /^1|0$/ } },
+			 },
+			 title_loop_duration => {
+			   optional => 1,
+			   type => SCALAR,
+			   callbacks => { "strictly positive float (seconds)" => sub { $_[0] > 0 } }
+			 },
+			 title_loop_pause => {
+			   optional => 1,
+			   type => SCALAR,
+			   callbacks => { "positive float (seconds)" => sub { $_[0] >= 0 } }
 			 },
 		   }
 }

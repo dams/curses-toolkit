@@ -203,9 +203,10 @@ Returns the widget;
 sub set_theme_property {
 	my $self = shift;
 	$self->get_theme->set_property(ref $self, @_);
+	return $self;
 }
 
-=head2 get_property
+=head2 get_theme_property
 
   my $value = $widget->get_theme_property('property name');
   my $hash = $widget->get_theme_property();

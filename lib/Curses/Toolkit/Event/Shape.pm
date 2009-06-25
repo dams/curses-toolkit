@@ -35,6 +35,7 @@ sub new {
 										  }
 						   },
 						   params => 0,
+						   root_window => { isa => 'Curses::Toolkit' },
 						 }
 					   );
 	$args{params} ||= {};
@@ -42,6 +43,7 @@ sub new {
 	my $definition = $self->get_params_definition($args{type});
 	my %params = validate( @args, $definition ),
 	$self->{type}   = $args{type};
+	$self->{root_window}   = $args{root_window};
 	$self->{params} = \%params;
 	return $self;
 }
@@ -85,6 +87,21 @@ Returns the parameter definition for a given type, as specified in Params::Valid
 sub get_params_definition {
 	my ($self, $type) = @_;
 	return $types{$type};
+}
+
+=head2 get_matching_widget
+
+Returns the widget that is affected by the event. In this case, it returns root
+window, because Shape event is only related to the root window
+
+  input  : none
+  output : the root window
+
+=cut
+
+sub get_matching_widget {
+	my ($self) = @_;
+	return $self->{root_window};
 }
 
 1;

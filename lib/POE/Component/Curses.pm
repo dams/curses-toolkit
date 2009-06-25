@@ -150,6 +150,11 @@ sub spawn {
 				my ($kernel, $heap) = @_[KERNEL, HEAP];
 				$heap->{mainloop}->event_redraw();
 			},
+
+			delay_handler => sub {
+				my $code = $_[ARG0];
+				$code->(@_[ARG0..$#_]);
+			}
         }
 	);
 	return $mainloop->get_toolkit_root();
