@@ -22,7 +22,7 @@ sub main {
 #	my $root = Curses::Toolkit->init_root_window();
 
 	local $| = 1;
-	print STDERR "\n\n\n--- starting demo9 -----------------\n\n";
+	print STDERR "\n\n\n--- starting demo11 -----------------\n\n";
 
 	$root->add_window(
         Curses::Toolkit::Widget::Window->new()

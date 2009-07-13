@@ -207,6 +207,22 @@ DESTROY {
 
 =head1 METHODS
 
+=head2 get_theme_name
+
+  my $theme_name = $root_window->get_theme_name();
+
+Return the theme associated with the root window. Typically used to get a
+usable default theme name. Use tha instead of hard-wiring
+'Curses::Toolkit::Theme::Default'
+
+=cut
+
+sub get_theme_name {
+	my ($self) = @_;
+	return $self->{theme_name};
+}
+
+
 =head2 add_event_listener
 
   $root->add_event_listener($event_listener);
@@ -476,7 +492,7 @@ sub dispatch_event {
 	while ( 1 ) {
 		foreach my $listener ($widget->get_event_listeners()) {
 			if ($listener->can_handle($event)) {
-				return $listener->send_event($event);
+				return $listener->send_event($event, $widget);
 			}
 		}
 		if ($widget->isa('Curses::Toolkit::Widget::Window')) {

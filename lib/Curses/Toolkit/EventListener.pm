@@ -62,8 +62,8 @@ Returns the result of the event code.
 
 sub send_event {
 	my $self = shift;
-	my ($event) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' } );
-	return $self->{code}->($event);	
+	my ($event, $widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' }, 1 );
+	return $self->{code}->($event, $widget);	
 }
 
 1;

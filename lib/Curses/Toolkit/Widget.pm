@@ -343,10 +343,13 @@ the parent. If there is no parent, the default theme name is used
 sub get_theme_name {
 	my ($self) = @_;
 	if ( ! defined $self->{theme_name} ) {
-		my $parent = $self->get_parent();
+		my $parent = $self->isa('Curses::Toolkit::Widget::Window') ?
+		  $self->get_root_window() : $self->get_parent();
 		defined $parent and
 		  return $parent->get_theme_name();
-		$self->{theme_name} = 'Curses::Toolkit::Theme::Default';
+		# If the widget is floating in the void (not on a root window), return
+		# void
+		return;
 	}
 	return $self->{theme_name};
 }

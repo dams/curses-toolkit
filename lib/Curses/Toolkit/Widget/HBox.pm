@@ -166,7 +166,6 @@ sub _rebuild_children_coordinates {
 =head2 get_desired_space
 
 Given a coordinate representing the available space, returns the space desired
-The HBox desires all the space available, so it returns the available space
 
   input : a Curses::Toolkit::Object::Coordinates object
   output : a Curses::Toolkit::Object::Coordinates object

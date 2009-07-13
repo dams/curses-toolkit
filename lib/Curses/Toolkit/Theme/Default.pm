@@ -44,7 +44,7 @@ sub _get_default_properties {
 					'Curses::Toolkit::Widget::Border' => {
 					  border_width => 1,
 					},
-					'Curses::Toolkit::Widget::Button' => {
+					'Curses::Toolkit::Widget::GenericButton' => {
 					  # inherited from Border
 					  border_width => 1,
 					},
@@ -62,24 +62,24 @@ sub HLINE { ACS_HLINE; }
 sub VLINE { ACS_VLINE; }
 
 sub STRING_NORMAL  { }
-sub STRING_FOCUSED { shift->_attron(A_BOLD) }
-sub STRING_CLICKED { shift->_attron(A_REVERSE) }
+sub STRING_FOCUSED { shift->_attron(A_REVERSE) }
+sub STRING_CLICKED { shift->_attron(A_BOLD) }
 
 sub TITLE_NORMAL  { }
-sub TITLE_FOCUSED { shift->_attron(A_BOLD) }
-sub TITLE_CLICKED { shift->_attron(A_REVERSE) }
+sub TITLE_FOCUSED { shift->_attron(A_REVERSE) }
+sub TITLE_CLICKED { shift->_attron(A_BOLD) }
 
 sub HLINE_NORMAL   { }
-sub HLINE_FOCUSED  { shift->_attron(A_BOLD) }
-sub HLINE_CLICKED  { shift->_attron(A_REVERSE) }
+sub HLINE_FOCUSED  { shift->_attron(A_REVERSE) }
+sub HLINE_CLICKED  { shift->_attron(A_BOLD) }
 				   
 sub VLINE_NORMAL   { }
-sub VLINE_FOCUSED  { shift->_attron(A_BOLD) }
-sub VLINE_CLICKED  { shift->_attron(A_REVERSE) }
+sub VLINE_FOCUSED  { shift->_attron(A_REVERSE) }
+sub VLINE_CLICKED  { shift->_attron(A_BOLD) }
 
 sub CORNER_NORMAL  { }
-sub CORNER_FOCUSED { shift->_attron(A_BOLD) }
-sub CORNER_CLICKED { shift->_attron(A_REVERSE) }
+sub CORNER_FOCUSED { shift->_attron(A_REVERSE) }
+sub CORNER_CLICKED { shift->_attron(A_BOLD) }
 
 sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
