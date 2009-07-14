@@ -30,7 +30,8 @@ sub new {
 					   relatives_coordinates => Curses::Toolkit::Object::Coordinates
 					   ->new_zero(),
 					   properties => {},
-					   event_listeners => [],
+					   event_listeners => {},
+					   next_index => 0,
 					 }, $class;
 	$self->set_sensitive(1);
 	$self->set_visible(1);
@@ -241,7 +242,10 @@ events
 sub add_event_listener {
 	my $self = shift;
 	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
-	push @{$self->{event_listeners}}, $listener;
+	my $index = $self->_get_next_index();
+	$self->{event_listeners}->{$index} = $listener;
+#	push @{$self->{event_listeners}}, $listener;
+	$listener->_set_widget($self, $index);
 	return $self;
 }
 
@@ -258,7 +262,16 @@ Returns the list of listeners connected to this widget.
 
 sub get_event_listeners {
 	my ($self) = @_;
-	return @{$self->{event_listeners}};
+	return values %{$self->{event_listeners}};
+}
+
+# given its index, unlink the event listener from the widget
+# input  : index
+# output : the widget
+sub _remove_event_listener {
+	my ($self, $index) = @_;
+	delete $self->{event_listeners}{$index};
+	return $self;
 }
 
 =head2 draw
@@ -555,6 +568,14 @@ sub _get_brother {
 	$iterator->prev();
 	defined $brother_widget and return $brother_widget;
 	return;
+}
+
+# returns the next available index
+# input  : none
+# output : index number
+sub _get_next_index {
+	my ($self) = @_;
+	return $self->{next_index}++;
 }
 
 1;

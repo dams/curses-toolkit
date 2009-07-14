@@ -130,9 +130,9 @@ sub draw_corner_lr {
 }
 
 sub draw_string {
-	my ($self, $x1, $y1, $text) = @_;
+	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	$self->curses->addstr($y1, $x1, $text);
+	$self->curses($attr)->addstr($y1, $x1, $text);
 	return $self;
 }
 

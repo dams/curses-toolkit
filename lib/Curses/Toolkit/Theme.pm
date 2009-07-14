@@ -94,11 +94,22 @@ sub get_widget {
 }
 
 sub curses {
-	my ($self) = @_;
+	my ($self, $attr) = @_;
 	$self->_get_curses_handler()->attrset(0);
 	my $caller = (caller(1))[3];
 	my $type = uc( (split('_', $caller))[1] );
 	$self->_compute_attributes($type);
+	if (defined $attr) {
+		use Curses;
+		if (exists $attr->{bold}) {
+			$attr->{bold} and $self->_attron(A_BOLD);
+			$attr->{bold} or  $self->_attroff(A_BOLD);
+		}
+		if (exists $attr->{reverse}) {
+			$attr->{reverse} and $self->_attron(A_REVERSE);
+			$attr->{reverse} or  $self->_attroff(A_REVERSE);
+		}
+	}
 	return $self->_get_curses_handler();
 }
 

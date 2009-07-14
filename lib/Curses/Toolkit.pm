@@ -485,16 +485,22 @@ Given an event, dispatch it to the appropriate widgets / windows, or to the root
 
 sub dispatch_event {
 	my $self = shift;
-	my ($event) = validate_pos(@_, { isa => 'Curses::Toolkit::Event' });
+	my ($event, $widget, $dont_dispatch_further) = 
+	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
+				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
+				       { type => BOOLEAN, optional => 1 },
+				  );
 
-	my $widget = $event->get_matching_widget();
+	$widget ||= $event->get_matching_widget();
+	defined $widget or return;
 
 	while ( 1 ) {
-		foreach my $listener ($widget->get_event_listeners()) {
+		foreach my $listener (grep { $_->is_enabled() } $widget->get_event_listeners()) {
 			if ($listener->can_handle($event)) {
 				return $listener->send_event($event, $widget);
 			}
 		}
+		$dont_dispatch_further and return;
 		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
 			$widget = $widget->get_root_window();
 		} elsif ($widget->isa('Curses::Toolkit::Widget')) {

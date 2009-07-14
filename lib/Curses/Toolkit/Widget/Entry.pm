@@ -31,23 +31,111 @@ sub new {
 	$self->{cursor_position} = 0;
 	$self->{text_display_offset} = 0;
 
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
+	# by default in non edit mode
+	$self->{edit_mode} = 0;
+
+	# set a key listener, disabled by default
+	$self->{key_listener} =
+	  Curses::Toolkit::EventListener->new(
 			accepted_event_class => 'Curses::Toolkit::Event::Key',
 			conditional_code => sub { 
 				my ($event) = @_;
 				# accept only key strokes
 				$event->{type} eq 'stroke' or return 0;
-				# don't accept strange keys
-				length $event->{params}{key} == 1 or return 0;
+				$event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
+				$event->{params}{key} eq '<^D>' and return 1;
+				$event->{params}{key} eq '<KEY_LEFT>' and return 1;
+				$event->{params}{key} eq '<KEY_RIGHT>' and return 1;
+				$event->{params}{key} eq '<KEY_UP>' and return 1;
+				$event->{params}{key} eq '<KEY_DOWN>' and return 1;
+				if ($event->{params}{key} eq '<^?>') {
+					$event->{params}{key} = '<KEY_BACKSPACE>';
+					return 1;
+				}
+				if ($event->{params}{key} eq '<^E>') {
+					$event->{params}{key} = '<KEY_DOWN>';
+					return 1;
+				}
+				if ($event->{params}{key} eq '<^A>') {
+					$event->{params}{key} = '<KEY_UP>';
+					return 1;
+				}
+
+				# accept simple character keys
+				length $event->{params}{key} == 1 and return 1;
+
+				# don't accept other strange keys
+				return 0;
 			},
 			code => sub {
 				my ($event, $entry) = @_;
-				$entry->set_text($entry->get_text() . $event->{params}{key});
+				my $k = $event->{params}{key};
+				my $c = $entry->get_cursor_position();
+				my $t = $entry->get_text();
+				if ($k eq '<KEY_LEFT>') {
+					$entry->move_cursor_position(-1);
+				} elsif ($k eq '<KEY_RIGHT>') {
+					$entry->move_cursor_position(1);
+				} elsif ($k eq '<KEY_UP>') {
+					$entry->set_cursor_position(0);
+				} elsif ($k eq '<KEY_DOWN>') {
+					$entry->set_cursor_position(length($t));
+				} elsif ($k eq '<KEY_BACKSPACE>') {
+					if ($c > 0) {
+						substr($t, $c - 1, 1) = '';
+						$entry->set_text($t);
+						$entry->move_cursor_position(-1);
+					}
+				} elsif ($k eq '<^D>') {
+					if ($c < length($t)) {
+						substr($t, $c, 1) = '';
+						$entry->set_text($t);
+					}
+				} else {
+					substr($t, $c, 0 ) = $k;
+					$entry->set_text($t);
+					$entry->move_cursor_position(length($k));
+				}
 				$entry->needs_redraw();
+			},
+		);
+	$self->{key_listener}->disable();
+	$self->add_event_listener(
+		$self->{key_listener},
+	);
+
+	# listen to the Enter key
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Key',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{type} eq 'stroke' or return 0;
+				$event->{params}{key} eq '<^M>' or return 0;
+				return 1;
+			},
+			code => sub {
+				my ($event, $entry) = @_;
+				$entry->set_edit_mode(! $entry->get_edit_mode());
 			},
 		)
 	);
+
+	# listen to the Focus Out event
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Focus::Out',
+			conditional_code => sub { 
+				my ($event) = @_;
+				return 1;
+			},
+			code => sub {
+				my ($event, $entry) = @_;
+				$entry->set_edit_mode(0);
+			},
+		)
+	);
+
 	return $self;
 }
 
@@ -65,6 +153,7 @@ sub new_with_text {
 	my ($text) = validate_pos( @_, { type => SCALAR } );
 	my $self = $class->new();
 	$self->set_text( $text );
+	$self->set_cursor_position( length($text) );
 	return $self;
 }
 
@@ -109,6 +198,95 @@ sub get_text {
 # ---- o2 --^ 
 
 
+=head2 set_edit_mode
+
+Set the entry to be in edit mode or not
+
+input  : true or false
+output : the entry widget
+
+=cut
+
+sub set_edit_mode {
+	my ($self, $bool) = @_;
+	my $old_bool = $self->get_edit_mode();
+	if ($bool && !$old_bool) {
+		# switched to edit mode
+		$self->{key_listener}->enable();
+		$self->{edit_mode} = 1;
+		$self->needs_redraw();
+	}
+	if (!$bool && $old_bool) {
+		# switched to non-edit mode
+		$self->{key_listener}->disable();
+		$self->{edit_mode} = 0;
+		$self->needs_redraw();
+	}
+	return $self;
+}
+
+=head2 get_edit_mode
+
+Returns true if the entry is in edit mode, false otherwise
+
+input  : none
+output : true or false
+
+=cut
+
+sub get_edit_mode {
+	my ($self) = @_;
+	return $self->{edit_mode};
+}
+
+=head2 set_cursor_position
+
+Set absolute position of the cursor
+
+  input  : the cursor position
+  output : the entry widget;
+
+=cut
+
+sub set_cursor_position {
+	my $self = shift;
+	my ($position) = validate_pos(@_, { type => SCALAR });
+	$position < 0 and $position = 0;
+	$position > length($self->get_text()) and $position = length($self->get_text());
+	$self->{cursor_position} = $position;
+	return $self;
+}
+
+=head2 get_cursor_position
+
+Returns the absolute position of the cursor
+
+  input  : none
+  output : the cursor position
+
+=cut
+
+sub get_cursor_position {
+	my $self = shift;
+	return $self->{cursor_position};
+}
+
+=head2 move_cursor_position
+
+Set the position of the cursor, relatively
+
+  input  : cursor deplacement (can be positive or negative)
+  output : the entry widget
+
+=cut
+
+sub move_cursor_position {
+	my $self = shift;
+	my ($rel_position) = validate_pos(@_, { type => SCALAR });
+	my $position = $self->get_cursor_position() + $rel_position;
+	return $self->set_cursor_position($position);
+}
+
 =head2 draw
 
 =cut
@@ -128,16 +306,40 @@ sub draw {
 	# prepare the background text
 	my $display_text = '_' x $w2;
 	# get the text to display
-	my $t = substr($text, $self->{text_display_offset}, $w2);
+
+	if ( ! $self->get_edit_mode() ) {
+		my $t = substr($text, 0, $w2);
 print STDERR " --> t : $t\n";
-	# put the background text below it
+		# put the background text below it
 print STDERR " --> t : $display_text\n";
-	substr($display_text, 0, length($t)) = $t;
+		substr($display_text, 0, length($t)) = $t;
 print STDERR " --> t : $t\n";
 
-	$theme->draw_string($c->x1(), $c->y1(), '[');
-	$theme->draw_string($c->x1() + $o2, $c->y1(), ']');
-	$theme->draw_string($c->x1() + $o1, $c->y1(), $display_text);
+		$theme->draw_string($c->x1(), $c->y1(), '[');
+		$theme->draw_string($c->x1() + $o2, $c->y1(), ']');
+		$theme->draw_string($c->x1() + $o1, $c->y1(), $display_text);
+
+	} else {
+		if ( $self->get_cursor_position() >= $self->{text_display_offset} + $w2 - 1) {
+			$self->{text_display_offset} = $self->get_cursor_position() - $w2 + 1;
+		}
+		if ( $self->get_cursor_position() < $self->{text_display_offset}) {
+			$self->{text_display_offset} = $self->get_cursor_position();
+		}
+		my $t = substr($text, $self->{text_display_offset}, $w2);
+		substr($display_text, 0, length($t)) = $t;
+		my $relative_cursor_position = $self->get_cursor_position() - $self->{text_display_offset};
+		my $t1 = substr($display_text, 0, $relative_cursor_position);
+		my $t2 = substr($display_text, $relative_cursor_position, 1);
+		my $t3 = substr($display_text, $relative_cursor_position + 1);
+
+		$theme->draw_string($c->x1(), $c->y1(), '[', { reverse => 0 });
+		$theme->draw_string($c->x1() + $o2, $c->y1(), ']', { reverse => 0 });
+		$theme->draw_string($c->x1() + $o1, $c->y1(), $t1, { reverse => 0 });
+		$theme->draw_string($c->x1() + $o1 + length($t1), $c->y1(), $t2, { reverse => 1 } );
+		$theme->draw_string($c->x1() + $o1 + length($t1) + 1, $c->y1(), $t3, { reverse => 0 } );
+	}
+
 
 	return;
 }

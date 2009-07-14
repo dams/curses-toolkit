@@ -217,7 +217,7 @@ sub get_focused_widget {
 	my ($self) = @_;
 	my $focused_widget = $self->{focused_widget};
 	if (defined $focused_widget && $focused_widget->can('is_focused') && $focused_widget->is_focused()) {
-		return $self->{focused_widget};
+		return $focused_widget;
 	}
 	return;
 }

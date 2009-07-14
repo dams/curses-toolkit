@@ -28,6 +28,7 @@ sub new {
 								code => { type => CODEREF },
 							  }
                          );
+	$params{enabled} = 1;
 	return bless { %params }, $class;
 }
 
@@ -64,6 +65,107 @@ sub send_event {
 	my $self = shift;
 	my ($event, $widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' }, 1 );
 	return $self->{code}->($event, $widget);	
+}
+
+=head2 enable
+
+Enables the event listener (by default the listener is enabled)
+
+  input  : none
+  output : the event listener
+
+=cut
+
+sub enable {
+	my ($self) = @_;
+	$self->{enabled} = 1;
+	return $self;
+}
+
+=head2 disable
+
+Disables the event listener
+
+  input  : none
+  output : the event listener
+
+=cut
+
+sub disable {
+	my ($self) = @_;
+	$self->{enabled} = 0;
+	return $self;
+}
+
+=head2 is_enabled
+
+Return the state of the listener
+
+input  : none
+output : true or false
+
+=cut
+
+sub is_enabled {
+	my ($self) = @_;
+	return $self->{enabled} ? 1 : 0;
+}
+
+=head2 is_attached
+
+Returns true if the event listener is already attached to a widget
+
+  input  : none
+  output : true or false
+
+=cut
+
+sub is_attached {
+	my ($self) = @_;
+	defined $self->{attached_to} and return 1;
+	return;
+}
+
+=head2 detach
+
+detach the event listener from the widget it is attached to.
+
+  input  : none
+  output : the event listener
+
+=cut
+
+sub detach {
+	my ($self) = @_;
+	$self->is_attached() or die "the event listener is not attached";
+	my $widget = $self->{attached_to};
+	my $index = $self->{attached_index};
+	if (defined $widget && defined $index) {
+		$widget->_remove_event_listener($index);
+	}
+	delete $self->{attached_to};
+	delete $self->{attached_index};
+	return $self;
+}
+
+# set the widget to which the event listener is attached
+# input  : a Curses::Toolkit::Widget
+#          the index
+# output : the event listener
+sub _set_widget {
+	my $self = shift;
+	my ($widget, $index) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' },
+										     { type => BOOLEAN },
+									   );
+	$self->{attached_to} = $widget;
+	$self->{attached_index} = $index;
+	return $self;
+}
+
+# destroyer
+DESTROY {
+    my ($self) = @_;
+	$self->is_attached() and $self->detach();
 }
 
 1;
