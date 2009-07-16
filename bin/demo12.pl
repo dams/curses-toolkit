@@ -13,6 +13,7 @@ sub main {
 
 	use Curses::Toolkit::Widget::Border;
 	use Curses::Toolkit::Widget::Label;
+	use Curses::Toolkit::Widget::Button;
 
 	my $root = POE::Component::Curses->spawn();
 
@@ -22,10 +23,20 @@ sub main {
 	$win1->add_widget(
       Curses::Toolkit::Widget::Border
 	    ->new()
+		->set_name("border1")
 		->add_widget(
-		  Curses::Toolkit::Widget::Label
-		    ->new()
-            ->set_text("window 1")
+ 		  Curses::Toolkit::Widget::Button
+ 			->new_with_label('Button')
+ 			->set_name('button1'),
+
+# 		  Curses::Toolkit::Widget::Entry
+# 			->new_with_text('Test')
+# 			->set_name('entry1'),
+
+# 		  Curses::Toolkit::Widget::Label
+# 		    ->new()
+# 			->set_name("label1")
+#             ->set_text("window 1")
 	  )
 	);
 
@@ -41,9 +52,11 @@ sub main {
 	$win2->add_widget(
       Curses::Toolkit::Widget::Border
 	    ->new()
+		->set_name("border2")
 		->add_widget(
 		  Curses::Toolkit::Widget::Label
 		    ->new()
+			->set_name("label2")
             ->set_text("window 2")
 	  )
 	);

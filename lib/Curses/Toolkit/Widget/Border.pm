@@ -47,7 +47,7 @@ sub draw {
 		$theme->draw_corner_ur($c->x2() - $i - 1, $c->y1() + $i);
 		$theme->draw_corner_lr($c->x2() - $i - 1, $c->y2() - $i - 1);
 	}
-
+	return;
 }
 
 # Returns the relative rectangle that a child widget can occupy.
@@ -59,7 +59,6 @@ sub draw {
 sub _get_available_space {
 	my ($self) = @_;
 	my $rc = $self->get_relatives_coordinates();
-	use Curses::Toolkit::Object::Coordinates;
 	my $bw = $self->get_theme_property('border_width');
 	return Curses::Toolkit::Object::Coordinates->new(
 		x1 => $bw, y1 => $bw,

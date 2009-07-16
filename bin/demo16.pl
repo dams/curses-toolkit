@@ -41,7 +41,7 @@ sub main {
 							   )
 					 ->pack_end(
 								Curses::Toolkit::Widget::Entry
-								->new_with_text('Thi')
+								->new_with_text('Test')
 								->set_name('entry1'),
 								{ expand => 1 }
 							   ),

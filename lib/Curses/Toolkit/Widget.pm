@@ -380,7 +380,13 @@ from the widget's theme name (see L<get_theme_name>).
 sub get_theme {
 	my ($self) = @_;
 	if ( ! defined $self->{theme} ) {
-		$self->{theme} = $self->get_theme_name()->new($self);
+		my $theme_name = $self->get_theme_name();
+		if (defined $theme_name) {
+			$self->{theme} = $self->get_theme_name()->new($self);
+		} else {
+use Curses::Toolkit::Theme::Default;
+return Curses::Toolkit::Theme::Default->new($self);
+		}
 	}
 	return $self->{theme};
 }
@@ -576,6 +582,113 @@ sub _get_brother {
 sub _get_next_index {
 	my ($self) = @_;
 	return $self->{next_index}++;
+}
+
+=head2 set_modal
+
+=cut
+
+sub set_modal {
+	my ($self) = @_;
+	my $window = $self->get_window();
+	defined $window or return $self;
+	my $root_window = $window->get_root_window();
+	defined $root_window or return $self;
+	$root_window->set_modal_widget($self);
+	return $self;
+}
+
+=head2 unset_modal
+
+=cut
+
+sub unset_modal {
+	my ($self) = @_;
+	my $window = $self->get_window();
+	defined $window or return $self;
+	my $root_window = $window->get_root_window();
+	defined $root_window or return $self;
+	$root_window->unset_modal_widget();
+	return $self;
+}
+
+
+## Focus related stuff
+
+=head2 get_next_focused_widget
+
+  my $next_focused_widget = $widget->get_next_focused_widget();
+
+Returns the widget next in the focus chain
+
+  input : optional, a true value to start searching from $widget
+  output : the next focused widget
+
+=cut
+
+sub get_next_focused_widget {
+	my ($self, $dont_avoid_me) = @_;
+
+	my $next_widget;
+	# look down and right
+	$next_widget = $self->_recursive_f1($self, !$dont_avoid_me);
+	defined $next_widget and return $next_widget;
+
+	# nothing down and right ? look up and right
+	$next_widget = $self->_recursive_f2($self);
+	defined $next_widget and return $next_widget;
+
+	# still nothing ? Start from top and look down
+	my $window = $self->get_window();
+	defined $window or return;
+	return $self->_recursive_f1($window);
+}
+
+sub _recursive_f1 {
+	my ($self, $widget, $avoid_me) = @_;
+	# Is the widget focusable ?
+	unless ($avoid_me) {
+		$widget->isa('Curses::Toolkit::Role::Focusable') && $widget->is_focusable()
+		  and return $widget;
+	}
+
+	# does the widget have any children ?
+	if ($widget->isa('Curses::Toolkit::Widget::Container')) {		
+		my @children = $widget->get_children();
+		if (@children) {
+			my $next_widget = $self->_recursive_f1($children[0]);
+			defined $next_widget and return $next_widget;
+		}
+	}
+	# does the widget have a brother ?
+	my $brother_widget = $widget->_get_brother();
+	defined $brother_widget or return;
+
+	return $self->_recursive_f1($brother_widget);
+}
+
+sub _recursive_f2 {
+	my ($self, $widget) = @_;
+	# get parent
+	my $parent_widget = $widget->get_parent();
+	defined $parent_widget or return;
+
+	# is the parent focusable ?
+	$parent_widget->isa('Curses::Toolkit::Role::Focusable') && $parent_widget->is_focusable()
+	  and return $parent_widget;
+
+	# if not, apply f1 on its potential brother
+	my $brother_widget = $parent_widget->_get_brother();
+	if (defined $brother_widget) {
+		my $next_widget = $self->_recursive_f1($brother_widget);
+		defined $next_widget and return $next_widget;
+	}
+
+	# still nothing ? call f2
+	my $next_widget = $self->_recursive_f2($parent_widget);
+	defined $next_widget and return $next_widget;
+
+	return;
 }
 
 1;

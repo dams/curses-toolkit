@@ -83,26 +83,29 @@ sub get_matching_widget {
 	my $recurse;
 	$recurse = sub { 
 		my $deepness = shift;
+		my $stack = shift;
 		$deepness++;
 		my @result = map { 
+			my $stack = ( $_->isa('Curses::Toolkit::Widget::Window') ? 
+						  $_->get_property(window => 'stack') : $stack
+						);
 			[ $deepness,
-			  ( $_->isa('Curses::Toolkit::Widget::Window') ? 
-				$_->get_property(window => 'stack') : 0
-			  ),
+			  $stack,
 			  $_
-			], ( $_->can('get_children') ? $recurse->($deepness, $_->get_children()) : () )	  
+			], ( $_->can('get_children') ? $recurse->($deepness, $stack, $_->get_children()) : () )	  
 		} @_;
 		return @result;
 	};
 
-	my @all_widgets = $recurse->(0, $self->{root_window}->get_windows());
+	my @all_widgets = $recurse->(0, 0, $self->{root_window}->get_windows());
 	# sort by window stack then deepnes in the widget tree
 	@all_widgets = sort { $b->[1] <=> $a->[1] || $b->[0] <=> $a->[0] } grep { $self->{coordinates}->is_in_widget($_->[2]) } @all_widgets;
-	print STDERR Dumper(map { $_->[2]->get_name() } @all_widgets); use Data::Dumper;
 
-	@all_widgets or @all_widgets = $self->{root_window};
+	print STDERR "\n----------------\n" . Dumper(map { my @foo = @$_; $foo[2] = $foo[2]->get_name(); \@foo } @all_widgets); use Data::Dumper;
 
-	return $all_widgets[0]->[2];
+	@all_widgets and return $all_widgets[0]->[2];
+	print STDERR "\nroot window\n";
+	return $self->{root_window};
 }
 
 1;

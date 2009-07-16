@@ -10,11 +10,20 @@ use Params::Validate qw(:all);
 use overload
   '+' => '_clone_add',
   '-' => '_clone_substract',
-  '""' => 'stringify';
+  '""' => '_stringify',
+  '==' => '_equals';
 
-sub stringify {
+sub _stringify {
 	my ($self) = @_;
 	return ref($self);
+}
+
+sub _equals {
+	my ($c1, $c2) = @_;
+	return $c1->x1() == $c2->x1() &&
+           $c1->y1() == $c2->y1() &&
+           $c1->x2() == $c2->x2() &&
+           $c1->y2() == $c2->y2()
 }
 
 =head1 NAME
@@ -35,20 +44,28 @@ Trivial class to hold 2 points
            y1 : top left y
            x2 : right bottom x
            y2 : right bottom y
+           [ normalize ] : optional, if false, won't normalize the coords (see below)
     OR
   input  : x1 : top left x
            y1 : top left y
            width : width
            height : heigth
+           [ normalize ] : optional, if false, won't normalize the coords (see below)
     OR
   input  : x1 : sub { ... } # returns top left x
            y1 : sub { ... } # returns top left y
            x2 : sub { ... } # returns right bottom x
            y2 : sub { ... } # returns right bottom y
+           [ normalize ] : optional, if false, won't normalize the coords (see below)
     OR
   input  : a Curses::Toolkit::Object::Coordinates object
 
   output : a Curses::Toolkit::Object::Coordinates object
+
+
+Normalize option : if set to false, the coordinate will be untouched. If set to
+true (default), the coordinate will make sure x1 < x2 and y1 < y2, and that
+they are all integers, swapping or rounding them if necessary.
 
 =cut
 
@@ -66,18 +83,21 @@ sub new {
 	if (exists $params{width} || exists $params{height}) {
 		validate(@_, { x1 => { type => SCALAR }, y1 => { type => SCALAR },
 					   width => { type => SCALAR }, height => { type => SCALAR },
+					   normalize => { optional => 1, type => BOOLEAN },
 					 }
 				);
 		$params{x2} = $params{x1} + $params{width};
 		$params{y2} = $params{y1} + $params{height};
+		defined $params{normalize} or $params{normalize} = 1;
 	} else {
 		validate(@_, { x1 => { type => SCALAR | CODEREF }, y1 => { type => SCALAR | CODEREF },
 					   x2 => { type => SCALAR | CODEREF }, y2 => { type => SCALAR | CODEREF },
+					   normalize => { optional => 1, type => BOOLEAN },
 					 }
 				);
 	}
 	my $self = bless \%params, $class;
-	$self->_normalize();
+	$params{normalize} and $self->_normalize();
 	return $self; 
 }
 
@@ -138,6 +158,10 @@ sub _normalize {
 
 	$self->x1() <= $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
 	$self->y1() <= $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
+# 	foreach (qw(x1 x2 y1 y2)) {
+# 		print STDERR '_________ ' . $self->{$_} . ' - ' . sprintf( "%.0f", $self->{$_}) . "\n";
+# 		$self->{$_} = sprintf( "%.0f", $self->{$_});
+# 	}
 	return;
 }
 

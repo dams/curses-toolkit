@@ -81,6 +81,14 @@ sub CORNER_NORMAL  { }
 sub CORNER_FOCUSED { shift->_attron(A_REVERSE) }
 sub CORNER_CLICKED { shift->_attron(A_BOLD) }
 
+sub RESIZE_NORMAL  { }
+sub RESIZE_FOCUSED { shift->_attron(A_REVERSE) }
+sub RESIZE_CLICKED { shift->_attron(A_BOLD) }
+
+sub BLANK_NORMAL  { shift->_attrset() }
+sub BLANK_FOCUSED { shift->_attrset() }
+sub BLANK_CLICKED { shift->_attrset() }
+
 sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
 	$self->get_widget->is_visible() or return;
@@ -143,5 +151,24 @@ sub draw_title {
 	return $self;
 }
 
+sub draw_resize {
+	my ($self, $x1, $y1) = @_;
+	$self->get_widget->is_visible or return;
+	$self->curses->addch($y1, $x1, ACS_CKBOARD);
+	return $self;
+}
+
+sub draw_blank {
+	my $self = shift;
+	$self->get_widget->is_visible or return;
+	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+	my $l = $c->x2() - $c->x1();
+	$l > 0 or return $self;
+	my $str = ' ' x $l;
+	foreach my $y ($c->y1()..$c->y2()-1) {
+		$self->curses()->addstr($y, $c->x1(), $str);
+	}
+	return $self;
+}
 
 1;

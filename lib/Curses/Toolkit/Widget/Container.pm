@@ -49,11 +49,24 @@ Default rendering method for the widget. All render() method should call draw()
 
 sub render {
 	my ($self) = @_;
+	$self->blank();
 	foreach my $child ($self->get_children()) {
 		$child->render();
 	}
 	$self->draw();
     return;
+}
+
+# default method for blanking
+sub blank {
+	my ($self) = @_;
+	my $theme = $self->get_theme();
+	my $c = $self->get_coordinates();
+	my $bc = $self->_get_available_space()
+	  + { x1 => $c->x1(), y1 => $c->y1(),
+		  x2 => $c->x1(), y2 => $c->y1(), };
+	$theme->draw_blank($bc);
+	return $self;
 }
 
 =head2 get_children

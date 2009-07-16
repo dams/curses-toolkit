@@ -32,12 +32,133 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 	# set window stack by default
 	$self->set_property(window => stack => -1);
+	$self->set_property(window => resizable => 1);
 	# set_default title
 	$self->set_title('');
 	$self->set_type('normal');
 	$self->{_title_offset} = 0;
 	$self->{_title_animation_direction} = '';
 #	$self->set_focused_widget($self);
+
+	# listen to the Mouse Click for focus switch
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{type} eq 'clicked' or return 0;
+				$event->{button} eq 'button1' or return 0;
+				return 1;
+			},
+			code => sub {
+				my ($event, $window) = @_;
+
+				# get the root window
+				my $root_window = $window->get_root_window();
+				defined $root_window or return;
+
+				# get the currently focused widget, unfocus it
+				my $current_focused_widget = $root_window->get_focused_widget();
+				if (defined $current_focused_widget && $current_focused_widget->can('set_focus')) {
+					$current_focused_widget->set_focus(0);
+				}
+
+				# bring the window to the front
+				$window->bring_to_front();
+				# focus the window or one of its component
+				my $next_focused_widget = $window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
+				defined $next_focused_widget and 
+				  $next_focused_widget->set_focus(1);
+				defined $next_focused_widget and
+				  print STDERR "\n -> " . $next_focused_widget->get_name() . " <-\n";
+				return;
+			},
+		)
+	);
+
+	# listen to the Mouse for moving the window
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{button} eq 'button1' or return 0;
+				$self->{_move_pressed} && $event->{type} eq 'released'
+				  and return 1;
+				my $c = $event->{coordinates};
+				my $wc = $self->get_coordinates();
+				! $self->{_move_pressed}
+				&& $event->{type} eq 'pressed'
+				&& $c->y1() == $wc->y1()
+				  and return 1;
+				return 0;
+			},
+			code => sub {
+				my ($event, $window) = @_;
+
+				if ($self->{_move_pressed}) {
+					# means we released it
+					$window->unset_modal();
+					my $c = $event->{coordinates};
+					my $oc = $self->{_move_coord};
+					my $wc = $window->get_coordinates();
+					$wc += { x1 => $c->x1() - $oc->x1(), x2 => $c->x1() - $oc->x1(),
+							 y1 => $c->y1() - $oc->y1(), y2 => $c->y1() - $oc->y1(),
+						   };
+					$window->set_coordinates($wc);
+					$window->needs_redraw();
+					$self->{_move_pressed} = 0;
+					$self->{_move_coord} = undef;
+				} else {
+					# means we pressed it
+					$window->set_modal();
+					$self->{_move_pressed} = 1;
+					$self->{_move_coord} = $event->{coordinates};
+				}
+				return;
+			},
+		)
+	);
+
+	# listen to the Mouse for resizing
+	$self->add_event_listener(
+		Curses::Toolkit::EventListener->new(
+			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
+			conditional_code => sub { 
+				my ($event) = @_;
+				$event->{button} eq 'button1' or return 0;
+				$self->{_resize_pressed} && $event->{type} eq 'released'
+				  and return 1;
+				my $c = $event->{coordinates};
+				my $wc = $self->get_coordinates();
+				! $self->{_resize_pressed}
+				&& $event->{type} eq 'pressed'
+				&& $c->x2() == $wc->x2()-1
+				&& $c->y2() == $wc->y2()-1
+				  and return 1;
+				return 0;
+			},
+			code => sub {
+				my ($event, $window) = @_;
+
+				if ($self->{_resize_pressed}) {
+					# means we released it
+					$window->unset_modal();
+					my $c = $event->{coordinates};
+					my $wc = $window->get_coordinates();
+					$wc->set( x2 => $c->x2(), y2 => $c->y2() );
+					$window->set_coordinates($wc);
+					$window->needs_redraw();
+					$self->{_resize_pressed} = 0;
+				} else {
+					# means we pressed it
+					$window->set_modal();
+					$self->{_resize_pressed} = 1;					
+				}
+				return;
+			},
+		)
+	);
 	return $self;
 }
 
@@ -108,7 +229,7 @@ sub set_coordinates {
 			if ($params{$x} =~ /^(.+)%$/ ) {
 				my $percent = $1;
 				$params{$x} = sub { return $self->get_root_window()
-									  ? $self->get_root_window()->get_shape()->width() * $percent / 100
+									  ? sprintf( "%.0f", $self->get_root_window()->get_shape()->width() * $percent / 100)
 									  : 0;
 								   };
 			}
@@ -117,7 +238,7 @@ sub set_coordinates {
 			if ($params{$y} =~ /^(.+)%$/ ) {
 				my $percent = $1;
 				$params{$y} = sub { return $self->get_root_window()
-									  ? $self->get_root_window()->get_shape()->height() * $percent / 100
+									  ? sprintf( "%.0f", $self->get_root_window()->get_shape()->height() * $percent / 100)
 								      : 0;
 								  };
 			}
@@ -176,6 +297,44 @@ sub get_root_window {
 	my ($self) = @_;
 	return $self->{root_window};
 }
+
+=head2 bring_to_front()
+
+  $window->bring_to_front()
+
+Bring the window to front
+
+  input : none
+  output : the window widget
+
+=cut
+
+sub bring_to_front {
+	my ($self) = @_;
+	my $root_window = $self->get_root_window();
+	defined $root_window or return;
+	my $last_stack = $root_window->{last_stack};
+	$root_window->{last_stack}++;
+	$self->set_property(window => 'stack', $root_window->{last_stack});
+	$self->needs_redraw();
+	return $self;
+}
+
+=head2 bring_to_back()
+
+  $window->bring_to_back()
+
+Bring the window to the back
+
+  input : none
+  output : none
+
+=cut
+
+# sub bring_to_front {
+# 	my ($self) = @_;
+# 	$self->
+# }
 
 =head2 set_focused_widget
 
@@ -295,7 +454,8 @@ sub draw {
 						  );
 	}
 
-	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
+#	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
+	$theme->draw_resize($c->x2() - 1, $c->y2() - 1);
 }
 
 sub _compute_draw_informations {

@@ -114,8 +114,8 @@ sub init_root_window {
     eval { Curses->can('NCURSES_MOUSE_VERSION') && (NCURSES_MOUSE_VERSION() >= 1 ) };
 
 	my $old_mouse_mask;
-	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS, $old_mouse_mask); 
-
+	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask); 
+	print STDERR "MOUSE MASK : " . Dumper($mouse_mask); use Data::Dumper;
 
     # curses basic init
 #    Curses::noecho();
@@ -367,7 +367,7 @@ sub add_window {
 	$window->_set_curses_handler($self->{curses_handler});
 	$window->set_theme_name($self->{theme_name});
 	$window->set_root_window($self);
-	$self->{last_stack} = $self->{last_stack} + 1;
+	$self->{last_stack}++;
 	$window->set_property(window => 'stack', $self->{last_stack});
 	# in case the window has proportional coordinates depending on the root window
 	# TODO : do that only if window has proportional coordinates, not always
@@ -413,6 +413,52 @@ sub get_windows {
     return @{$self->{windows}};
 }
 
+=head2 set_modal_widget
+
+Set a widget to be modal
+
+  input  : a widget
+  output : the root window
+
+=cut
+
+sub set_modal_widget {
+	my $self = shift;
+    my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
+	$self->{_modal_widget} = $widget;
+	return $self;
+}
+
+=head2 unset_modal_widget
+
+Unset the widget to be modal
+
+  input  : none
+  output : the root window
+
+=cut
+
+sub unset_modal_widget {
+	my $self = shift;
+	$self->{_modal_widget} = undef;
+	return;
+}
+
+=head2 get_modal_widget
+
+returns the modal widget, or void
+
+  input  : none
+  output : the modal widget or void
+
+=cut
+
+sub get_modal_widget {
+	my ($self) = @_;
+	my $modal_widget = $self->{_modal_widget};
+	defined $modal_widget or return;
+	return $modal_widget;
+}
 
 =head2 show_all
 
@@ -491,6 +537,7 @@ sub dispatch_event {
 				       { type => BOOLEAN, optional => 1 },
 				  );
 
+	$widget ||= $self->get_modal_widget();
 	$widget ||= $event->get_matching_widget();
 	defined $widget or return;
 
@@ -518,7 +565,7 @@ sub dispatch_event {
 Has an effect only if a mainloop is active ( see POE::Component::Curses )
 
   $root_window->add_delay($seconds, \&code, @args)
-  $root_window->add_delay(5, sub { print "wow, 5 seconds wasted, dear $name\n"; }, $name);
+  $root_window->add_delay(5, sub { print "wow, 5 seconds wasted, dear $_[0]\n"; }, $name);
 
 Add a timer that will execute the \&code once, in $seconds seconds. $seconds
 can be a fraction. @args will be passed to the code reference

@@ -54,5 +54,9 @@ sub TITLE_NORMAL  { shift->_attron(COLOR_PAIR(1)) }
 sub TITLE_FOCUSED { shift->_attron(COLOR_PAIR(2) | A_BOLD) }
 sub TITLE_CLICKED { shift->_attron(COLOR_PAIR(1) | A_REVERSE) }
 
+sub RESIZE_NORMAL  { shift->_attron(COLOR_PAIR(1)) }
+sub RESIZE_FOCUSED { shift->_attron(COLOR_PAIR(2) | A_BOLD) }
+sub RESIZE_CLICKED { shift->_attron(COLOR_PAIR(1) | A_REVERSE) }
+
 
 1;

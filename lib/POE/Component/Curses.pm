@@ -41,6 +41,7 @@ sub spawn {
 				);
 			},
 			key_handler => sub {
+				print STDERR "___________ IN KEY HANDLER\n";
 				my ($kernel, $heap, $keystroke) = @_[ KERNEL, HEAP, ARG0];
 				use Curses; # for keyname and unctrl
 				if ($keystroke ne -1) {
