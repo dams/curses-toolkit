@@ -36,8 +36,8 @@ sub _get_default_properties {
 					  title_left_offset => 1,
 					  title_right_offset => 1,
 					  title_animation => 1,
-					  title_loop_duration => 2,
-					  title_loop_pause => 1/2,
+					  title_loop_duration => 4,
+					  title_loop_pause => 2/3,
 					  # inherited from Border
 					  border_width => 1,
 					},
@@ -48,6 +48,12 @@ sub _get_default_properties {
 					  # inherited from Border
 					  border_width => 1,
 					},
+#  					'Curses::Toolkit::Widget::Paned' => {
+#  					  gutter_size => 1,
+#  					},
+# 					'Curses::Toolkit::Widget::Entry' => {
+# 					  default_width => 20,
+# 					},
 				  );
 	return $default{$class_name} || {};
 }
@@ -166,7 +172,7 @@ sub draw_blank {
 	$l > 0 or return $self;
 	my $str = ' ' x $l;
 	foreach my $y ($c->y1()..$c->y2()-1) {
-		$self->curses()->addstr($y, $c->x1(), $str);
+		$self->curses->addstr($y, $c->x1(), $str);
 	}
 	return $self;
 }

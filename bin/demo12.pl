@@ -20,11 +20,8 @@ sub main {
 	$root->add_window(my $win1 = Curses::Toolkit::Widget::Window->new());
 
 	$win1->set_name("WIN1");
+	$win1->set_title("This is the title");
 	$win1->add_widget(
-      Curses::Toolkit::Widget::Border
-	    ->new()
-		->set_name("border1")
-		->add_widget(
  		  Curses::Toolkit::Widget::Button
  			->new_with_label('Button')
  			->set_name('button1'),
@@ -37,7 +34,6 @@ sub main {
 # 		    ->new()
 # 			->set_name("label1")
 #             ->set_text("window 1")
-	  )
 	);
 
 	$win1->set_coordinates(x1 => 0,   y1 => 0,
@@ -50,15 +46,10 @@ sub main {
 
 	$win2->set_name("WIN2");
 	$win2->add_widget(
-      Curses::Toolkit::Widget::Border
-	    ->new()
-		->set_name("border2")
-		->add_widget(
 		  Curses::Toolkit::Widget::Label
 		    ->new()
 			->set_name("label2")
             ->set_text("window 2")
-	  )
 	);
 
 	$win2->set_coordinates(x1 => '15%',   y1 => '15%',

@@ -123,16 +123,13 @@ the associated theme. See the Curses::Toolkit::Theme class used for the default
 (default class to look at is Curses::Toolkit::Theme::Default)
 
 Don't forget to look at properties from the parent class, as these are also
-inherit of !
+inherited of !
 
 =head2 border_width
 
 Sets the with of the window border. If not set, the window border will be invisible
 
 =cut
-
-my @title_bar_positions = qw(top bottom left right);
-my @title_positions = qw(left center right);
 
 sub _get_theme_properties_definition {
 	my ($self) = @_;

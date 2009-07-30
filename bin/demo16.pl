@@ -27,7 +27,7 @@ sub main {
 
 	my $window = Curses::Toolkit::Widget::Window->new();
 	$root->add_window($window);
-	$window->set_title("a title");
+	$window->set_title("The usually long title...");
 #	$window->set_theme_property(title_position => 'center');
 
 	my $vbox = Curses::Toolkit::Widget::VBox->new();

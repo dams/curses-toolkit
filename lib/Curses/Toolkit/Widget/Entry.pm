@@ -34,6 +34,9 @@ sub new {
 	# by default in non edit mode
 	$self->{edit_mode} = 0;
 
+#	# default entry width
+#	$self->{width} = $self->get_theme_property('default_width');
+
 	# set a key listener, disabled by default
 	$self->{key_listener} =
 	  Curses::Toolkit::EventListener->new(
@@ -191,11 +194,37 @@ sub get_text {
 	return $self->{text};
 }
 
-# <--- w1 -->
-#  <-- w2 ->
-# [some text]
-# -^  o1 
-# ---- o2 --^ 
+# =head2 set_width
+
+# Set the width of the visible text in the entry
+
+#   input  : the width (positive integer)
+#   output : the widget
+
+# =cut
+
+# sub set_width {
+# 	my $self = shift;
+# 	my ($width) = validate_pos( @_, { type => SCALAR,
+# 									}
+# 							  );
+# 	$self->{width} = $width;
+# 	return $self;
+# }
+
+# =head2 get_width
+
+# Get the width of the visible text in the entry
+
+#   input  : none
+#   output : the width
+
+# =cut
+
+# sub get_width {
+# 	my ($self) = @_;
+# 	return $self->{width};
+# }
 
 
 =head2 set_edit_mode
@@ -291,6 +320,12 @@ sub move_cursor_position {
 
 =cut
 
+# <--- w1 -->
+#  <-- w2 ->
+# [some text]
+# -^  o1 
+# ---- o2 --^ 
+
 sub draw {
 	my ($self) = @_;
 	my $theme = $self->get_theme();
@@ -358,7 +393,8 @@ sub get_desired_space {
 	my ($self, $available_space) = @_;
 
 	my $desired_space = $available_space->clone();
-	$desired_space->set( x2 => $available_space->x1() + 12,
+#	$desired_space->set( x2 => $available_space->x1() + $self->get_width(),
+	$desired_space->set( x2 => $available_space->x2(),
 						 y2 => $available_space->y1() + 1,
 					   );
 	return $desired_space;
@@ -385,5 +421,36 @@ sub get_minimum_space {
 					   );
 	return $minimum_space;
 }
+
+# =head1 Theme related properties
+
+# To set/get a theme properties, you should do :
+
+# $entry->set_theme_property(property_name => $property_value);
+# $value = $entry->get_theme_property('property_name')
+
+# Here is the list of properties related to the entry, that can be changed in
+# the associated theme. See the Curses::Toolkit::Theme class used for the default
+# (default class to look at is Curses::Toolkit::Theme::Default)
+
+# Don't forget to look at properties from the parent class, as these are also
+# inherited of !
+
+# =head2 default_width
+
+# Sets the value of the width of the entry by default.
+
+# =cut
+
+# sub _get_theme_properties_definition {
+# 	my ($self) = @_;
+# 	return { %{$self->SUPER::_get_theme_properties_definition() },
+# 			 default_width => {
+# 			   optional => 0,
+# 			   type => SCALAR,
+# 			   callbacks => { "positive integer" => sub { $_[0] >= 0 } }
+# 			 },
+# 		   }
+# }
 
 1;

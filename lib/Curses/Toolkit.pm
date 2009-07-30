@@ -73,6 +73,13 @@ sub init_root_window {
     # get the Curses handler
     use Curses;
     my $curses_handler = Curses->new();
+
+# already done ?
+# 	raw();
+# 	cbreak();
+# 	noecho();
+# 	$curses_handler->keypad(1);
+
 	if (has_colors) {
 		start_color();
 # 		print STDERR "color is supported\n";
@@ -133,11 +140,14 @@ sub init_root_window {
 #    my $container = Curses::Toolkit::Widget::Warper->new();
 
 	use Curses::Toolkit::Theme::Default;
-	use Curses::Toolkit::Theme::Default::Color;
-	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color' : 'Curses::Toolkit::Theme::Default');
+	use Curses::Toolkit::Theme::Default::Color::Yellow;
+	use Curses::Toolkit::Theme::Default::Color::Pink;
+	use Tie::Array::Iterable;
+	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color::Pink' : 'Curses::Toolkit::Theme::Default');
+	my @windows = ();
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,
-                       windows => [],
+                       windows => Tie::Array::Iterable->new( @windows ),
 					   theme_name => $params{theme_name},
 					   mainloop => $params{mainloop},
 					   last_stack => 0,
@@ -175,6 +185,7 @@ sub init_root_window {
 			},
 		)
 	);
+	# key listener for TAB
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
 			accepted_event_class => 'Curses::Toolkit::Event::Key',
@@ -193,6 +204,8 @@ sub init_root_window {
 			},
 		)
 	);
+
+#$self->{window_iterator}
     return $self;
 }
 
@@ -373,6 +386,7 @@ sub add_window {
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
+	$self->{window_iterator} ||= $self->{windows}->forward_from(0);
 	$self->needs_redraw();
 	return $self;
 }
