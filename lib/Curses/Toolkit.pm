@@ -438,6 +438,7 @@ Set a widget to be modal
 
 sub set_modal_widget {
 	my $self = shift;
+	print STDERR "\n--> ** set modal widget **\n";
     my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
 	$self->{_modal_widget} = $widget;
 	return $self;
@@ -454,6 +455,7 @@ Unset the widget to be modal
 
 sub unset_modal_widget {
 	my $self = shift;
+	print STDERR "\n--> ** unset modal widget **\n";
 	$self->{_modal_widget} = undef;
 	return;
 }
@@ -469,6 +471,8 @@ returns the modal widget, or void
 
 sub get_modal_widget {
 	my ($self) = @_;
+	print STDERR "\n--> ** get modal widget **\n";
+
 	my $modal_widget = $self->{_modal_widget};
 	defined $modal_widget or return;
 	return $modal_widget;
@@ -551,7 +555,10 @@ sub dispatch_event {
 				       { type => BOOLEAN, optional => 1 },
 				  );
 
-	$widget ||= $self->get_modal_widget();
+	if (! defined $widget) {
+		$widget = $self->get_modal_widget();
+		defined $widget and $self->unset_modal_widget();
+	}
 	$widget ||= $event->get_matching_widget();
 	defined $widget or return;
 
@@ -565,7 +572,9 @@ sub dispatch_event {
 		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
 			$widget = $widget->get_root_window();
 		} elsif ($widget->isa('Curses::Toolkit::Widget')) {
+			print STDERR "\n--> ** get parent of $widget  : **\n";
 			$widget = $widget->get_parent();
+			print STDERR "     $widget\n";
 		} else {
 			return;
 		}

@@ -113,6 +113,7 @@ sub new {
 					# means we pressed it
 					$window->set_modal();
 					$self->{_move_pressed} = 1;
+					$self->needs_redraw();
 					$self->{_move_coord} = $event->{coordinates};
 				}
 				return;
@@ -153,6 +154,7 @@ sub new {
 				} else {
 					# means we pressed it
 					$window->set_modal();
+					$self->needs_redraw();
 					$self->{_resize_pressed} = 1;					
 				}
 				return;
@@ -450,12 +452,13 @@ sub draw {
 	my $theme = $self->get_theme();
 	if (length $title_to_display) {
 		$theme->draw_title($c->x1() + $o1, $c->y1(),
-						   join($title_to_display, @title_brackets_characters)
+						   join($title_to_display, @title_brackets_characters),
+						   { clicked => $self->{_move_pressed} }
 						  );
 	}
 
 #	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
-	$theme->draw_resize($c->x2() - 1, $c->y2() - 1);
+	$theme->draw_resize($c->x2() - 1, $c->y2() - 1, { clicked => $self->{_resize_pressed} } );
 }
 
 sub _compute_draw_informations {

@@ -107,11 +107,11 @@ sub draw_hline {
 }
 
 sub draw_vline {
-	my ($self, $x1, $y1, $width) = @_;
+	my ($self, $x1, $y1, $width, $attr) = @_;
 	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
 	print STDERR "$name : draw_vline $x1, $y1, $width\n";
-	$self->curses->vline($y1, $x1, VLINE(), $width);
+	$self->curses($attr)->vline($y1, $x1, VLINE(), $width);
 	return $self;
 }
 
@@ -151,16 +151,16 @@ sub draw_string {
 }
 
 sub draw_title {
-	my ($self, $x1, $y1, $text) = @_;
+	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	$self->curses->addstr($y1, $x1, $text);
+	$self->curses($attr)->addstr($y1, $x1, $text);
 	return $self;
 }
 
 sub draw_resize {
-	my ($self, $x1, $y1) = @_;
+	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible or return;
-	$self->curses->addch($y1, $x1, ACS_CKBOARD);
+	$self->curses($attr)->addch($y1, $x1, ACS_CKBOARD);
 	return $self;
 }
 

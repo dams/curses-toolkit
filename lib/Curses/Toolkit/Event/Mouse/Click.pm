@@ -80,6 +80,7 @@ widget where the click were done
 sub get_matching_widget {
 	my ($self) = @_;
 
+	print STDERR "\n--> ** get matching widget **\n";
 	my $recurse;
 	$recurse = sub { 
 		my $deepness = shift;
