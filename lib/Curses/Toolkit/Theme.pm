@@ -98,7 +98,7 @@ sub curses {
 	$self->_get_curses_handler()->attrset(0);
 	my $caller = (caller(1))[3];
 	my $type = uc( (split('_', $caller))[1] );
-	$self->_compute_attributes($type);
+	$self->_compute_attributes($type, $attr);
 	if (defined $attr) {
 		use Curses;
 		if (exists $attr->{bold}) {
@@ -123,15 +123,22 @@ sub _get_curses_handler {
 }
 
 sub _compute_attributes {
-	my ($self, $type) = @_;
+	my ($self, $type, $attr) = @_;
+	$attr ||= { };
 	my $method = $type . '_NORMAL';
 	$self->$method();
 # 	if ( ! $self->get_widget()->is_visible() ) {
 # 		$method = $type . '_INVISIBLE';
 # 	}
-	if ( $self->get_widget()->isa('Curses::Toolkit::Role::Focusable') &&
-		 $self->get_widget()->is_focused() ) {
+	if ( ( $self->get_widget()->isa('Curses::Toolkit::Role::Focusable') &&
+		   $self->get_widget()->is_focused() )
+		 || delete $attr->{focused}
+	   ) {
 		$method = $type . '_FOCUSED';
+		$self->$method();
+	}
+	if (delete $attr->{clicked}) {
+		$method = $type . '_CLICKED';
 		$self->$method();
 	}
 	return;
