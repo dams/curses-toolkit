@@ -51,6 +51,7 @@ sub set_text {
 	
 	my ($text) = validate_pos( @_, { type => SCALAR } );
 	$self->{text} = $text;
+	$self->needs_redraw();
 	return $self;
 
 }
@@ -270,6 +271,7 @@ needed to properly display itself
 sub get_minimum_space {
 	my ($self, $available_space) = @_;
 
+	print STDERR Dumper($available_space); use Data::Dumper;
 	my $minimum_space = $available_space->clone();
 	my $wrap_mode = $self->get_wrap_mode();
 	my $text = $self->get_text();

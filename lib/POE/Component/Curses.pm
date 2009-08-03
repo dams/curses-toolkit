@@ -134,15 +134,6 @@ sub spawn {
 			window_resize => sub { 
 				my ($kernel, $heap) = @_[ KERNEL, HEAP];
 
-# 				$class->restart_curses();
-# 				my %sessions = $class->get_sessions();
-# 				my @sessions_names = keys(%sessions);
-# 				# send the window_resize to all sessions (including root)
-# 				foreach my $name (@sessions_names) {
-# 					# window resize signal provided by default (see Session.pm)
-# 					$kernel->call($name, '__window_resize');
-# 				}
-
 				$heap->{mainloop}->event_resize();
 
 			},
@@ -153,9 +144,14 @@ sub spawn {
 				$heap->{mainloop}->event_redraw();
 			},
 
+			add_delay_handler => sub {
+				my $seconds = $_[ARG0];
+				my $code = $_[ARG1];
+				$_[KERNEL]->delay_set('delay_handler', $seconds, $code, @_[ARG2..$#_]);
+			},
 			delay_handler => sub {
 				my $code = $_[ARG0];
-				$code->(@_[ARG0..$#_]);
+				$code->(@_[ARG1..$#_]);
 			}
         }
 	);

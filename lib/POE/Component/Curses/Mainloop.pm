@@ -44,13 +44,22 @@ sub new {
 sub set_session_name {
 	my $self = shift;
 	my ($session_name) = validate_pos( @_, { type => SCALAR } );
+	$self->{session_name} = $session_name;
 	return $self;
 }
 
 sub get_toolkit_root {
-	my ($self) = @_;
-	return $self->{toolkit_root};
+       my ($self) = @_;
+       return $self->{toolkit_root};
 }
+
+
+# sub set_session {
+# 	my $self = shift;
+# 	my ($session) = validate_pos( @_, { isa => 'POE::Session' } );
+# 	$self->{session} = $session;
+# 	return $self;
+# }
 
 
 #### Now implement the Mainloop API ####
@@ -71,8 +80,12 @@ sub add_delay {
 	my $self = shift;
 	my $seconds = shift;
 	my $code = shift;
-	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
+	$poe_kernel->call($self->{session_name}, 'add_delay_handler', $seconds, $code, @_);
+	return;
+#	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
+#	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
 }
+
 
 ## Methods called by the POE Component session ##
 ## They usually return nothing

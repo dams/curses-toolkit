@@ -140,6 +140,77 @@ $step1 = sub {
 };
 
 $step2 = sub {
+	$root->add_window(
+	  my $window = Curses::Toolkit::Widget::Window->new()
+	    ->set_title("This is a long title")
+	);
+	$window->set_theme_property(border_width => 0);
+	$window->set_coordinates( x1 => 3, y1 => '55%',
+#							  x2 => 50, y2 => 80,
+							  x2 => '100%', y2 => '100%',
+							);
+	$window->add_widget(my $label = Curses::Toolkit::Widget::Label->new()
+						->set_text("Hello !                                                                           .\n                                                                           .\n                                                                           .\n                                                                           .\n                                                                           .\n\n\n")
+					   );
+	my $app = sub { $label->set_text($label->get_text() . $_[0])};
+	my $set = sub { $label->set_text($_[0])};
+	my $o = 0;
+	my $t = sub { $o += ($_[0]/1); return $o; };
+# 	$root->add_delay($t->(5), sub { $set->("My name is Damien Krotkine\n") });
+# 	$root->add_delay($t->(3), sub { $app->("I'm also known as 'dams'\n") });
+# 	$root->add_delay($t->(3), sub { $set->("\n") });
+# 	$root->add_delay($t->(3), sub { $set->("I am not the funny guy which is standing on the scene.\n") });
+# 	$root->add_delay($t->(5), sub { $app->("The funny guy is called BooK, and I'm sure you ALL know him.") });
+# 	$root->add_delay($t->(5), sub { $set->("I couldn't make it to the YAPC::EU this year\nso I asked Book to give this talk for me !") });
+# 	$root->add_delay($t->(5), sub { $set->("") });
+# 	$root->add_delay($t->(5), sub { $set->("OK. So what is this talk about ?\n") });
+# 	$root->add_delay($t->(5), sub { $set->("this talk is about : \n") });
+# 	$root->add_delay($t->(5), sub { $app->("   Curses::Toolkit   !") });
+# 	$root->add_delay($t->(5), sub { $set->("Curses::Toolkit is a\n") });
+# 	$root->add_delay($t->(2), sub { $app->("modern ") });
+# 	$root->add_delay($t->(2), sub { $app->("POE based ") });
+# 	$root->add_delay($t->(2), sub { $app->("object oriented ") });
+# 	$root->add_delay($t->(2), sub { $app->("widget oriented ") });
+# 	$root->add_delay($t->(2), sub { $app->("GTK inspired ") });
+# 	$root->add_delay($t->(2), sub { $app->("curses ") });
+# 	$root->add_delay($t->(2), sub { $app->("toolkit !\n") });
+# 	$root->add_delay($t->(5), sub { $set->("") });
+#	$root->add_delay($t->(5), sub { $set->("Book is kind enough to do things for me\n") });
+#	$root->add_delay($t->(2), sub { $app->("So I'll use that opportunity to make him do stupid things :)\n") });
+#	$root->add_delay($t->(5), sub { $app->("\nOh and you will have to participate too !\n") });
+#	$root->add_delay($t->(2), sub { $app->("And while doing so I'll demonstrate some features of Curses::Toolkit\n") });
+#	$root->add_delay($t->(5), sub { $set->("") });
+
+	my $audience_window;
+	my $audience_label;
+	$root->add_delay($t->(2), sub { $set->("Let's start with a window\n");});
+	$root->add_delay($t->(2), sub { 
+									$root->add_window(
+													  $audience_window = Curses::Toolkit::Widget::Window->new()
+													 );
+									$audience_window->set_coordinates( x1 => 3, y1 => 3,
+																	   x2 => 40, y2 => 10,
+																	 );
+									$audience_window->add_widget(
+																 $audience_label = Curses::Toolkit::Widget::Label->new()
+																 ->set_text("Wow this is a cool window !")
+																);
+
+								});
+	$root->add_delay($t->(2), sub { $app->("oh it's new and shiny !\n") });
+	$root->add_delay($t->(2), sub { $set->("The good thing about Curses::Toolkit is that\nyou don't have to mess with cordinates, the module handles it for you") });
+	$root->add_delay($t->(5), sub { $set->("For example, I can move and resize the window") });
+					  
+#	my $move_audience_window = 0;
+	my $move_audience_window_sub;
+	my $loop = 10;
+	$move_audience_window_sub = sub { my $wc = $audience_window->get_coordinates(); 
+									  $audience_window->set_coordinates(x1 => $wc->x1() + 1);
+									  $loop-- and 	$root->add_delay(1/3, $move_audience_window_sub);
+								  };
+	$root->add_delay($t->(2), $move_audience_window_sub);
+	
+};
 
 	$step1->();
 	POE::Kernel->run();
