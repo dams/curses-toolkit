@@ -143,7 +143,8 @@ sub init_root_window {
 	use Curses::Toolkit::Theme::Default::Color::Yellow;
 	use Curses::Toolkit::Theme::Default::Color::Pink;
 	use Tie::Array::Iterable;
-	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color::Pink' : 'Curses::Toolkit::Theme::Default');
+#	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color::Pink' : 'Curses::Toolkit::Theme::Default');
+	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color::Yellow' : 'Curses::Toolkit::Theme::Default');
 	my @windows = ();
     my $self = bless { initialized => 1, 
                        curses_handler => $curses_handler,

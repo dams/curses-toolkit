@@ -30,9 +30,10 @@ sub new {
 	my $class = shift;
 
 	my %params = validate( @_, { session_name => { optional => 1, type => SCALAR },
+								 args => { optional => 1, type => HASHREF, default => {} }
 							   }
 						 );
-	my $toolkit_root = Curses::Toolkit->init_root_window();
+	my $toolkit_root = Curses::Toolkit->init_root_window( %{$params{args}} );
 	my $self = bless( { toolkit_root => $toolkit_root,
 						session_name => $params{session_name},
 					  }, $class);

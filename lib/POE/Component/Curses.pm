@@ -16,11 +16,12 @@ sub spawn {
 	my $class = shift;
 
 	my %params = validate( @_, { alias => { default => 'curses' },
+								 args => { optional => 1, type => HASHREF }
 							   }
 						  );
 
 	# setup mainloop and root toolkit object
-	my $mainloop = POE::Component::Curses::MainLoop->new(session_name => $params{alias});
+	my $mainloop = POE::Component::Curses::MainLoop->new(session_name => $params{alias}, defined $params{args} ? (args => $params{args}) : ());
 	POE::Session->create(
 		inline_states => {
 			_start => sub {
