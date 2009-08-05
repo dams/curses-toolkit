@@ -80,7 +80,6 @@ widget where the click were done
 sub get_matching_widget {
 	my ($self) = @_;
 
-	print STDERR "\n--> ** get matching widget **\n";
 	my $recurse;
 	$recurse = sub { 
 		my $deepness = shift;
@@ -102,10 +101,8 @@ sub get_matching_widget {
 	# sort by window stack then deepnes in the widget tree
 	@all_widgets = sort { $b->[1] <=> $a->[1] || $b->[0] <=> $a->[0] } grep { $self->{coordinates}->is_in_widget($_->[2]) } @all_widgets;
 
-	print STDERR "\n----------------\n" . Dumper(map { my @foo = @$_; $foo[2] = $foo[2]->get_name(); \@foo } @all_widgets); use Data::Dumper;
 
 	@all_widgets and return $all_widgets[0]->[2];
-	print STDERR "\nroot window\n";
 	return $self->{root_window};
 }
 

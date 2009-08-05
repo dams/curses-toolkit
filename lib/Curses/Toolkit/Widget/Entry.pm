@@ -344,11 +344,8 @@ sub draw {
 
 	if ( ! $self->get_edit_mode() ) {
 		my $t = substr($text, 0, $w2);
-print STDERR " --> t : $t\n";
 		# put the background text below it
-print STDERR " --> t : $display_text\n";
 		substr($display_text, 0, length($t)) = $t;
-print STDERR " --> t : $t\n";
 
 		$theme->draw_string($c->x1(), $c->y1(), '[');
 		$theme->draw_string($c->x1() + $o2, $c->y1(), ']');

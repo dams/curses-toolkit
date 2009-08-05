@@ -114,15 +114,12 @@ sub init_root_window {
 # 		}
 # 	}
 
-	} else {
-		print STDERR "no color support\n";
 	}
 
     eval { Curses->can('NCURSES_MOUSE_VERSION') && (NCURSES_MOUSE_VERSION() >= 1 ) };
 
 	my $old_mouse_mask;
 	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask); 
-	print STDERR "MOUSE MASK : " . Dumper($mouse_mask); use Data::Dumper;
 
     # curses basic init
 #    Curses::noecho();
@@ -181,7 +178,6 @@ sub init_root_window {
 				lc $event->{params}{key} eq 'q' or return 0;
 			},
 			code => sub {
-				print STDERR "received Q, bailing out\n";
 				exit;
 			},
 		)
@@ -439,7 +435,6 @@ Set a widget to be modal
 
 sub set_modal_widget {
 	my $self = shift;
-	print STDERR "\n--> ** set modal widget **\n";
     my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
 	$self->{_modal_widget} = $widget;
 	return $self;
@@ -456,7 +451,6 @@ Unset the widget to be modal
 
 sub unset_modal_widget {
 	my $self = shift;
-	print STDERR "\n--> ** unset modal widget **\n";
 	$self->{_modal_widget} = undef;
 	return;
 }
@@ -472,7 +466,6 @@ returns the modal widget, or void
 
 sub get_modal_widget {
 	my ($self) = @_;
-	print STDERR "\n--> ** get modal widget **\n";
 
 	my $modal_widget = $self->{_modal_widget};
 	defined $modal_widget or return;
@@ -573,9 +566,7 @@ sub dispatch_event {
 		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
 			$widget = $widget->get_root_window();
 		} elsif ($widget->isa('Curses::Toolkit::Widget')) {
-			print STDERR "\n--> ** get parent of $widget  : **\n";
 			$widget = $widget->get_parent();
-			print STDERR "     $widget\n";
 		} else {
 			return;
 		}

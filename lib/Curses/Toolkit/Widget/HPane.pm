@@ -46,18 +46,6 @@ sub new {
 				my $gp = $self->get_gutter_position();
 				#	my $gw = $self->get_theme_property('gutter_width');
 				my $gw = 1;
-				print STDERR " cx1 : " . $c->x1() . "\n";
-				print STDERR " wcx1 : " . $wc->x1() . "\n";
-				print STDERR " gp : " . $gp . "\n";
-				print STDERR " gw : " . $gw . "\n";
-				print STDERR " event type : " . $event->{type} . "\n";
-				print STDERR " gutter move : [" . $self->{_gutter_move_pressed} . "]\n";
-				print STDERR " result : " . 				! $self->{_gutter_move_pressed}
-				&& $event->{type} eq 'pressed'
-				&& $c->x1() >= $wc->x1() + $gp
-				&& $c->x1() < $wc->x1() + $gp + $gw
-				&& $c->y1() < $wc->y2()
- . "\n";
 				! $self->{_gutter_move_pressed}
 				&& $event->{type} eq 'pressed'
 				&& $c->x1() >= $wc->x1() + $gp
@@ -69,7 +57,6 @@ sub new {
 			code => sub {
 				my ($event, $widget) = @_;
 
-				print STDERR "\n--> ** in LISTENER CODE. event : **\n";
 				if ($self->{_gutter_move_pressed}) {
 					# means we released it
 					$self->unset_modal();

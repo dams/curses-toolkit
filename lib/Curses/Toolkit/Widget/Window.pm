@@ -69,8 +69,6 @@ sub new {
 				my $next_focused_widget = $window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
 				defined $next_focused_widget and 
 				  $next_focused_widget->set_focus(1);
-				defined $next_focused_widget and
-				  print STDERR "\n -> " . $next_focused_widget->get_name() . " <-\n";
 				return;
 			},
 		)
@@ -515,7 +513,6 @@ sub _start_animation {
  			$self->{_title_offset} = 0;
 			$delay = $self->get_theme_property('title_loop_pause');
  		}
-		print STDERR " ######### W4 : $w4 | length : " . length($title) . " | offset : " . $self->{_title_offset} . "\n";
  		if ($self->{_title_offset} > length($title) - $w4 + 1) {
  			$self->{_title_offset} = length($title) - $w4 + 1;
  			$self->{_title_animation_direction} = 'left';

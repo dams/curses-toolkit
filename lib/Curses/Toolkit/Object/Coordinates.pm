@@ -158,10 +158,6 @@ sub _normalize {
 
 	$self->x1() <= $self->x2() or ($self->{x1}, $self->{x2}) = ($self->{x2}, $self->{x1});
 	$self->y1() <= $self->y2() or ($self->{y1}, $self->{y2}) = ($self->{y2}, $self->{y1});
-# 	foreach (qw(x1 x2 y1 y2)) {
-# 		print STDERR '_________ ' . $self->{$_} . ' - ' . sprintf( "%.0f", $self->{$_}) . "\n";
-# 		$self->{$_} = sprintf( "%.0f", $self->{$_});
-# 	}
 	return;
 }
 

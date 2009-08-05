@@ -99,7 +99,6 @@ sub draw_hline {
 	my ($self, $x1, $y1, $width) = @_;
 	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
-	print STDERR "$name : draw_hline $x1, $y1, $width\n";
 
 	$self->curses->hline($y1, $x1, HLINE(), $width);
 
@@ -110,7 +109,6 @@ sub draw_vline {
 	my ($self, $x1, $y1, $width, $attr) = @_;
 	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
-	print STDERR "$name : draw_vline $x1, $y1, $width\n";
 	$self->curses($attr)->vline($y1, $x1, VLINE(), $width);
 	return $self;
 }
