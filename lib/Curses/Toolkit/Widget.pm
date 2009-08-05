@@ -343,7 +343,7 @@ sub set_theme_name {
 	return $self;
 }
 
-=head2 get_theme_class
+=head2 get_theme_name
 
 Get the theme name used for this widget. If there is none, tries to get it from
 the parent. If there is no parent, the default theme name is used

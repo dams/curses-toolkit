@@ -68,7 +68,9 @@ Removes the child widget.
 
 sub remove_widget {
 	my ($self) = @_;
-	$self->{children} = [];
+	my @children = ();
+
+	$self->{children} = Tie::Array::Iterable->new( @children );
 	return $self;
 }
 

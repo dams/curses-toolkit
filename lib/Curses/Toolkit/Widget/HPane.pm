@@ -152,9 +152,11 @@ sub set_gutter_position {
 	my $self = shift;
 	my ($position) = validate_pos( @_,
 								   { type => SCALAR,
-									 callbacks => { positive_integer => sub { shift() >= 0 } }
+# 									 callbacks => { positive_integer => sub { shift() >= 0 }
+# 												  }
 								   },
 								 );
+	$position < 0 and $position = 0;
 	$self->{position} = $position;
 	return $self;
 }
