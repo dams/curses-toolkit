@@ -139,12 +139,27 @@ sub set_gutter_position {
 	my $self = shift;
 	my ($position) = validate_pos( @_,
 								   { type => SCALAR,
-# 									 callbacks => { positive_integer => sub { shift() >= 0 }
-# 												  }
 								   },
 								 );
 	$position < 0 and $position = 0;
+	$self->_del_actual_gutter_position();
 	$self->{position} = $position;
+	
+	return $self;
+}
+
+# sets the gutter position, which can be different from the one desired
+sub _set_actual_gutter_position {
+	my ($self, $position) = @_;
+	$position < 0 and $position = 0;
+	$self->{actual_position} = $position;
+	return $self;
+}
+
+# deletes the actual gutter position
+sub _del_actual_gutter_position {
+	my ($self) = @_;
+	$self->{actual_position} = undef;
 	return $self;
 }
 
@@ -158,6 +173,13 @@ Return the position of the gutter from the left
 =cut
 
 sub get_gutter_position {
+	my ($self) = @_;
+	defined $self->{actual_position}
+	  and return $self->{actual_position};
+	return $self->{position};
+}
+
+sub _get_original_gutter_position {
 	my ($self) = @_;
 	return $self->{position};
 }
@@ -188,9 +210,12 @@ sub _rebuild_children_coordinates {
 
 #	my $gw = $self->get_theme_property('gutter_width');
 	my $gw = 1;
-	my $gp = $self->get_gutter_position();
+	my $gp = $self->_get_original_gutter_position();
 	if ($gp > ($available_space->width() - $gw)) {
 		$gp = $available_space->width() - $gw;
+		$self->_set_actual_gutter_position($gp);
+	} else {
+		$self->_del_actual_gutter_position();
 	}
 
 	if (defined $child1) {
@@ -279,6 +304,10 @@ sub draw {
 	my $gp = $self->get_gutter_position();
 #	my $gw = $self->get_theme_property('gutter_width');
 	my $gw = 1;
+# 	if ($gp + $gw >= $c->x2()) {
+# 		$gp = $c->x2() - $gw - 1;
+# 		$self->_set_actual_gutter_position($gp);
+# 	}
 	$gw > 0 or return;
 	for my $i (0..$gw-1) {
 		$theme->draw_vline($c->x1() + $gp + $i, $c->y1(), $c->height(), $attr );
