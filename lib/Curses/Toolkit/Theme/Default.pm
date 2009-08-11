@@ -96,11 +96,11 @@ sub BLANK_FOCUSED { shift->_attrset() }
 sub BLANK_CLICKED { shift->_attrset() }
 
 sub draw_hline {
-	my ($self, $x1, $y1, $width) = @_;
+	my ($self, $x1, $y1, $width, $attr) = @_;
 	$self->get_widget->is_visible() or return;
 	my $name = $self->get_widget()->get_name();
 
-	$self->curses->hline($y1, $x1, HLINE(), $width);
+	$self->curses($attr)->hline($y1, $x1, HLINE(), $width);
 
 	return $self;
 }
@@ -114,30 +114,30 @@ sub draw_vline {
 }
 
 sub draw_corner_ul {
-	my ($self, $x1, $y1) = @_;
+	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
- 	$self->curses->addch($y1, $x1, ULCORNER());
+ 	$self->curses($attr)->addch($y1, $x1, ULCORNER());
 	return $self;
 }
 
 sub draw_corner_ll {
-	my ($self, $x1, $y1) = @_;
+	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
- 	$self->curses->addch($y1, $x1, LLCORNER());
+ 	$self->curses($attr)->addch($y1, $x1, LLCORNER());
 	return $self;
 }
 
 sub draw_corner_ur {
-	my ($self, $x1, $y1) = @_;
+	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
- 	$self->curses->addch($y1, $x1, URCORNER());
+ 	$self->curses($attr)->addch($y1, $x1, URCORNER());
 	return $self;
 }
 
 sub draw_corner_lr {
-	my ($self, $x1, $y1) = @_;
+	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
- 	$self->curses->addch($y1, $x1, LRCORNER());
+ 	$self->curses($attr)->addch($y1, $x1, LRCORNER());
 	return $self;
 }
 

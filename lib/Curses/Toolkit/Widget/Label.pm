@@ -199,7 +199,7 @@ sub draw {
 
 sub _textwrap {
   my $text = shift;
-  my $columns = shift || 72;
+  my $columns = shift || 1;
   my (@tmp, @rv, $p);
 
   # Early exit if no text was passed
@@ -307,6 +307,11 @@ sub get_minimum_space {
 		my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
 		$minimum_space->set( y2 => $minimum_space->y1() + scalar(@text) );
 		$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) );
+		{ open my $f, ">>/tmp/__foo__"; print $f "mini space : \n"; }
+		{ open my $f, ">>/tmp/__foo__"; print $f " x1 :" . $minimum_space->x1() . "\n"; }
+		{ open my $f, ">>/tmp/__foo__"; print $f " y1 :" . $minimum_space->y1() . "\n"; }
+		{ open my $f, ">>/tmp/__foo__"; print $f " x2 :" . $minimum_space->x2() . "\n"; }
+		{ open my $f, ">>/tmp/__foo__"; print $f " y2 :" . $minimum_space->y2() . "\n"; }
 		return $minimum_space;
 	}
 	die;
