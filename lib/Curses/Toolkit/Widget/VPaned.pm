@@ -62,6 +62,37 @@ sub _p7 {
 	return;
 }
 
+sub _p8 {
+	my ($self, $c, $gp, $gw) = @_;
+	return (y2 => $c->y1() + $gp + $gw);
+}
+
+sub _p9 {
+	my ($self, $c) = @_;
+	return (x2 => $c->x2());
+}
+
+sub _p10 {
+	my ($self, $c) = @_;
+	return (y1 => $c->y1());
+}
+
+sub _p11 {
+	my ($self, $c1, $c2) = @_;
+	return (y2 => $c1->y1() + $c1->height() + $c2->height());
+}
+
+sub _p12 {
+	my ($self, $c) = @_;
+	return (x2 => $c->x1() + 1);
+}
+
+sub _p13 {
+	my ($self, $c1, $c2) = @_;
+	use List::Util qw(max);
+	return (x2 => max($c1->x2(), $c2->x2()));
+}
+
 =head1 METHODS
 
 =head2 add1

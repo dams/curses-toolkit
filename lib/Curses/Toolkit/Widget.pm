@@ -470,9 +470,9 @@ sub get_relatives_coordinates {
 	return $self->{relatives_coordinates};
 }
 
-=head2 rebuild_coordinates
+=head2 rebuild_all_coordinates
 
-  $widget->rebuild_coordinates();
+  $widget->rebuild_all_coordinates();
 
 Recompute all the relative coordinates accross the whole window
 

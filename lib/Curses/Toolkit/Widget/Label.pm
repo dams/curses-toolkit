@@ -284,10 +284,7 @@ sub get_minimum_space {
 	} elsif ($wrap_mode eq 'active') {
 		my $width = 1;
 		while (1) {
-			{ open my $f, ">>/tmp/__foo__"; print $f " width = $width \n"; }
 			my @text = _textwrap($self->get_text(), $width);
-			{ open my $f, ">>/tmp/__foo__"; print $f " text : " . scalar(@text) . "\n"; }
-			{ open my $f, ">>/tmp/__foo__"; print $f " HEIGHT: " . $available_space->height() . "\n"; }
 			if ($width >= length($self->get_text())) {
 				$minimum_space->set( x2 => $minimum_space->x1() + length($self->get_text()) + 1,
 									 y2 => $minimum_space->y1() + 1 );
@@ -297,7 +294,6 @@ sub get_minimum_space {
 				$width++;
 				next;
 			}
-			{ open my $f, ">>/tmp/__foo__"; print $f " setting to : " . ( $minimum_space->x1() + max(map { length } @text )) . "\n      - " . ($minimum_space->y1() + $#text) . "\n"; }
 			$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) + 1,
 								 y2 => $minimum_space->y1() + scalar(@text) );
 			last;
@@ -307,11 +303,6 @@ sub get_minimum_space {
 		my @text = _textwrap($self->get_text(), max($available_space->width(), 1));
 		$minimum_space->set( y2 => $minimum_space->y1() + scalar(@text) );
 		$minimum_space->set( x2 => $minimum_space->x1() + max(map { length } @text ) );
-		{ open my $f, ">>/tmp/__foo__"; print $f "mini space : \n"; }
-		{ open my $f, ">>/tmp/__foo__"; print $f " x1 :" . $minimum_space->x1() . "\n"; }
-		{ open my $f, ">>/tmp/__foo__"; print $f " y1 :" . $minimum_space->y1() . "\n"; }
-		{ open my $f, ">>/tmp/__foo__"; print $f " x2 :" . $minimum_space->x2() . "\n"; }
-		{ open my $f, ">>/tmp/__foo__"; print $f " y2 :" . $minimum_space->y2() . "\n"; }
 		return $minimum_space;
 	}
 	die;

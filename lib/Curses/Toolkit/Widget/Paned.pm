@@ -57,13 +57,8 @@ sub new {
 					my $wc = $self->get_coordinates();
 					$self->set_gutter_position($self->_p1($ec) - $self->_p1($wc));
 					# changing the gutter position might change the space of
-					# the gutter itself, so rebuild starting from the parent
-					my $parent = $self->get_parent();
-					if (defined $parent) {
-						$parent->_rebuild_children_coordinates();
-					} else {
-						$self->_rebuild_children_coordinates();
-					}
+					# the gutter itself, so rebuild starting from the start
+					$self->rebuild_all_coordinates();
 					$self->needs_redraw();
 					$self->{_gutter_move_pressed} = 0;
 				} else {
@@ -211,16 +206,16 @@ sub get_desired_space {
 	}
 
 	my $desired_space1 = $available_space->clone();
-	$desired_space1->set(x2 => $desired_space1->x1() + $gp + $gw);
-	$desired_space1->set(y2 => $available_space->y2());
+	$desired_space1->set($self->_p8($desired_space1, $gp, $gw));
+	$desired_space1->set($self->_p9($available_space));
 
 	if (defined $child2) {
 		my $desired_space2 = $available_space->clone();
-		$desired_space2->set(x1 => $available_space->x1() + $gp + $gw);
+		$desired_space2->set($self->_p5($available_space, $gp, $gw));
 		$desired_space2 = $child2->get_desired_space($desired_space2);
-		$desired_space2->set(x1 => $desired_space1->x1());
-		$desired_space2->set(x2 => $desired_space1->width() + $desired_space2->width());
-		$desired_space2->set(y2 => $available_space->y2());
+		$desired_space2->set($self->_p10($desired_space1));
+		$desired_space2->set($self->_p11($desired_space1, $desired_space2));
+		$desired_space2->set($self->_p9($available_space));
 		return $desired_space2;
 	}
 	return $desired_space1;
@@ -240,22 +235,22 @@ sub get_minimum_space {
 	}
 
 	my $minimum_space1 = $available_space->clone();
-	$minimum_space1->set(x2 => $minimum_space1->x1() + $gp + $gw);
+	$minimum_space1->set($self->_p8($minimum_space1, $gp, $gw));
 	if (! defined $child1) {
-		$minimum_space1->set(y2 => $minimum_space1->y1() + 1);
+		$minimum_space1->set($self->_p12($minimum_space1));
 	} else {
 		$minimum_space1 = $child1->get_minimum_space($minimum_space1);
-		$minimum_space1->set(x2 => $minimum_space1->x1() + $gp + $gw);
+		$minimum_space1->set($self->_p8($minimum_space1, $gp, $gw));
 	}
 	if (defined $child2) {
 		my $minimum_space2 = $available_space->clone();
-		$minimum_space2->set(x1 => $available_space->x1() + $gp + $gw);
+		$minimum_space2->set($self->_p5($available_space, $gp, $gw));
 		$minimum_space2 = $child2->get_minimum_space($minimum_space2);
-		$minimum_space2->set(x1 => $minimum_space1->x1());
-		$minimum_space2->set(x2 => $minimum_space1->width() + $minimum_space2->width());
-		use List::Util qw(max);
-		$minimum_space2->set(y2 => max($minimum_space1->y2(), $minimum_space2->y2()));
-		return $minimum_space2;
+		my $return_space = $minimum_space2->clone();
+		$return_space->set($self->_p10($minimum_space1));
+		$return_space->set($self->_p11($minimum_space1, $minimum_space2));
+		$return_space->set($self->_p13($minimum_space1, $minimum_space2));
+		return $return_space;
 	}
 	return $minimum_space1;
 }
