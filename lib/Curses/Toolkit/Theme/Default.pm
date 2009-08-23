@@ -98,24 +98,27 @@ sub BLANK_CLICKED { shift->_attrset() }
 sub draw_hline {
 	my ($self, $x1, $y1, $width, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	my $name = $self->get_widget()->get_name();
-
-	$self->curses($attr)->hline($y1, $x1, HLINE(), $width);
-
+	$y1 >= 0 or return;
+	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => $width, height => 1)
+	  or return;
+	$self->curses($attr)->hline($c->y1(), $c->x1(), HLINE(), $c->width());
 	return $self;
 }
 
 sub draw_vline {
-	my ($self, $x1, $y1, $width, $attr) = @_;
+	my ($self, $x1, $y1, $height, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	my $name = $self->get_widget()->get_name();
-	$self->curses($attr)->vline($y1, $x1, VLINE(), $width);
+	$x1 >= 0 or return;
+	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => 1, height => $height)
+	  or return;
+	$self->curses($attr)->vline($c->y1(), $c->x1(), VLINE(), $c->height());
 	return $self;
 }
 
 sub draw_corner_ul {
 	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
+	$self->is_in_shape(x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1) or return;
  	$self->curses($attr)->addch($y1, $x1, ULCORNER());
 	return $self;
 }
@@ -123,6 +126,7 @@ sub draw_corner_ul {
 sub draw_corner_ll {
 	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
+	$self->is_in_shape(x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1) or return;
  	$self->curses($attr)->addch($y1, $x1, LLCORNER());
 	return $self;
 }
@@ -130,6 +134,7 @@ sub draw_corner_ll {
 sub draw_corner_ur {
 	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
+	$self->is_in_shape(x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1) or return;
  	$self->curses($attr)->addch($y1, $x1, URCORNER());
 	return $self;
 }
@@ -137,6 +142,7 @@ sub draw_corner_ur {
 sub draw_corner_lr {
 	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible() or return;
+	$self->is_in_shape(x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1) or return;
  	$self->curses($attr)->addch($y1, $x1, LRCORNER());
 	return $self;
 }
@@ -144,20 +150,27 @@ sub draw_corner_lr {
 sub draw_string {
 	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	$self->curses($attr)->addstr($y1, $x1, $text);
+	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => length($text), height => 1) or return;
+	$text = substr($text, $c->x1()-$x1, $c->width());
+	defined $text && length $text or return;
+	$self->curses($attr)->addstr($c->y1(), $c->x1(), $text);
 	return $self;
 }
 
 sub draw_title {
 	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	$self->curses($attr)->addstr($y1, $x1, $text);
+	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => length($text), height => 1) or return;
+	$text = substr($text, $c->x1()-$x1, $c->width());
+	defined $text && length $text or return;
+	$self->curses($attr)->addstr($c->y1(), $c->x1(), $text);
 	return $self;
 }
 
 sub draw_resize {
 	my ($self, $x1, $y1, $attr) = @_;
 	$self->get_widget->is_visible or return;
+	$self->is_in_shape(x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1) or return;
 	$self->curses($attr)->addch($y1, $x1, ACS_CKBOARD);
 	return $self;
 }
@@ -166,6 +179,8 @@ sub draw_blank {
 	my $self = shift;
 	$self->get_widget->is_visible or return;
 	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+	$c = $self->restrict_to_shape($c)
+	  or return;
 	my $l = $c->x2() - $c->x1();
 	$l > 0 or return $self;
 	my $str = ' ' x $l;

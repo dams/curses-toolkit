@@ -366,6 +366,43 @@ sub restrict_to {
 	return $self;
 }
 
+=head2 contains
+
+Return true if the coordinates contains the given coordinates
+
+  my $boolean = $self->contains( $coord )
+
+  input  : a Curses::Toolkit::Object::Coordinates object : the coordinates
+  output : true or false
+
+=cut
+
+sub contains {
+	my $self = shift;
+	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+	return $self->x1() <= $c->x1() &&
+	       $self->y1() <= $c->y1() &&
+		   $self->x2() >= $c->x2() &&
+		   $self->y2() >= $c->y2()
+}
+
+=head2 is_inside
+
+Return true if the coordinates is inside the given coordinates
+
+  my $boolean = $self->is_inside( $coord )
+
+  input  : a Curses::Toolkit::Object::Coordinates object : the coordinates
+  output : true or false
+
+=cut
+
+sub is_inside {
+	my $self = shift;
+	my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+	return $c->contains($self);
+}
+
 =head2 is_in_widget
 
 Return true if the coordinates is in side the give widget

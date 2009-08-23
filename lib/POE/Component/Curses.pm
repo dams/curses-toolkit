@@ -40,6 +40,10 @@ sub spawn {
 				$_[HEAP]{console} = POE::Wheel::Curses->new(
 				  InputEvent => 'key_handler',
 				);
+				
+				# ask the mainloop to rebuild_all coordinate
+				$kernel->yield('rebuild_all');
+				
 			},
 			key_handler => sub {
 				my ($kernel, $heap, $keystroke) = @_[ KERNEL, HEAP, ARG0];
@@ -111,7 +115,7 @@ sub spawn {
 					} else {
 
 						if ($keystroke eq '<^L>') {
-							$kernel->post($params{alias}, 'window_resize');
+							$kernel->yield('window_resize');
 						} elsif ($keystroke eq '<^C>') {
 							exit();
 						} else {
@@ -131,17 +135,17 @@ sub spawn {
 			},
 			window_resize => sub { 
 				my ($kernel, $heap) = @_[ KERNEL, HEAP];
-
 				$heap->{mainloop}->event_resize();
-
 			},
-
+			rebuild_all => sub {
+				my ($kernel, $heap) = @_[ KERNEL, HEAP ];
+				$heap->{mainloop}->event_rebuild_all();
+			},
 			# Now the Mainloop signals
 			redraw => sub {
 				my ($kernel, $heap) = @_[KERNEL, HEAP];
 				$heap->{mainloop}->event_redraw();
 			},
-
 			add_delay_handler => sub {
 				my $seconds = $_[ARG0];
 				my $code = $_[ARG1];

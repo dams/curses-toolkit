@@ -84,14 +84,123 @@ sub get_property {
 	return( { %$properties } );
 }
 
+=head2 get_widget
 
+  my $widget = $theme_instance->get_widget();
 
+Returns the widget of this theme instance, or undef
 
+=cut
 
 sub get_widget {
 	my ($self) = @_;
+	defined $self->{widget} or return;
 	return $self->{widget};
 }
+
+=head2 get_window
+
+  my $widget = $theme_instance->get_window();
+
+Returns the window of this theme instance, or void
+
+=cut
+
+sub get_window {
+	my ($self) = @_;
+	my $widget = $self->get_widget()
+	  or return;
+	my $window = $widget->get_window()
+	  or return;
+	return $window;
+}
+
+=head2 get_root_window
+
+  my $widget = $theme_instance->get_root_window();
+
+Returns the root window of this theme instance, or void
+
+=cut
+
+sub get_root_window {
+	my ($self) = @_;
+	my $window = $self->get_window()
+	  or return;
+	my $root_window = $window->get_root_window()
+	  or return;
+	return $root_window;
+}
+
+=head2 get_shape
+
+  my $widget = $theme_instance->get_shape();
+
+Returns the shape of the root window of this theme instance, or void
+
+=cut
+
+sub get_shape {
+	my ($self) = @_;
+	my $root_window = $self->get_root_window()
+	  or return;
+	my $shape = $root_window->get_shape()
+	  or return;
+	return $shape;
+}
+
+=head2 is_in_shape
+
+  my $coordinates = $theme_instance->is_in_shape( $coordinate );
+  my $coordinates = $theme_instance->is_in_shape( x1 => 1, y1 => 1, x2 => 25, y2 => 10 );
+  my $coordinates = $theme_instance->is_in_shape( x1 => 1, y1 => 1, width => 4, height => 1 );
+
+Returns true / false if the given coordinates are in the current shape. Or
+returns void if there is no root window.
+
+=cut
+
+sub is_in_shape {
+	my $self = shift;
+	my $shape = $self->get_shape()
+	  or return;
+	return Curses::Toolkit::Object::Coordinates->new( @_ )
+	  ->is_inside($shape);
+}
+
+=head2 restrict_to_shape
+
+  my $coordinates = $theme_instance->restrict_to_shape( $coordinate );
+  my $coordinates = $theme_instance->restrict_to_shape( x1 => 1, y1 => 1, x2 => 25, y2 => 10 );
+  my $coordinates = $theme_instance->restrict_to_shape( x1 => 1, y1 => 1, width => 4, height => 1 );
+
+Given a coordinates, returns it restricted to the shape of the root window, or
+void if there is no root window. Useful to draw text / line and make sure thay
+are in the shape
+
+=cut
+
+sub restrict_to_shape {
+	my $self = shift;
+	my $shape = $self->get_shape()
+	  or return;
+	return Curses::Toolkit::Object::Coordinates->new( @_ )
+	  ->restrict_to($shape);
+}
+
+=head2 curses
+
+  my $curses_object = $theme_instance->curses($attr);
+
+Returns the Curses object. $attr is an optional HASHREF that
+can contain these keys:
+
+  bold : set bold on / off
+  reverse : set reverse on / off
+  focused : draw in focused mode
+  clicked : draw in clicked mode
+
+=cut
 
 sub curses {
 	my ($self, $attr) = @_;

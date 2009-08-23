@@ -657,6 +657,14 @@ sub _recompute_shape {
 	return $self;
 }
 
+sub _rebuild_all {
+	my ($self) = @_;
+	foreach my $window ($self->get_windows()) {
+		$window->rebuild_all_coordinates();
+	}
+	return $self;
+}
+
 =head1 AUTHOR
 
 Damien "dams" Krotkine, C<< <dams at cpan.org> >>

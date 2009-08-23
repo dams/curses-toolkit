@@ -145,7 +145,7 @@ sub new {
 					$window->unset_modal();
 					my $c = $event->{coordinates};
 					my $wc = $window->get_coordinates();
-					$wc->set( x2 => $c->x2(), y2 => $c->y2() );
+					$wc->set( x2 => $c->x2() + 1, y2 => $c->y2() + 1 );
 					$window->set_coordinates($wc);
 					$window->needs_redraw();
 					$self->{_resize_pressed} = 0;

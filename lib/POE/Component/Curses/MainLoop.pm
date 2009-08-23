@@ -90,6 +90,14 @@ sub add_delay {
 ## Methods called by the POE Component session ##
 ## They usually return nothing
 
+# POE::Component::Curses asked to rebuild all coordinates
+
+sub event_rebuild_all {
+	my ($self) = @_;
+	$self->{toolkit_root}->_rebuild_all();	
+	return;
+}
+
 # POE::Component::Curses ordered a redraw
 sub event_redraw {
 	my ($self) = @_;
