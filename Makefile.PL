@@ -11,6 +11,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Curses' => 0,
         'Test::More' => 0,
+        'Tie::Array::Iterable' => 0,
+        'parent' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Curses-Toolkit-*' },
