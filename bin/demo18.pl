@@ -34,10 +34,8 @@ sub main {
 	$hpaned->set_name('hpaned'),
 	$hpaned->set_gutter_position(50);
 	$window->add_widget($hpaned);
-	$hpaned->add1(Curses::Toolkit::Widget::Label->new()
-				 ->set_text('This is a naive label. Very naive')
-				 ->set_name('label1'),
-				);
+	$hpaned->add1(Curses::Toolkit::Widget::Button->new_with_label('This is a button'),
+				 );
 	$hpaned->add2(Curses::Toolkit::Widget::Label->new()
 				  ->set_text('An other nonetheless naive label.Honest !')
 				  ->set_name('label2'),
