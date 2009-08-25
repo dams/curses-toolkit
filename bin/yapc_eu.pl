@@ -20,7 +20,7 @@ sub main {
 	use Curses::Toolkit::Widget::Button;
 	use Curses::Toolkit::Widget::Border;
 	use Curses::Toolkit::Widget::Entry;
-	use Curses::Toolkit::Widget::HPane;
+	use Curses::Toolkit::Widget::HPaned;
 	use Curses::Toolkit::Widget::Label;
 	use Curses::Toolkit::Widget::Entry;
 
