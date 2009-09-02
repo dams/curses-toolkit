@@ -17,19 +17,52 @@ Version 0.01
 
 our $VERSION = '0.01';
 
+=head1 SYNOPSIS
+
+=head1 SYNOPSIS
+
+  # spawn a root window
+  my $root_window = POE::Component::Curses->spawn();
+  # adds some widget
+  $root->add_window(
+      my $window = Curses::Toolkit::Widget::Window
+        ->new()
+        ->set_name('main_window')
+        ->add_widget(
+          my $border1 = Curses::Toolkit::Widget::Border
+            ->new()
+            ->set_name('border1')
+            ->add_widget(
+              my $label1 = Curses::Toolkit::Widget::Label
+                ->new()
+                ->set_name('label1')
+                ->set_text('This demonstrates the use of Curses::Toolkit used with its POE Event Loop : POE::Component::Curses. Keyboard events and window resizing are supported')
+            ),
+        )
+        ->set_coordinates(x1 => 0,   y1 => 0,
+                          x2 => '100%',
+                          y2 => '100%',
+                         )
+  );
+
+  # start main loop
+  POE::Kernel->run();
+
 =head1 DESCRIPTION
 
 This module tries to be a modern curses toolkit, based on the Curses module, to
-build "graphical" console user interfaces easily.
+build "semi-graphical" user interfaces easily.
 
-However, please consider using L<POE::Component::Curses>, which is probably
-what you want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a
-mainloop and handles keyboard, mouse, timer and other events, whereas
-Curses::Toolkit is just the drawing library.
+Curses::Toolkit is meant to be used with a mainloop, which is not part of this
+module. I recommend you L<POE::Component::Curses>, which is probably what you
+want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a mainloop
+and handles keyboard, mouse, timer and other events, whereas Curses::Toolkit is
+just the drawing library. See the example above. the C<spawn> method returns a
+L<Curses::Toolkit> object, which you can call methods on.
 
-However if you already have a mainloop or if you don't need it, you might want
+If you already have a mainloop or if you don't need it, you might want
 to use Curses::Toolkit directly. But again, it's probably not what you want to
-use.
+use. In this case you would do something like :
 
   use Curses::Toolkit;
 
@@ -47,7 +80,8 @@ use.
 
 Initialize the Curses environment, and return an object representing it. This
 is not really a constructor, because you can't have more than one
-Curses::Toolkit object for one Curses environment.
+Curses::Toolkit object for one Curses environment. Think of it more like a
+service.
 
   input  : clear_background  : optional, boolean, default 1 : if true, clears background
            theme_name        : optional, the name of them to use as default diosplay theme

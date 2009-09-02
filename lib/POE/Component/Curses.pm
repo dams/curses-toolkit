@@ -7,10 +7,69 @@ use warnings;
 
 our $VERSION = '0.01';
 
-
 use POE qw(Session);
 use POE qw(Wheel::Curses);
 use Params::Validate qw(:all);
+
+=head1 NAME
+
+POE::Component::Curses - the ( currently only ) loader for Curses::toolkit
+
+=head1 SYNOPSIS
+
+  # spawn a root window
+  my $root_window = POE::Component::Curses->spawn();
+  # adds some widget
+  $root->add_window(
+      my $window = Curses::Toolkit::Widget::Window
+        ->new()
+        ->set_name('main_window')
+        ->add_widget(
+          my $border1 = Curses::Toolkit::Widget::Border
+            ->new()
+            ->set_name('border1')
+            ->add_widget(
+              my $label1 = Curses::Toolkit::Widget::Label
+                ->new()
+                ->set_name('label1')
+                ->set_text('This demonstrates the use of Curses::Toolkit used with its POE Event Loop : POE::Component::Curses. Keyboard events and window resizing are supported')
+            ),
+        )
+        ->set_coordinates(x1 => 0,   y1 => 0,
+                          x2 => '100%',
+                          y2 => '100%',
+                         )
+  );
+
+  # start main loop
+  POE::Kernel->run();
+
+=head1 DESCRIPTION
+
+POE::Component::Curses is a mainloop for L<Curses::Toolkit>.
+
+It has only one method : C<spawn>, which instantiate and returs a
+L<Curses::Toolkit> object for you. This is the root window.
+
+You should use this object to populate your root window with widgets. See
+L<Curses::Toolkit> for more information.
+
+=head1 CLASS METHODS
+
+=head2 spawn
+
+This is the main method. It will create and return a L<Curses::Toolkit> object,
+and create a POE Session that will be the mainloop. C<spawn> takes as argument
+the optional alias you want to give to this POE Session (default is
+C<'curses'>), and an optional C<args> which is a hashref. It should contain
+arguments that will be passed to the C<init_root_window> of L<Curses::Toolkit>.
+See its documentation for more information
+
+  input  : alias <String> : the name of the POE Session. Default : 'curses'
+         : args <HashRef> : the arguments to be passed to C<Curses::Toolkit::init_root_window>
+  output : a L<Curses::Toolkit> instance
+
+=cut
 
 sub spawn {
 	my $class = shift;
