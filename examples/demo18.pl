@@ -22,27 +22,47 @@ sub main {
 
 	my $root = POE::Component::Curses->spawn();
 
-	local $| = 1;
-	print STDERR "\n\n\n--- starting demo18 -----------------\n\n";
 
-	my $window = Curses::Toolkit::Widget::Window->new();
-	$window->set_name('window'),
-	$root->add_window($window);
-	$window->set_title("a title");
+	$root->add_window(
+		my $window1 = Curses::Toolkit::Widget::Window->new()
+		  ->set_name('window')
+		  ->set_title("a title")
+	);
 
-	my $hpaned = Curses::Toolkit::Widget::HPaned->new();
-	$hpaned->set_name('hpaned'),
-	$hpaned->set_gutter_position(50);
-	$window->add_widget($hpaned);
-	$hpaned->add1(Curses::Toolkit::Widget::Button->new_with_label('This is a button'),
-				 );
-	$hpaned->add2(Curses::Toolkit::Widget::Label->new()
-				  ->set_text('An other nonetheless naive label.Honest !')
-				  ->set_name('label2'),
-				 );
-	$window->set_coordinates(x1 => 0,   y1 => 0,
-							 x2 => '100%',
-							 y2 => '100%',
+	$window1->add_widget(
+		my $hpaned = Curses::Toolkit::Widget::HPaned->new()
+		  ->set_name('hpaned')
+		  ->set_gutter_position(50)
+		  ->add1(
+            my $button1 = Curses::Toolkit::Widget::Button->new_with_label('This is a button'),
+		  )
+	      ->add2(
+			my $button2 = Curses::Toolkit::Widget::Button->new_with_label('This is an other button')
+		  )
+	);
+	$window1->set_coordinates(x1 => '10%',   y1 => '10%',
+							 x2 => '80%',
+							 y2 => '80%',
 							);
+
+
+	$root->add_window(
+		my $window2 = Curses::Toolkit::Widget::Window->new()
+		  ->set_name('window2')
+		  ->set_title("a title2")
+	);
+
+	my $button3 = Curses::Toolkit::Widget::Button->new_with_label('This is a button 3');
+	my $button4 = Curses::Toolkit::Widget::Button->new_with_label('This is a button 4');
+	$window2->add_widget(
+		my $vbox = Curses::Toolkit::Widget::VBox->new()
+		  ->pack_end($button3, { expand => 0 })
+		  ->pack_end($button4, { expand => 0 })
+	);
+	$window2->set_coordinates(x1 => '15%',   y1 => '15%',
+							 x2 => '85%',
+							 y2 => '85%',
+							);
+	$button3->set_focus(1);
 	POE::Kernel->run();
 }

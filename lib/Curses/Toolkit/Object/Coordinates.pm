@@ -366,6 +366,92 @@ sub restrict_to {
 	return $self;
 }
 
+=head2 translate
+
+Given a X value and a Y value, translates the coordinate accordingly
+
+  input  : x : value to translate the coord horizontally
+           y : value to translate the coord vertically
+  output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub translate {
+	my $self = shift;
+
+	my %params = validate(@_, { x => { type => SCALAR, optional => 1 },
+								y => { type => SCALAR, optional => 1 },
+							  });
+	defined $params{x} || $params{y} or
+	  die "needs at least one of 'x' or 'y'";
+
+	if (defined $params{x}) {
+		$self->{x1} += $params{x};
+		$self->{x2} += $params{x};
+	}
+	if (defined $params{y}) {
+		$self->{y1} += $params{y};
+		$self->{y2} += $params{y};
+	}
+	return $self;
+}
+
+=head2 translate_up
+
+Given a value, translates the coordinate up (value sign is ignored)
+
+  input  : value to translate the coord up
+  output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub translate_up {
+	my ($self, $value) = @_;
+	return $self->translate(y => - abs $value);
+}
+
+=head2 translate_down
+
+Given a value, translates the coordinate down (value sign is ignored)
+
+  input  : value to translate the coord down
+  output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub translate_down {
+	my ($self, $value) = @_;
+	return $self->translate(y => abs $value);
+}
+
+=head2 translate_left
+
+Given a value, translates the coordinate left (value sign is ignored)
+
+  input  : value to translate the coord left
+  output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub translate_left {
+	my ($self, $value) = @_;
+	return $self->translate(x => - abs $value);
+}
+
+=head2 translate_right
+
+Given a value, translates the coordinate right (value sign is ignored)
+
+  input  : value to translate the coord right
+  output : the Curses::Toolkit::Object::Coordinates object
+
+=cut
+
+sub translate_right {
+	my ($self, $value) = @_;
+	return $self->translate(x => abs $value);
+}
+
 =head2 contains
 
 Return true if the coordinates contains the given coordinates

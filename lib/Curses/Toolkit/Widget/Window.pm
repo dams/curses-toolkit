@@ -97,12 +97,22 @@ sub new {
 				if ($self->{_move_pressed}) {
 					# means we released it
 					$window->unset_modal();
-					my $c = $event->{coordinates};
-					my $oc = $self->{_move_coord};
-					my $wc = $window->get_coordinates();
+					my $c = $event->{coordinates}; # event coord
+					my $oc = $self->{_move_coord}; # click-origin coord
+					my $wc = $window->get_coordinates(); # window coord
+					my $rc = $self->get_root_window()->get_shape(); # root coord
 					$wc += { x1 => $c->x1() - $oc->x1(), x2 => $c->x1() - $oc->x1(),
 							 y1 => $c->y1() - $oc->y1(), y2 => $c->y1() - $oc->y1(),
-						   };
+						   }; 
+					$wc->y1() < 0
+					  and $wc->translate_down( $wc->y1() );
+					$wc->y1() > $rc->height() - 1
+					  and $wc->translate_up( $wc->y1() - $rc->height() + 1  );
+					$wc->x1() < - $wc->width() + 1
+					  and $wc->translate_right( - $wc->width() + 1 - $wc->x1() );
+					$wc->x1() > $rc->width() - 1
+					  and $wc->translate_left( - $wc->x1() - $rc->width() + 1 );
+
 					$window->set_coordinates($wc);
 					$window->needs_redraw();
 					$self->{_move_pressed} = 0;
