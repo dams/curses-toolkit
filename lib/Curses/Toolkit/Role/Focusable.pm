@@ -60,7 +60,6 @@ sub set_focus {
 	my ($focus) = validate_pos( @_, { type => BOOLEAN } );
 
 	if ($self->is_focusable()) {
-		$self->set_property(basic => 'focused', $focus ? 1 : 0);
 		if ($focus) {
 			if ($self->can('get_window')) {
 				my $window = $self->get_window();
@@ -87,8 +86,10 @@ sub set_focus {
 				}
 			}
 		}
+		$self->set_property(basic => 'focused', $focus ? 1 : 0);
 		$self->needs_redraw();
 	}
+
 	return $self;
 }
 

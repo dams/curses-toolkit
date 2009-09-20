@@ -223,12 +223,17 @@ sub init_root_window {
 			conditional_code => sub { 
 				my ($event) = @_;
 				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq '<^I>' or return 0;
+				$event->{params}{key} eq 'j' || $event->{params}{key} eq '<^I>' or return 0;
 			},
 			code => sub {
 				my $focused_widget = $self->get_focused_widget();
 				if (defined $focused_widget) {
 					my $next_focused_widget = $focused_widget->get_next_focused_widget();
+					defined $next_focused_widget and 
+					  $next_focused_widget->set_focus(1);
+				} else {
+					my $focused_window = $self->get_focused_window();
+					my $next_focused_widget = $focused_window->get_next_focused_widget();
 					defined $next_focused_widget and 
 					  $next_focused_widget->set_focus(1);
 				}
