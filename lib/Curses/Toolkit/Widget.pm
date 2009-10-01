@@ -691,4 +691,17 @@ sub _recursive_f2 {
 	return;
 }
 
+sub _possible_signals {
+	return ();
+}
+
+sub signal_connect {
+	my $self = shift;
+	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
+												      { type => CODEREF },
+												);
+	$self->_bind_signal($signal_name, $code_ref);
+	return $self;
+}
+
 1;

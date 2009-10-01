@@ -110,10 +110,11 @@ sub draw {
 	my $w2 = $w1 - 4;
 	my $o1 = 2;
 	my $o2 = $w1 - 2;
+	my $t = ' ' x (($w2 - length $text) / 2);
 
 	$theme->draw_string($c->x1(), $c->y1(), '< ');
 	$theme->draw_string($c->x1() + $o2, $c->y1(), ' >');
-	$theme->draw_string($c->x1() + $o1, $c->y1(), $text);
+	$theme->draw_string($c->x1() + $o1, $c->y1(), $t . $text . $t);
 
 	return;
 }
@@ -152,5 +153,34 @@ sub get_minimum_space {
 	return $desired_space;
 }
 
+sub _possible_signals {
+	my $self = shift;
+	my ($code_ref) = validate_pos( @_, { type => CODEREF },
+								);
+	return ($self->SUPER::_possible_signals($code_ref),
+			clicked => Curses::Toolkit::EventListener->new(
+				accepted_event_class => 'Curses::Toolkit::Event::Key',
+				conditional_code => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq ' ' or return 0;
+				},
+				code => $code_ref,
+			)			
+		   );
+}
+
+sub _bind_signal {
+	my $self = shift;
+	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
+												      { type => CODEREF },
+												);
+	my %signals = $self->_possible_signals($code_ref);
+	my $event_listener = $signals{$signal_name};
+	defined $event_listener
+	  or die "signal '$signal_name' doesn't exists for widget of type " . ref($self) . ". Possible signals are : " . join(', ', keys %signals);
+	$self->add_event_listener($event_listener);
+	return $self;
+}
 
 1;
