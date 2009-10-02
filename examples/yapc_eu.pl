@@ -347,9 +347,9 @@ $step3 = sub {
 	my $t = sub { $o += ($_[0]/1); return $o; };
 	my $text = $audience_entry->get_text();
 	$root->add_delay($t->(1), sub { $set->(" You entered the text : '$text'") });
-	$root->add_delay($t->(5), sub { $set->("OK ! Let's have a look at the Pane widget ! ") });
+	$root->add_delay($t->(5), sub { $set->("OK ! Let's have a look at the Paned widget ! ") });
 	$root->add_delay($t->(2), sub {
-						 my $hpane = Curses::Toolkit::Widget::HPane->new();
+						 my $hpane = Curses::Toolkit::Widget::HPaned->new();
 						 $hpane->set_name('hpane');
 						 $hpane->set_gutter_position(13);
 						 $audience_window->add_widget($hpane);
@@ -370,7 +370,7 @@ $step3 = sub {
 	});
 
 	$root->add_delay($t->(1), sub { $set->("Mister Book, can you please resize and move the window ?\n") });
-	$root->add_delay($t->(2), sub { $app->("Oh and, can you drag and drop the Pane seperation ?\n") });
+	$root->add_delay($t->(2), sub { $app->("Oh and, can you drag and drop the Paned seperation ?\n") });
 	$root->add_delay($t->(3), sub { $set->("") });
 
 	$root->add_delay($t->(5), sub { $audience_window->set_coordinates( x1 => 3, y1 => 3, x2 => 40, y2 => 10);
