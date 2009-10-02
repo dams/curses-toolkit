@@ -32,12 +32,28 @@ sub main {
 	$menu_window->add_widget($menu_vbox);
 
 	my @spawned_windows;
+	my $current_pane;
+	my $switch_pane = 0;
 	my $b1 = Curses::Toolkit::Widget::Button->new_with_label('spawn a window');
 	$menu_vbox->pack_end($b1, { expand => 0 });
 	$b1->signal_connect(clicked => sub {
 							my $w = Curses::Toolkit::Widget::Window->new()
 							  ->set_title("Spawned window n." . scalar @spawned_windows + 1);
-							
+							my $hp = Curses::Toolkit::Widget::HPaned->new();
+							$hp->set_gutter_position(10);
+							$w->add_widget($hp);
+							$hp->add1(Curses::Toolkit::Widget::Label->new()
+									  ->set_text('This is a naive label. Very naive')
+									 );
+ 							$hp->add2(	my $vb = Curses::Toolkit::Widget::VBox->new()
+										->pack_end(
+												   Curses::Toolkit::Widget::Label->new()
+												   ->set_text('An other nonetheless naive label.Honest !'),
+												   { expand => 0 }
+												  )
+ 									 );
+							$current_pane = $vb;
+
 							my $s = scalar(@spawned_windows) * 2;
 							push @spawned_windows, $w;
 							$w->set_coordinates(x1 => 30 + $s, y1 => 5 + $s,
@@ -70,6 +86,29 @@ sub main {
 								$theme_switch = !$theme_switch;
 							}
 							$root->needs_redraw();
+						});
+
+	my $b4 = Curses::Toolkit::Widget::Button->new_with_label('Add a Pane');
+	$menu_vbox->pack_end($b4, { expand => 0 });
+	$b4->signal_connect(clicked => sub {
+							defined $current_pane or return;
+							my $pane = $switch_pane ? Curses::Toolkit::Widget::HPaned->new()
+							                      : Curses::Toolkit::Widget::VPaned->new();
+							$pane->set_gutter_position( $switch_pane ? 7 : 2);
+							$current_pane->pack_end(
+													$pane,
+													{ expand => 0 }
+												   );
+							$pane->add1(Curses::Toolkit::Widget::Label->new()
+									  ->set_text('This is a naive label. Very naive')
+									 );
+							$pane->add2(my $box = ($switch_pane ? Curses::Toolkit::Widget::VBox->new()
+										                       : Curses::Toolkit::Widget::HBox->new())
+
+									 );
+							$current_pane = $box;
+							$switch_pane = !$switch_pane;
+
 						});
 
 	$root->add_window($menu_window);
