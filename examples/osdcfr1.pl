@@ -157,6 +157,96 @@ sub main {
 											   });
 						});
 
+	my $b6 = Curses::Toolkit::Widget::Button->new_with_label('spawn boxes');
+	$menu_vbox->pack_end($b6, { expand => 0 });
+	$b6->signal_connect(clicked => sub {
+
+        my $w = Curses::Toolkit::Widget::Window
+          ->new()
+          ->set_name('main_window')
+			->set_title("Spawned window n." . scalar @spawned_windows + 1)
+          ->add_widget(
+                my $vbox1 = Curses::Toolkit::Widget::VBox->new()
+                  ->pack_end(
+                     my $border2 = Curses::Toolkit::Widget::Border
+                       ->new()
+                       ->set_name('border2')
+                       ->add_widget(
+                         my $label1 = Curses::Toolkit::Widget::Label
+                         ->new()
+                         ->set_name('label1')
+                         ->set_text('non-expanding border but a long label that hopefully wraps')
+                       )
+                  )
+                  ->pack_end(
+#                      my $border3 = Curses::Toolkit::Widget::Border
+#                        ->new()
+#                        ->set_name('border3')
+#                        ->add_widget(
+						 my $hbox1 = Curses::Toolkit::Widget::HBox
+                           ->new()
+                           ->set_name('hbox1')
+						   ->pack_end(
+                             my $border4 = Curses::Toolkit::Widget::Border
+                               ->new()
+                               ->set_name('border4')
+                               ->add_widget(
+							     my $label3 = Curses::Toolkit::Widget::Label
+								   ->new()
+                                   ->set_name('label3')
+                                   ->set_text('expanding border')
+							   ),
+							   { expand => 1 }
+                           )
+						   ->pack_end(
+                             my $border5 = Curses::Toolkit::Widget::Border
+                               ->new()
+                               ->set_name('border5')
+                               ->add_widget(
+							     my $label4 = Curses::Toolkit::Widget::Label
+								   ->new()
+                                   ->set_name('label4')
+                                   ->set_text('expanding border')
+							   ),
+							 { expand => 1 }
+						   ),
+						 { expand => 1 }
+#                       ),
+                  )
+				  ->pack_end(
+                    my $border6 = Curses::Toolkit::Widget::Border
+                      ->new()
+                      ->set_name('border6')
+                      ->add_widget(
+                        my $label5 = Curses::Toolkit::Widget::Label
+                          ->new()
+                          ->set_name('label5')
+                          ->set_text('expanding border')
+                      ),
+				      { expand => 1 }
+                  )
+				  ->pack_end(
+                    my $border7 = Curses::Toolkit::Widget::Border
+                      ->new()
+                      ->set_name('border7')
+                      ->add_widget(
+                        my $label6 = Curses::Toolkit::Widget::Label
+                          ->new()
+                          ->set_name('label6')
+                          ->set_text('non expanding border')
+                      ),
+                  )
+          );
+
+							my $s = scalar(@spawned_windows) * 2;
+							push @spawned_windows, $w;
+							$w->set_coordinates(x1 => 30 + $s, y1 => 5 + $s,
+												x2 => 70 + $s, y2 => 20 + $s,
+											   );
+							$root->add_window($w);
+							$w->set_theme_property(title_width => 30 );
+
+						});
 
 	$root->add_window($menu_window);
 
