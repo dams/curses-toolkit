@@ -111,6 +111,53 @@ sub main {
 
 						});
 
+
+	my $b5 = Curses::Toolkit::Widget::Button->new_with_label('spawn dialog');
+	$menu_vbox->pack_end($b5, { expand => 0 });
+	$b5->signal_connect(clicked => sub {
+							my $w = Curses::Toolkit::Widget::Window->new()
+							  ->set_title("Spawned window n." . scalar @spawned_windows + 1)
+							  ->add_widget(
+							    Curses::Toolkit::Widget::VBox->new()
+								->pack_end(
+								  my $e = Curses::Toolkit::Widget::Entry->new(),
+										   { expand => 0 },
+										  )
+                                ->pack_end(
+								  my $b = Curses::Toolkit::Widget::Button->new_with_label(' Click me !'),
+										   { expand => 0 },
+										  )
+								->pack_end(
+								  Curses::Toolkit::Widget::Label->new()->set_text(' '),
+										   { expand => 0 },
+										  )										   
+								->pack_end(
+								  Curses::Toolkit::Widget::Label->new()->set_text(' '),
+										   { expand => 0 },
+										  )										   
+								->pack_end(
+								  my $l = Curses::Toolkit::Widget::Label->new()
+									  ->set_text("I'll be displaying things here"),
+										   { expand => 0 },
+										  )										   
+							  );
+							my $s = scalar(@spawned_windows) * 2;
+							push @spawned_windows, $w;
+							$w->set_coordinates(x1 => 30 + $s, y1 => 5 + $s,
+												x2 => 70 + $s, y2 => 20 + $s,
+											   );
+							$root->add_window($w);
+							$w->set_theme_property(title_width => 80 );
+
+							$b->signal_connect(clicked => sub {
+												   my $t = $e->get_text();
+												   $t = uc($t);
+												   $l->set_text("You entered this: $t");
+												   $root->needs_redraw();
+											   });
+						});
+
+
 	$root->add_window($menu_window);
 
 
