@@ -6,14 +6,6 @@ package Curses::Toolkit;
 
 use Params::Validate qw(:all);
 
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
 =head1 SYNOPSIS
 
 =head1 SYNOPSIS

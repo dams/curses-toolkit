@@ -6,8 +6,6 @@ package POE::Component::Curses;
 
 use POE::Component::Curses::MainLoop;
 
-our $VERSION = '0.01';
-
 use POE qw(Session);
 use POE qw(Wheel::Curses);
 use Params::Validate qw(:all);
