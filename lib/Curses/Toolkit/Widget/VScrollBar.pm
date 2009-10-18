@@ -1,15 +1,12 @@
-package Curses::Toolkit::Widget::VScrollBar;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::VScrollBar;
+# ABSTRACT: a vertical scrollbar widget
 
 use parent qw(Curses::Toolkit::Widget);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::VScrollBar - a vertical scrollbar widget
 
 =head1 DESCRIPTION
 

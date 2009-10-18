@@ -1,15 +1,12 @@
-package Curses::Toolkit::Widget::Bin;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::Bin;
+# ABSTRACT: a bin widget
 
 use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::Bin - a bin widget
 
 =head1 DESCRIPTION
 

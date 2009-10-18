@@ -1,15 +1,12 @@
-package Curses::Toolkit::Widget::HBox;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::HBox;
+# ABSTRACT: an horizontal box widget
 
 use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::HBox - an horizontal box widget
 
 =head1 DESCRIPTION
 

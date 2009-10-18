@@ -1,23 +1,10 @@
-package Curses::Toolkit;
-
 use warnings;
 use strict;
 
+package Curses::Toolkit;
+# ABSTRACT: a modern Curses toolkit
+
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit - a modern Curses toolkit
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
-=head1 SYNOPSIS
 
 =head1 SYNOPSIS
 
@@ -707,9 +694,7 @@ sub _rebuild_all {
 	return $self;
 }
 
-=head1 AUTHOR
-
-Damien "dams" Krotkine, C<< <dams at cpan.org> >>
+1;
 
 =head1 BUGS
 
@@ -747,15 +732,3 @@ L<http://search.cpan.org/dist/Curses-Toolkit>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Damien "dams" Krotkine, all rights reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-=cut
-
-1; # End of Curses::Toolkit

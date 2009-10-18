@@ -1,19 +1,14 @@
+use warnings;
+use strict;
+
 package POE::Component::Curses;
+# ABSTRACT: the ( currently only ) loader for Curses::toolkit
 
 use POE::Component::Curses::MainLoop;
-
-use strict;
-use warnings;
-
-our $VERSION = '0.01';
 
 use POE qw(Session);
 use POE qw(Wheel::Curses);
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-POE::Component::Curses - the ( currently only ) loader for Curses::toolkit
 
 =head1 SYNOPSIS
 

@@ -1,13 +1,11 @@
-package Curses::Toolkit::Widget::Window::Dialog::About;
-
 use warnings;
 use strict;
 
+package Curses::Toolkit::Widget::Window::Dialog::About;
+# ABSTRACT: an about dialog window
+
 use parent qw(Curses::Toolkit::Widget::Window::Dialog);
 
-=head1 NAME
-
-Curses::Toolkit::Widget::Window::Dialog::About - an about dialog window
 
 =head1 DESCRIPTION
 
@@ -19,3 +17,5 @@ selects the About option from the Help menu. All parts of the dialog are
 optional.
 
 =cut
+
+1;

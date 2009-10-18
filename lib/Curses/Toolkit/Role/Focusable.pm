@@ -1,15 +1,12 @@
-package Curses::Toolkit::Role::Focusable;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Role::Focusable;
+# ABSTRACT: This role implements the fact that a widget can have focus
 
 use parent qw(Curses::Toolkit::Role);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Role::Focusable - This role implements the fact that a widget can have focus
 
 =head1 DESCRIPTION
 

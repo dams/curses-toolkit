@@ -1,16 +1,13 @@
-package Curses::Toolkit::Theme::Default;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Theme::Default;
+# ABSTRACT: default widget theme
 
 use parent qw(Curses::Toolkit::Theme);
 
 use Params::Validate qw(:all);
 use Curses;
-
-=head1 NAME
-
-Curses::Toolkit::Theme::Default - default widget theme
 
 =head1 DESCRIPTION
 

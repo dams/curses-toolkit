@@ -1,11 +1,8 @@
-package Curses::Toolkit::Role;
-
 use warnings;
 use strict;
 
-=head1 NAME
-
-Curses::Toolkit::Role - base class for roles, before migrating to Moose
+package Curses::Toolkit::Role;
+# ABSTRACT: base class for roles, before migrating to Moose
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,12 @@
-package Curses::Toolkit::Widget::Entry;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::Entry;
+# ABSTRACT: base class for focus events
 
 use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::Entry - an entry widget
 
 =head1 DESCRIPTION
 

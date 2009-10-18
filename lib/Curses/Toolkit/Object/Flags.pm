@@ -1,13 +1,10 @@
-package Curses::Toolkit::Object::Flags;
-
 use warnings;
 use strict;
 
+package Curses::Toolkit::Object::Flags;
+# ABSTRACT: simple collection of flags
+
 use parent qw(Curses::Toolkit::Object);
-
-=head1 NAME
-
-Curses::Toolkit::Object::Flags - simple collection of flags
 
 =head1 DESCRIPTION
 

@@ -1,16 +1,14 @@
-package Curses::Toolkit::Theme::Default::Color::Pink;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Theme::Default::Color::Pink;
+# ABSTRACT: default widget theme with pink-ish color, made for Book
 
 use parent qw(Curses::Toolkit::Theme::Default::Color);
 
 use Params::Validate qw(:all);
 use Curses;
 
-=head1 NAME
-
-Curses::Toolkit::Theme::Default::Color::Pink - default widget theme with pink-ish color, made for Book
 
 =head1 DESCRIPTION
 

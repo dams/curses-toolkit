@@ -1,15 +1,12 @@
-package Curses::Toolkit::Event::Key;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Key;
+# ABSTRACT: event that is related to keystrokes
 
 use parent qw(Curses::Toolkit::Event);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event::Key - event that is related to keystrokes
 
 =head1 DESCRIPTION
 

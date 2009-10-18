@@ -1,16 +1,13 @@
-package Curses::Toolkit::Widget::GenericButton;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::GenericButton;
+# ABSTRACT: a button widget
 
 use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(:all);
 use Curses::Toolkit::Object::Coordinates;
-
-=head1 NAME
-
-Curses::Toolkit::Widget::GenericButton - a button widget
 
 =head1 DESCRIPTION
 

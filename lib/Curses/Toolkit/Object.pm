@@ -1,11 +1,8 @@
-package Curses::Toolkit::Object;
-
 use warnings;
 use strict;
 
-=head1 NAME
-
-Curses::Toolkit::Object - base class for objects
+package Curses::Toolkit::Object;
+# ABSTRACT: base class for objects
 
 =head1 DESCRIPTION
 

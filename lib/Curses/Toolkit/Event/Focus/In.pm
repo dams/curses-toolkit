@@ -1,15 +1,12 @@
-package Curses::Toolkit::Event::Focus::In;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Focus::In;
+# ABSTRACT: event that is related to in-focus
 
 use parent qw(Curses::Toolkit::Event::Focus);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event::Focus::In - event that is related to in-focus
 
 =head1 DESCRIPTION
 

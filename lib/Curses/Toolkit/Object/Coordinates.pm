@@ -1,7 +1,8 @@
-package Curses::Toolkit::Object::Coordinates;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Object::Coordinates;
+# ABSTRACT: simple coordinates class
 
 use parent qw(Curses::Toolkit::Object);
 
@@ -25,10 +26,6 @@ sub _equals {
            $c1->x2() == $c2->x2() &&
            $c1->y2() == $c2->y2()
 }
-
-=head1 NAME
-
-Curses::Toolkit::Object::Coordinates - simple coordinates class
 
 =head1 DESCRIPTION
 

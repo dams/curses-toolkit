@@ -1,15 +1,13 @@
-package Curses::Toolkit::Widget::VBox;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::VBox;
+# ABSTRACT: a vertical box widget
 
 use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(:all);
 
-=head1 NAME
-
-Curses::Toolkit::Widget::VBox - a vertical box widget
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,12 @@
-package Curses::Toolkit::Event::Shape;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Shape;
+# ABSTRACT: event that is related to root window shape change
 
 use parent qw(Curses::Toolkit::Event);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event::Shape - event that is related to root window shape change
 
 =head1 DESCRIPTION
 
