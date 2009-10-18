@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::HBox;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::HBox;
 
 use parent qw(Curses::Toolkit::Widget::Container);
 

@@ -1,7 +1,7 @@
-package Curses::Toolkit::Event::Shape;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Shape;
 
 use parent qw(Curses::Toolkit::Event);
 

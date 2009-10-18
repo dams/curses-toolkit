@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget;
 
 use Params::Validate qw(:all);
 

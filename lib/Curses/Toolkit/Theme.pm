@@ -1,7 +1,7 @@
-package Curses::Toolkit::Theme;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Theme;
 
 use Params::Validate qw(:all);
 

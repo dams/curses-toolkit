@@ -1,7 +1,7 @@
-package Curses::Toolkit::Theme::Default::Color;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Theme::Default::Color;
 
 use parent qw(Curses::Toolkit::Theme::Default);
 

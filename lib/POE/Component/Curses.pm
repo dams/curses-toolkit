@@ -1,9 +1,9 @@
+use warnings;
+use strict;
+
 package POE::Component::Curses;
 
 use POE::Component::Curses::MainLoop;
-
-use strict;
-use warnings;
 
 our $VERSION = '0.01';
 

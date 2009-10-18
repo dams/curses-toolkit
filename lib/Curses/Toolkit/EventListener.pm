@@ -1,7 +1,7 @@
-package Curses::Toolkit::EventListener;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::EventListener;
 
 use Params::Validate qw(:all);
 

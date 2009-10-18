@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::Label;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::Label;
 
 use parent qw(Curses::Toolkit::Widget);
 

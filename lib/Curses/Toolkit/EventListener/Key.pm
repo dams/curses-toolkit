@@ -1,7 +1,7 @@
-package Curses::Toolkit::EventListener::Key;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::EventListener::Key;
 
 use parent qw(Curses::Toolkit::EventListener);
 

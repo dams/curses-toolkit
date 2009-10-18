@@ -1,7 +1,7 @@
-package Curses::Toolkit::Event::Focus;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Focus;
 
 use parent qw(Curses::Toolkit::Event);
 

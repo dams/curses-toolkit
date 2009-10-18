@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::Container;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::Container;
 
 use parent qw(Curses::Toolkit::Widget);
 

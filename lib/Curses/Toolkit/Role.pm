@@ -1,7 +1,7 @@
-package Curses::Toolkit::Role;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Role;
 
 =head1 NAME
 

@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::VScrollBar;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::VScrollBar;
 
 use parent qw(Curses::Toolkit::Widget);
 

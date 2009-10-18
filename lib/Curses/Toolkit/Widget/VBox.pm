@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::VBox;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::VBox;
 
 use parent qw(Curses::Toolkit::Widget::Container);
 

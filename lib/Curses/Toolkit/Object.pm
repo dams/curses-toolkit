@@ -1,7 +1,7 @@
-package Curses::Toolkit::Object;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Object;
 
 =head1 NAME
 

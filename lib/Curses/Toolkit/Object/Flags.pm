@@ -1,7 +1,7 @@
-package Curses::Toolkit::Object::Flags;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Object::Flags;
 
 use parent qw(Curses::Toolkit::Object);
 

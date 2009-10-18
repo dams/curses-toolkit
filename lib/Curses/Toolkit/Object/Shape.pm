@@ -1,7 +1,7 @@
-package Curses::Toolkit::Object::Shape;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Object::Shape;
 
 use parent qw(Curses::Toolkit::Object::Coordinates);
 

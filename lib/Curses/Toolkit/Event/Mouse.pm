@@ -1,7 +1,7 @@
-package Curses::Toolkit::Event::Mouse;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Event::Mouse;
 
 use parent qw(Curses::Toolkit::Event);
 

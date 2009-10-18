@@ -1,7 +1,7 @@
-package Curses::Toolkit::Widget::Button;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Widget::Button;
 
 use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 

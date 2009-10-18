@@ -1,7 +1,7 @@
-package POE::Component::Curses::MainLoop;
-
-use strict;
 use warnings;
+use strict;
+
+package POE::Component::Curses::MainLoop;
 
 use POE qw(Session);
 use Params::Validate qw(:all);
