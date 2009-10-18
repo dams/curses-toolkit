@@ -2,14 +2,11 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::EventListener::Key;
+# ABSTRACT: event listener listening for a keyboard action
 
 use parent qw(Curses::Toolkit::EventListener);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::EventListener::Key - event listener listening for a keyboard action
 
 =head1 DESCRIPTION
 

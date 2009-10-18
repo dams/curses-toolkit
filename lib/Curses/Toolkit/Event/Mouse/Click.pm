@@ -2,14 +2,11 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Mouse::Click;
+# ABSTRACT: event that is related to mouse click
 
 use parent qw(Curses::Toolkit::Event::Mouse);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event::Mouse::Click - event that is related to mouse click
 
 =head1 DESCRIPTION
 

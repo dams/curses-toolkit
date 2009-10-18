@@ -2,15 +2,12 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Theme::Default::Color::Yellow;
+# ABSTRACT: default widget theme with color
 
 use parent qw(Curses::Toolkit::Theme::Default::Color);
 
 use Params::Validate qw(:all);
 use Curses;
-
-=head1 NAME
-
-Curses::Toolkit::Theme::Default::Color - default widget theme with color
 
 =head1 DESCRIPTION
 

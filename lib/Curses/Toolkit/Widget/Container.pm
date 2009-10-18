@@ -2,14 +2,12 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Container;
+# ABSTRACT: a container widget
 
 use parent qw(Curses::Toolkit::Widget);
 
 use Params::Validate qw(:all);
 
-=head1 NAME
-
-Curses::Toolkit::Widget::Container - a container widget
 
 =head1 DESCRIPTION
 

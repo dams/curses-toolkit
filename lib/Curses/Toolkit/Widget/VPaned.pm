@@ -2,14 +2,10 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::VPaned;
-
+# ABSTRACT: a container with two panes arranged horizontally
 use parent qw(Curses::Toolkit::Widget::Paned);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::VPaned - a container with two panes arranged horizontally
 
 =head1 DESCRIPTION
 

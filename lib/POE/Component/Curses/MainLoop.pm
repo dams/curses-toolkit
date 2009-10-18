@@ -2,15 +2,12 @@ use warnings;
 use strict;
 
 package POE::Component::Curses::MainLoop;
+# ABSTRACT: <FIXME to be filled>
 
 use POE qw(Session);
 use Params::Validate qw(:all);
 
 use Curses::Toolkit;
-
-=head1 NAME
-
-POE::Component::Curses::MainLoop
 
 =head1 SYNOPSIS
 

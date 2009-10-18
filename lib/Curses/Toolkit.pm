@@ -2,12 +2,9 @@ use warnings;
 use strict;
 
 package Curses::Toolkit;
+# ABSTRACT: a modern Curses toolkit
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit - a modern Curses toolkit
 
 =head1 VERSION
 

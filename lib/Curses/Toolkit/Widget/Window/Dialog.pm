@@ -2,12 +2,10 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Window::Dialog;
+# ABSTRACT: a dialog window
 
 use parent qw(Curses::Toolkit::Widget::Window);
 
-=head1 NAME
-
-Curses::Toolkit::Widget::Window::Dialog - a dialog window
 
 =head1 DESCRIPTION
 

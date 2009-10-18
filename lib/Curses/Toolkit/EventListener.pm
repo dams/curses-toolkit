@@ -2,12 +2,9 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::EventListener;
+# ABSTRACT: base class for event listeners
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::EventListener - base class for event listeners
 
 =head1 DESCRIPTION
 

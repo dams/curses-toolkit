@@ -2,14 +2,11 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Paned;
+# ABSTRACT: generic paned widget
 
 use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::Paned - generic paned widget
 
 =head1 DESCRIPTION
 

@@ -2,14 +2,11 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object::Shape;
+# ABSTRACT: simple shape class
 
 use parent qw(Curses::Toolkit::Object::Coordinates);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Object::Shape - simple shape class
 
 =head1 DESCRIPTION
 

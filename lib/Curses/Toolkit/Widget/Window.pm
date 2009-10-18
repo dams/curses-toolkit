@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Window;
+# ABSTRACT: a window
 
 use parent qw(Curses::Toolkit::Widget::Border);
 
@@ -10,9 +11,6 @@ use Params::Validate qw(:all);
 use List::MoreUtils qw(any none);
 use List::Util qw(min sum max);
 
-=head1 NAME
-
-Curses::Toolkit::Widget::Window - a window
 
 =head1 DESCRIPTION
 

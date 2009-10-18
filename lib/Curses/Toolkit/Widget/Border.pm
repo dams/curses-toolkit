@@ -2,16 +2,13 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Border;
+# ABSTRACT: a border widget
 
 use parent qw(Curses::Toolkit::Widget::Bin);
 
 use Params::Validate qw(:all);
 
 use Curses::Toolkit::Object::Coordinates;
-
-=head1 NAME
-
-Curses::Toolkit::Widget::Border - a border widget
 
 =head1 DESCRIPTION
 

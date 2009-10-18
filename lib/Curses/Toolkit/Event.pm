@@ -2,12 +2,9 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event;
+# ABSTRACT: base class for events
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event - base class for events
 
 =head1 DESCRIPTION
 

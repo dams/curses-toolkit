@@ -2,15 +2,13 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Button;
+# ABSTRACT: a simple text button widget
 
 use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(:all);
 use Curses::Toolkit::Object::Coordinates;
 
-=head1 NAME
-
-Curses::Toolkit::Widget::Button - a simple text button widget
 
 =head1 DESCRIPTION
 

@@ -2,12 +2,9 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget;
+# ABSTRACT: base class for widgets
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Widget - base class for widgets
 
 =head1 DESCRIPTION
 

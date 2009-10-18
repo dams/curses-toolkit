@@ -2,14 +2,11 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Focus::Out;
+# ABSTRACT: event that is related to out-focus
 
 use parent qw(Curses::Toolkit::Event::Focus);
 
 use Params::Validate qw(:all);
-
-=head1 NAME
-
-Curses::Toolkit::Event::Focus::Out - event that is related to out-focus
 
 =head1 DESCRIPTION
 

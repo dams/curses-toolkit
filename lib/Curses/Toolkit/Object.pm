@@ -2,10 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object;
-
-=head1 NAME
-
-Curses::Toolkit::Object - base class for objects
+# ABSTRACT: base class for objects
 
 =head1 DESCRIPTION
 

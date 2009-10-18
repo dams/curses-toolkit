@@ -2,15 +2,12 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Label;
+# ABSTRACT: a container with two panes arranged horizontally
 
 use parent qw(Curses::Toolkit::Widget);
 
 use Params::Validate qw(:all);
 use List::Util qw(min max);
-
-=head1 NAME
-
-Curses::Toolkit::Widget::Label - a label widget
 
 =head1 DESCRIPTION
 
