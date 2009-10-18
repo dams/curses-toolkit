@@ -8,8 +8,6 @@ use Params::Validate qw(:all);
 
 =head1 SYNOPSIS
 
-=head1 SYNOPSIS
-
   # spawn a root window
   my $root_window = POE::Component::Curses->spawn();
   # adds some widget
