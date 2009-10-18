@@ -19,12 +19,17 @@ a given event, and if yes, performs specific action on it.
 
 =head2 new
 
+  input : accepted_events <HASHREF> : keys are a Event class, values are CODEREFs (see below)
+          code <CODEREF> : code to be executed if an evet listener can handle the event
+
+The CODEREfs receive an event as argument. If they return true, then the event
+listener can handle this event
+
 =cut
 
 sub new {
     my $class = shift;
-    my %params = validate(@_, { accepted_event_class => { type => SCALAR },
-								conditional_code => { type => CODEREF },
+    my %params = validate(@_, { accepted_events => { type => HASHREF },
 								code => { type => CODEREF },
 							  }
                          );
@@ -46,8 +51,9 @@ Given an event, returns true if the listener is capable of handling this event
 sub can_handle {
 	my $self = shift;
 	my ($event) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' } );
-	$event->isa($self->{accepted_event_class}) or return;
-	$self->{conditional_code}->($event) or return;
+	my $event_class = ref $event;
+	exists $self->{accepted_events}{$event_class} or return;
+	$self->{accepted_events}{$event_class}->($event) or return;
 	return 1;
 }
 

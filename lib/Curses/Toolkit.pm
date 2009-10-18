@@ -191,8 +191,9 @@ sub init_root_window {
 	# add a default listener that listen to any Shape event
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Shape',
-			conditional_code => sub { 1; },
+			accepted_events => {
+				'Curses::Toolkit::Event::Shape' => sub { 1; },
+			},
 			code => sub {
 				my ($screen_h, $screen_w);
 				$self->_recompute_shape();
@@ -205,11 +206,12 @@ sub init_root_window {
 	);
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'stroke' or return 0;
-				lc $event->{params}{key} eq 'q' or return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					lc $event->{params}{key} eq 'q' or return 0;
+				},
 			},
 			code => sub {
 				exit;
@@ -219,11 +221,12 @@ sub init_root_window {
 	# key listener for TAB
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq 'j' || $event->{params}{key} eq '<^I>' or return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub {
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq 'j' || $event->{params}{key} eq '<^I>' or return 0;
+				},
 			},
 			code => sub {
 				my $focused_widget = $self->get_focused_widget();

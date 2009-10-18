@@ -43,12 +43,13 @@ sub new {
 	# listen to the Mouse Click for focus switch
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'clicked' or return 0;
-				$event->{button} eq 'button1' or return 0;
-				return 1;
+			accepted_events => {
+				'Curses::Toolkit::Event::Mouse::Click' => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'clicked' or return 0;
+					$event->{button} eq 'button1' or return 0;
+					return 1;
+				},
 			},
 			code => sub {
 				my ($event, $window) = @_;
@@ -77,19 +78,20 @@ sub new {
 	# listen to the Mouse for moving the window
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{button} eq 'button1' or return 0;
-				$self->{_move_pressed} && $event->{type} eq 'released'
-				  and return 1;
-				my $c = $event->{coordinates};
-				my $wc = $self->get_coordinates();
-				! $self->{_move_pressed}
-				&& $event->{type} eq 'pressed'
-				&& $c->y1() == $wc->y1()
-				  and return 1;
-				return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Mouse::Click' => sub { 
+					my ($event) = @_;
+					$event->{button} eq 'button1' or return 0;
+					$self->{_move_pressed} && $event->{type} eq 'released'
+					  and return 1;
+					my $c = $event->{coordinates};
+					my $wc = $self->get_coordinates();
+					! $self->{_move_pressed}
+					&& $event->{type} eq 'pressed'
+					&& $c->y1() == $wc->y1()
+					  and return 1;
+					return 0;
+				},
 			},
 			code => sub {
 				my ($event, $window) = @_;
@@ -132,20 +134,21 @@ sub new {
 	# listen to the Mouse for resizing
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{button} eq 'button1' or return 0;
-				$self->{_resize_pressed} && $event->{type} eq 'released'
-				  and return 1;
-				my $c = $event->{coordinates};
-				my $wc = $self->get_coordinates();
-				! $self->{_resize_pressed}
-				&& $event->{type} eq 'pressed'
-				&& $c->x2() == $wc->x2()-1
-				&& $c->y2() == $wc->y2()-1
-				  and return 1;
-				return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Mouse::Click' => sub {
+					my ($event) = @_;
+					$event->{button} eq 'button1' or return 0;
+					$self->{_resize_pressed} && $event->{type} eq 'released'
+					  and return 1;
+					my $c = $event->{coordinates};
+					my $wc = $self->get_coordinates();
+					! $self->{_resize_pressed}
+					&& $event->{type} eq 'pressed'
+					&& $c->x2() == $wc->x2()-1
+					&& $c->y2() == $wc->y2()-1
+					  and return 1;
+					return 0;
+				},
 			},
 			code => sub {
 				my ($event, $window) = @_;

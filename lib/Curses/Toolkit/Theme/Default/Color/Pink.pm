@@ -30,14 +30,10 @@ sub new {
 	my $class = shift;
 	has_colors() or
 	  die "Cannot create a '" .  __PACKAGE__ . "' object : color is not supported";
-	# pair 1 : yellow on blue
 	init_pair(1, COLOR_WHITE, COLOR_MAGENTA);
 	init_pair(2, COLOR_BLUE, COLOR_MAGENTA);
 	init_pair(3, COLOR_BLACK, COLOR_MAGENTA);
 	init_pair(4, COLOR_RED, COLOR_MAGENTA);
-#	init_pair(4, COLOR_RED, COLOR_MAGENTA);
-#	init_pair(5, COLOR_YELLOW, COLOR_MAGENTA);
-#	init_pair(6, COLOR_RED, COLOR_MAGENTA);
 	return $class->SUPER::new(@_);
 }
 

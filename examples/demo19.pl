@@ -41,5 +41,9 @@ sub main {
 							 y2 => '85%',
 							);
 	$button3->set_focus(1);
+	$button3->signal_connect(clicked => sub {
+								 print STDERR "clicked button 3\n";
+							 });
+
 	POE::Kernel->run();
 }

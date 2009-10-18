@@ -29,24 +29,25 @@ sub new {
 	# listen to the Mouse for moving the gutter
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{button} eq 'button1' or return 0;
-				$self->{_gutter_move_pressed} && $event->{type} eq 'released'
-				  and return 1;
-				my $ec = $event->{coordinates};
-				my $wc = $self->get_coordinates();
-				my $gp = $self->get_gutter_position();
-				#	my $gw = $self->get_theme_property('gutter_width');
-				my $gw = 1;
-				! $self->{_gutter_move_pressed}
-				&& $event->{type} eq 'pressed'
-				&& $self->_p1($ec) >= $self->_p1($wc) + $gp
-				&& $self->_p1($ec) < $self->_p1($wc) + $gp + $gw
-				&& $self->_p2($ec) < $self->_p2($wc)
-				  and return 1;
-				return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Mouse::Click' => sub { 
+					my ($event) = @_;
+					$event->{button} eq 'button1' or return 0;
+					$self->{_gutter_move_pressed} && $event->{type} eq 'released'
+					  and return 1;
+					my $ec = $event->{coordinates};
+					my $wc = $self->get_coordinates();
+					my $gp = $self->get_gutter_position();
+					#	my $gw = $self->get_theme_property('gutter_width');
+					my $gw = 1;
+					! $self->{_gutter_move_pressed}
+					&& $event->{type} eq 'pressed'
+					&& $self->_p1($ec) >= $self->_p1($wc) + $gp
+					&& $self->_p1($ec) < $self->_p1($wc) + $gp + $gw
+					&& $self->_p2($ec) < $self->_p2($wc)
+					  and return 1;
+					return 0;
+				},
 			},
 			code => sub {
 				my ($event, $widget) = @_;

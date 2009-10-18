@@ -23,18 +23,18 @@ sub main {
 	my $root = POE::Component::Curses->spawn();
 
 
-	my $menu_window = Curses::Toolkit::Widget::Window->new();
+	my $menu_window = Curses::Toolkit::Widget::Window->new()->set_name('THE WINDOW');
 	$menu_window->set_title("Demo Menu");
 	$menu_window->set_coordinates(x1 => 0, y1 => 0,
 								  x2 => '25%', y2 => '100%',
 								 );
-	my $menu_vbox = Curses::Toolkit::Widget::VBox->new();
+	my $menu_vbox = Curses::Toolkit::Widget::VBox->new()->set_name('VBOX');
 	$menu_window->add_widget($menu_vbox);
 
 	my @spawned_windows;
 	my $current_pane;
 	my $switch_pane = 0;
-	my $b1 = Curses::Toolkit::Widget::Button->new_with_label('spawn a window');
+	my $b1 = Curses::Toolkit::Widget::Button->new_with_label('spawn a window')->set_name('B1');
 	$menu_vbox->pack_end($b1, { expand => 0 });
 	$b1->signal_connect(clicked => sub {
 							my $w = Curses::Toolkit::Widget::Window->new()
@@ -66,6 +66,7 @@ sub main {
 
 	my $theme_switch = 1;
 	my $b2 = Curses::Toolkit::Widget::Button->new_with_label('change themes');
+	$b2->set_name('THE BUTTON 2');
 	$menu_vbox->pack_end($b2, { expand => 0 });
 	$b2->signal_connect(clicked => sub {
 							foreach my $w (@spawned_windows) {
@@ -179,10 +180,6 @@ sub main {
                        )
                   )
                   ->pack_end(
-#                      my $border3 = Curses::Toolkit::Widget::Border
-#                        ->new()
-#                        ->set_name('border3')
-#                        ->add_widget(
 						 my $hbox1 = Curses::Toolkit::Widget::HBox
                            ->new()
                            ->set_name('hbox1')
@@ -211,7 +208,6 @@ sub main {
 							 { expand => 1 }
 						   ),
 						 { expand => 1 }
-#                       ),
                   )
 				  ->pack_end(
                     my $border6 = Curses::Toolkit::Widget::Border
@@ -251,17 +247,6 @@ sub main {
 	$root->add_window($menu_window);
 
 
-# 	my $button4 = Curses::Toolkit::Widget::Button->new_with_label('This is a button 4');
-# 	$window2->add_widget(
-# 		my $vbox = Curses::Toolkit::Widget::VBox->new()
-# 		  ->pack_end($button3, { expand => 0 })
-# #		  ->pack_end($button4, { expand => 0 })
-# 	);
-# 	$window2->set_coordinates(x1 => '15%',   y1 => '15%',
-# 							 x2 => '85%',
-# 							 y2 => '85%',
-# 							);
-# 	$button3->set_focus(1);
 	$menu_window->set_theme_property(title_width => 90 );
 	POE::Kernel->run();
 }

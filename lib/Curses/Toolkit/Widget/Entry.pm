@@ -40,35 +40,36 @@ sub new {
 	# set a key listener, disabled by default
 	$self->{key_listener} =
 	  Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				# accept only key strokes
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
-				$event->{params}{key} eq '<^D>' and return 1;
-				$event->{params}{key} eq '<KEY_LEFT>' and return 1;
-				$event->{params}{key} eq '<KEY_RIGHT>' and return 1;
-				$event->{params}{key} eq '<KEY_UP>' and return 1;
-				$event->{params}{key} eq '<KEY_DOWN>' and return 1;
-				if ($event->{params}{key} eq '<^?>') {
-					$event->{params}{key} = '<KEY_BACKSPACE>';
-					return 1;
-				}
-				if ($event->{params}{key} eq '<^E>') {
-					$event->{params}{key} = '<KEY_DOWN>';
-					return 1;
-				}
-				if ($event->{params}{key} eq '<^A>') {
-					$event->{params}{key} = '<KEY_UP>';
-					return 1;
-				}
-
-				# accept simple character keys
-				length $event->{params}{key} == 1 and return 1;
-
-				# don't accept other strange keys
-				return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub { 
+					my ($event) = @_;
+					# accept only key strokes
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
+					$event->{params}{key} eq '<^D>' and return 1;
+					$event->{params}{key} eq '<KEY_LEFT>' and return 1;
+					$event->{params}{key} eq '<KEY_RIGHT>' and return 1;
+					$event->{params}{key} eq '<KEY_UP>' and return 1;
+					$event->{params}{key} eq '<KEY_DOWN>' and return 1;
+					if ($event->{params}{key} eq '<^?>') {
+						$event->{params}{key} = '<KEY_BACKSPACE>';
+						return 1;
+					}
+					if ($event->{params}{key} eq '<^E>') {
+						$event->{params}{key} = '<KEY_DOWN>';
+						return 1;
+					}
+					if ($event->{params}{key} eq '<^A>') {
+						$event->{params}{key} = '<KEY_UP>';
+						return 1;
+					}
+					
+					# accept simple character keys
+					length $event->{params}{key} == 1 and return 1;
+					
+					# don't accept other strange keys
+					return 0;
+				},
 			},
 			code => sub {
 				my ($event, $entry) = @_;
@@ -110,12 +111,13 @@ sub new {
 	# listen to the Enter key
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq '<^M>' or return 0;
-				return 1;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq '<^M>' or return 0;
+					return 1;
+				},
 			},
 			code => sub {
 				my ($event, $entry) = @_;
@@ -127,10 +129,11 @@ sub new {
 	# listen to the Focus Out event
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Focus::Out',
-			conditional_code => sub { 
-				my ($event) = @_;
-				return 1;
+			accepted_events => {
+				'Curses::Toolkit::Event::Focus::Out' => sub {
+					my ($event) = @_;
+					return 1;
+				},
 			},
 			code => sub {
 				my ($event, $entry) = @_;

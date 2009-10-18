@@ -153,33 +153,41 @@ sub get_minimum_space {
 	return $desired_space;
 }
 
-sub _possible_signals {
-	my $self = shift;
-	my ($code_ref) = validate_pos( @_, { type => CODEREF },
-								);
-	return ($self->SUPER::_possible_signals($code_ref),
-			clicked => Curses::Toolkit::EventListener->new(
-				accepted_event_class => 'Curses::Toolkit::Event::Key',
-				conditional_code => sub { 
-					my ($event) = @_;
-					$event->{type} eq 'stroke' or return 0;
-					$event->{params}{key} eq ' ' or return 0;
-				},
-				code => $code_ref,
-			)			
+=head2 possible_signals
+
+my @signals = keys $button->possible_signals();
+
+returns the possible signals that can be used
+
+  input  : none
+  output : HASH, keys are siagnal names, values are signal classes
+
+=cut
+
+sub possible_signals {
+	my ($self) = @_;
+	return ( $self->SUPER::possible_signals(),
+			 clicked => 'Curses::Toolkit::Signal::Clicked',
 		   );
 }
 
 sub _bind_signal {
 	my $self = shift;
 	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
-												      { type => CODEREF },
-												);
-	my %signals = $self->_possible_signals($code_ref);
-	my $event_listener = $signals{$signal_name};
-	defined $event_listener
+												     { type => CODEREF },
+											   );
+	my %signals = $self->possible_signals();
+	my $signal_class = $signals{$signal_name};
+	defined $signal_class
 	  or die "signal '$signal_name' doesn't exists for widget of type " . ref($self) . ". Possible signals are : " . join(', ', keys %signals);
-	$self->add_event_listener($event_listener);
+
+	require UNIVERSAL::require;
+	$signal_class->require
+	  or die $@;
+	$self->add_event_listener($signal_class->generate_listener( widget => $self,
+																code_ref => $code_ref,
+															  )
+							 );
 	return $self;
 }
 

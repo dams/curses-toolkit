@@ -691,7 +691,8 @@ sub _recursive_f2 {
 	return;
 }
 
-sub _possible_signals {
+# default widget signals
+sub possible_signals {
 	return ();
 }
 
@@ -700,6 +701,8 @@ sub signal_connect {
 	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
 												      { type => CODEREF },
 												);
+#	my %s = $self->_possible_signal_names();
+	
 	$self->_bind_signal($signal_name, $code_ref);
 	return $self;
 }
