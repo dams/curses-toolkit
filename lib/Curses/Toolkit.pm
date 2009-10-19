@@ -16,15 +16,10 @@ use Params::Validate qw(:all);
         ->new()
         ->set_name('main_window')
         ->add_widget(
-          my $border1 = Curses::Toolkit::Widget::Border
-            ->new()
-            ->set_name('border1')
-            ->add_widget(
-              my $label1 = Curses::Toolkit::Widget::Label
-                ->new()
-                ->set_name('label1')
-                ->set_text('This demonstrates the use of Curses::Toolkit used with its POE Event Loop : POE::Component::Curses. Keyboard events and window resizing are supported')
-            ),
+          my $button = Curses::Toolkit::Widget::Button
+            ->new_with_label('Click Me to quit')
+            ->set_name('my_button')
+            ->signal_connect(clicked => sub { exit(0); })
         )
         ->set_coordinates(x1 => 0,   y1 => 0,
                           x2 => '100%',
@@ -40,6 +35,11 @@ use Params::Validate qw(:all);
 This module tries to be a modern curses toolkit, based on the Curses module, to
 build "semi-graphical" user interfaces easily.
 
+B<WARNING> : This is still in "beta" version, not all the features are
+implemented, and the API may change. However, most of the components are there,
+and things should not change that much in the future... Still, don't use it in
+production, and don't consider it stable.
+
 Curses::Toolkit is meant to be used with a mainloop, which is not part of this
 module. I recommend you L<POE::Component::Curses>, which is probably what you
 want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a mainloop
@@ -53,11 +53,68 @@ use. In this case you would do something like :
 
   use Curses::Toolkit;
 
+  # using Curses::Toolkit without any event loop
   my $root = Curses::Toolkit->init_root_window();
   my $window = Curses::Toolkit::Widget::Window->new();
   $root->add($window);
   ...
   $root->render
+
+=head1 WIDGETS
+
+Curses::Toolkit is based on a widget model, inspired by Gtk. I suggest you read the pod of the following widgets :
+
+=over
+
+=item L<Curses::Toolkit::Widget::Window>
+
+Use this widget to create a window. It's the first thing to do once you have a root_window
+
+=item L<Curses::Toolkit::Widget>
+
+Useful to read, it contains the common methods of all the widgets
+
+=item L<Curses::Toolkit::Widget::Label>
+
+To display simple text
+
+=item L<Curses::Toolkit::Widget::Button>
+
+Simple interaction with the user
+
+=item L<Curses::Toolkit::Widget::Entry>
+
+To input text from the user
+
+=item L<Curses::Toolkit::Widget::VBox>
+
+To pack widgets vertically, thus building complex layouts
+
+=item L<Curses::Toolkit::Widget::HBox>
+
+To pack widgets horizontally, thus building complex layouts
+
+=item L<Curses::Toolkit::Widget::Border>
+
+Add a simple border around any widget
+
+=item L<Curses::Toolkit::Widget::HPaned>
+
+To pack 2 widgets horizontally with a flexible gutter
+
+=item L<Curses::Toolkit::Widget::VPaned>
+
+To pack 2 widgets vertically with a flexible gutter
+
+=item L<Curses::Toolkit::Widget::HScrollBar>
+
+Not yet implemented
+
+=item L<Curses::Toolkit::Widget::VScrollBar.pm>
+
+Not yet implemented
+
+=back
 
 =head1 CLASS METHODS
 
