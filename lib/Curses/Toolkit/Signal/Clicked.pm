@@ -1,7 +1,7 @@
-package Curses::Toolkit::Signal::Clicked;
-
 use warnings;
 use strict;
+
+package Curses::Toolkit::Signal::Clicked;
 
 use parent qw(Curses::Toolkit::Signal);
 
