@@ -6,15 +6,14 @@ package Curses::Toolkit::Event::Mouse;
 
 use parent qw(Curses::Toolkit::Event);
 
+1;
+__END__
+
 =head1 DESCRIPTION
 
-Base class for mouse events
+Base class for mouse events.
 
 =head1 CONSTRUCTOR
 
-None, this is an abstract class
+None, this is an abstract class.
 
-=cut
-
-
-1;

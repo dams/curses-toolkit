@@ -6,6 +6,12 @@ package Curses::Toolkit::Widget::Window::Dialog::About;
 
 use parent qw(Curses::Toolkit::Widget::Window::Dialog);
 
+1;
+__END__
+
+=head1 SYNOPSIS
+
+    # FIXME: not yet implemented
 
 =head1 DESCRIPTION
 
@@ -16,6 +22,3 @@ worked on the program. An about dialog is typically opened when the user
 selects the About option from the Help menu. All parts of the dialog are
 optional.
 
-=cut
-
-1;

@@ -6,9 +6,15 @@ package Curses::Toolkit::Widget::Window::Dialog;
 
 use parent qw(Curses::Toolkit::Widget::Window);
 
+1;
+__END__
+
+=head1 SYNOPSIS
+
+    # FIXME: not yet implemented
 
 =head1 DESCRIPTION
 
-This widget is a dialog window
+This widget is a dialog window.
 
 =cut

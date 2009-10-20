@@ -8,12 +8,6 @@ use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(:all);
 
-=head1 DESCRIPTION
-
-Don't use this widget. Please see L<Curses::Toolkit::Widget::HPaned> and L<Curses::Toolkit::Widget::VPaned>
-
-=cut
-
 sub new {
     my $class = shift;
     # TODO : use Exception;
@@ -277,3 +271,18 @@ sub draw {
 
 
 1;
+__END__
+
+=head1 SYNOPSIS
+
+    # don't use this widget directly
+
+=head1 DESCRIPTION
+
+A paned widget is a widget containing 2 other widgets. It is used to
+stack them horizontally or vertically.
+
+Don't use this widget directly. Please see
+L<Curses::Toolkit::Widget::HPaned> and
+L<Curses::Toolkit::Widget::VPaned>.
+

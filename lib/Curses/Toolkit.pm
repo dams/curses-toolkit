@@ -40,7 +40,7 @@ implemented, and the API may change. However, most of the components are there,
 and things should not change that much in the future... Still, don't use it in
 production, and don't consider it stable.
 
-Curses::Toolkit is meant to be used with a mainloop, which is not part of this
+L<Curses::Toolkit> is meant to be used with a mainloop, which is not part of this
 module. I recommend you L<POE::Component::Curses>, which is probably what you
 want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a mainloop
 and handles keyboard, mouse, timer and other events, whereas Curses::Toolkit is
