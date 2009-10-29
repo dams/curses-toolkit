@@ -9,7 +9,7 @@ use Params::Validate qw(:all);
 =head1 SYNOPSIS
 
   # spawn a root window
-  my $root_window = POE::Component::Curses->spawn();
+  my $root = POE::Component::Curses->spawn();
   # adds some widget
   $root->add_window(
       my $window = Curses::Toolkit::Widget::Window
