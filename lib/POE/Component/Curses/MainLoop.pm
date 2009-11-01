@@ -130,6 +130,7 @@ sub event_key {
 
 	if ($params{type} eq 'stroke') {
 		use Curses::Toolkit::Event::Key;
+#		print STDERR " -- Mainloop stroke : [$params{key}] \n";
 		my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
 													  params => { key => $params{key}},
 													  root_window => $self->{toolkit_root},

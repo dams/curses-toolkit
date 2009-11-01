@@ -562,13 +562,24 @@ sub _set_iterator {
 	return $self;
 }
 
-sub _get_brother {
+sub _get_next_brother {
 	my ($self) = @_;
 	my $iterator = $self->{iterator};
-	defined $iterator or return; # there is not brothers
+	defined $iterator or return; # there is no brothers
 	$iterator->next();
 	my $brother_widget = $iterator->value(); # might be undef
 	$iterator->prev();
+	defined $brother_widget and return $brother_widget;
+	return;
+}
+
+sub _get_prev_brother {
+	my ($self) = @_;
+	my $iterator = $self->{iterator};
+	defined $iterator or return; # there is no brothers
+	$iterator->prev();
+	my $brother_widget = $iterator->value(); # might be undef
+	$iterator->next();
 	defined $brother_widget and return $brother_widget;
 	return;
 }
@@ -658,7 +669,7 @@ sub _recursive_f1 {
 		}
 	}
 	# does the widget have a brother ?
-	my $brother_widget = $widget->_get_brother();
+	my $brother_widget = $widget->_get_next_brother();
 	defined $brother_widget or return;
 
 	return $self->_recursive_f1($brother_widget);
@@ -675,7 +686,7 @@ sub _recursive_f2 {
 	  and return $parent_widget;
 
 	# if not, apply f1 on its potential brother
-	my $brother_widget = $parent_widget->_get_brother();
+	my $brother_widget = $parent_widget->_get_next_brother();
 	if (defined $brother_widget) {
 		my $next_widget = $self->_recursive_f1($brother_widget);
 		defined $next_widget and return $next_widget;
@@ -687,6 +698,36 @@ sub _recursive_f2 {
 
 	return;
 }
+
+# =head2 get_previous_focused_widget
+
+#   my $next_previous_widget = $widget->get_previous_focused_widget();
+
+# Returns the widget previous in the focus chain
+
+#   input : optional, a true value to start searching from $widget
+#   output : the previous focused widget
+
+# =cut
+
+# sub get_previous_focused_widget {
+# 	my ($self, $dont_avoid_me) = @_;
+
+# 	my $prev_widget;
+# 	# look down and right
+# 	$prev_widget = $self->_recursive_f1($self, !$dont_avoid_me);
+# 	defined $prev_widget and return $prev_widget;
+
+# 	# nothing down and right ? look up and right
+# 	$prev_widget = $self->_recursive_f2($self);
+# 	defined $prev_widget and return $prev_widget;
+
+# 	# still nothing ? Start from top and look down
+# 	my $window = $self->get_window();
+# 	defined $window or return;
+# 	return $self->_recursive_f1($window);
+# }
+
 
 # default widget signals
 sub possible_signals {
