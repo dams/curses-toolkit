@@ -690,6 +690,9 @@ sub _recursive_f2 {
 
 # default widget signals
 sub possible_signals {
+	my ($self) = @_;
+	$self->isa('Curses::Toolkit::Role::Focusable')
+	  and return ( focused => 'Curses::Toolkit::Signal::Focused' );
 	return ();
 }
 
