@@ -4,7 +4,7 @@ use strict;
 package POE::Component::Curses::MainLoop;
 # ABSTRACT: <FIXME to be filled>
 
-use Moose;
+use Moose 0.92;
 use MooseX::FollowPBP;
 use POE;
 use Params::Validate qw(:all);
@@ -27,6 +27,17 @@ has session_name => ( is=>'rw', isa=>'Str' );
 has args         => ( is=>'ro', isa=>'HashRef', default=>sub{ {} } );
 
 has toolkit_root => ( is=>'ro',	isa=>'Curses::Toolkit', lazy_build=>1 );
+has redraw_needed => (
+      traits    => ['Bool'],
+      is        => 'rw',
+      isa       => 'Bool',
+      default   => 0,
+      handles   => {
+          request_redraw => 'set',
+          cancel_redraw  => 'unset',
+      },
+
+);
 
 
 sub _build_toolkit_root {
@@ -46,8 +57,8 @@ sub _build_toolkit_root {
 sub needs_redraw {
 	my ($self) = @_;
 	# if redraw is already stacked, just quit
-	$self->{needs_redraw_bool} and return;
-	$self->{needs_redraw_bool} = 1;
+	$self->get_redraw_needed and return;
+	$self->request_redraw;
 	$poe_kernel->post($self->get_session_name, 'redraw');
 	return $self;
 }
@@ -79,7 +90,7 @@ sub event_redraw {
 	my ($self) = @_;
 	# set his to 0 so redraw requests that may appear in the mean time will be
 	# granted
-	$self->{needs_redraw_bool} = 0;
+	$self->cancel_redraw;
 
 	$self->get_toolkit_root->render();
 	$self->get_toolkit_root->display();
