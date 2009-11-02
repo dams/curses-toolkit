@@ -6,7 +6,7 @@ package POE::Component::Curses::MainLoop;
 
 use Moose;
 use MooseX::FollowPBP;
-use POE qw(Session);
+use POE;
 use Params::Validate qw(:all);
 
 use Curses::Toolkit;
@@ -48,7 +48,7 @@ sub needs_redraw {
 	# if redraw is already stacked, just quit
 	$self->{needs_redraw_bool} and return;
 	$self->{needs_redraw_bool} = 1;
-	$poe_kernel->post($self->{session_name}, 'redraw');
+	$poe_kernel->post($self->get_session_name, 'redraw');
 	return $self;
 }
 
@@ -56,7 +56,7 @@ sub add_delay {
 	my $self = shift;
 	my $seconds = shift;
 	my $code = shift;
-	$poe_kernel->call($self->{session_name}, 'add_delay_handler', $seconds, $code, @_);
+	$poe_kernel->call($self->get_session_name, 'add_delay_handler', $seconds, $code, @_);
 	return;
 #	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
 #	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
@@ -70,7 +70,7 @@ sub add_delay {
 
 sub event_rebuild_all {
 	my ($self) = @_;
-	$self->{toolkit_root}->_rebuild_all();	
+	$self->get_toolkit_root->_rebuild_all();	
 	return;
 }
 
@@ -81,8 +81,8 @@ sub event_redraw {
 	# granted
 	$self->{needs_redraw_bool} = 0;
 
-	$self->{toolkit_root}->render();
-	$self->{toolkit_root}->display();
+	$self->get_toolkit_root->render();
+	$self->get_toolkit_root->display();
 	return;
 }
 
@@ -91,9 +91,11 @@ sub event_resize {
 	my ($self) = @_;
 
 	use Curses::Toolkit::Event::Shape;
-	my $event = Curses::Toolkit::Event::Shape->new( type => 'change',
-													root_window => $self->{toolkit_root}, );
-	$self->{toolkit_root}->dispatch_event($event);
+	my $event = Curses::Toolkit::Event::Shape->new(
+		type        => 'change',
+		root_window => $self->get_toolkit_root
+	);
+	$self->get_toolkit_root->dispatch_event($event);
 	return;
 }
 
@@ -102,21 +104,19 @@ sub event_key {
 	my $self = shift;
 
 	my %params = validate( @_, {
-								type => 1,
-								key => 1 ,
-							   }
-						 );
+		type => 1,
+		key => 1 ,
+	} );
 
-	if ($params{type} eq 'stroke') {
-		use Curses::Toolkit::Event::Key;
+	return unless $params{type} eq 'stroke';
+
+	use Curses::Toolkit::Event::Key;
 #		print STDERR " -- Mainloop stroke : [$params{key}] \n";
-		my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
-													  params => { key => $params{key}},
-													  root_window => $self->{toolkit_root},
-													);
-		$self->{toolkit_root}->dispatch_event($event);
-	}
-	return;
+	my $event = Curses::Toolkit::Event::Key->new( type => 'stroke',
+		params      => { key => $params{key} },
+		root_window => $self->get_toolkit_root,
+	);
+	$self->get_toolkit_root->dispatch_event($event);
 }
 
 # POE::Component::Curses informed on a mouse event
@@ -124,30 +124,30 @@ sub event_mouse {
 	my $self = shift;
 
 	my %params = validate( @_, {
-								type => 1,
-								type2 => 1,
-								button => 1 ,
-								x => 1,
-								y => 1,
-								z => 1,
-							   }
-						 );
+		type => 1,
+		type2 => 1,
+		button => 1 ,
+		x => 1,
+		y => 1,
+		z => 1,
+	} );
 
-	if ($params{type} eq 'click') {
-		use Curses::Toolkit::Event::Mouse::Click;
-		$params{type} = delete $params{type2};
-		use Curses::Toolkit::Object::Coordinates;
-		$params{coordinates} = Curses::Toolkit::Object::Coordinates->new( x1 => $params{x},
-																		 x2 => $params{x},
-																		 y1 => $params{y},
-																		 y2 => $params{y},
-																	   );
-		delete @params{qw(x y z)};
-		my $event = Curses::Toolkit::Event::Mouse::Click->new( %params,
-															   root_window => $self->{toolkit_root} );
-		$self->{toolkit_root}->dispatch_event($event);
-	}
-	return;
+	return unless $params{type} eq 'click';
+	
+	use Curses::Toolkit::Event::Mouse::Click;
+	$params{type} = delete $params{type2};
+	use Curses::Toolkit::Object::Coordinates;
+	$params{coordinates} = Curses::Toolkit::Object::Coordinates->new(
+		x1 => $params{x},
+		x2 => $params{x},
+		y1 => $params{y},
+		y2 => $params{y},
+	);
+	delete @params{qw(x y z)};
+	my $event = Curses::Toolkit::Event::Mouse::Click->new(
+		%params, root_window => $self->get_toolkit_root );
+
+	$self->get_toolkit_root->dispatch_event($event);
 }
 
 no Moose;
