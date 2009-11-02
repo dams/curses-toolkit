@@ -4,6 +4,8 @@ use strict;
 package POE::Component::Curses::MainLoop;
 # ABSTRACT: <FIXME to be filled>
 
+use Moose;
+use MooseX::FollowPBP;
 use POE qw(Session);
 use Params::Validate qw(:all);
 
@@ -20,43 +22,20 @@ Please look at L<POE::Component::Curses>. Thanks !
 
 =cut
 
-# OK so this creates the mainlopp object. It's the bridge between the POE
-# Component and the Curses Toolkit root object.
+# constructor arguments
+has session_name => ( is=>'rw', isa=>'Str' );
+has args         => ( is=>'ro', isa=>'HashRef', default=>sub{ {} } );
 
-sub new {
-	my $class = shift;
+has toolkit_root => ( is=>'ro',	isa=>'Curses::Toolkit', lazy_build=>1 );
 
-	my %params = validate( @_, { session_name => { optional => 1, type => SCALAR },
-								 args => { optional => 1, type => HASHREF, default => {} }
-							   }
-						 );
-	my $toolkit_root = Curses::Toolkit->init_root_window( %{$params{args}} );
-	my $self = bless( { toolkit_root => $toolkit_root,
-						session_name => $params{session_name},
-					  }, $class);
-	$toolkit_root->set_mainloop($self);
-	return $self;
-}
 
-sub set_session_name {
+sub _build_toolkit_root {
 	my $self = shift;
-	my ($session_name) = validate_pos( @_, { type => SCALAR } );
-	$self->{session_name} = $session_name;
-	return $self;
+	my $toolkit_root = Curses::Toolkit->init_root_window( %{ $self->get_args } );
+	$toolkit_root->set_mainloop($self);
+	return $toolkit_root;
 }
 
-sub get_toolkit_root {
-       my ($self) = @_;
-       return $self->{toolkit_root};
-}
-
-
-# sub set_session {
-# 	my $self = shift;
-# 	my ($session) = validate_pos( @_, { isa => 'POE::Session' } );
-# 	$self->{session} = $session;
-# 	return $self;
-# }
 
 
 #### Now implement the Mainloop API ####
@@ -170,5 +149,8 @@ sub event_mouse {
 	}
 	return;
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 1;
