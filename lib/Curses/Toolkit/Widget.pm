@@ -327,16 +327,25 @@ sub get_parent {
 Set a specific display theme name.
 
   input  : a STRING, name of a class inheriting from Curses::Toolkit::Theme
+           a BOOLEAN, if true, recursively sets the themes to the children
   output : the widget
 
 =cut
 
 sub set_theme_name {
 	my $self = shift;
-    my ($theme_name) = validate_pos( @_, { type => SCALAR }
-									 # isa => 'Curses::Toolkit::Theme' }
-								   );
+    my ($theme_name, $recurse) = validate_pos( @_, { type => SCALAR },
+											       { type => BOOLEAN, optional => 1 },
+											 );
 	$self->{theme_name} = $theme_name;
+	$self->{theme} = undef;
+	if ($recurse) {
+		if ($self->isa('Curses::Toolkit::Widget::Container')) {		
+			foreach my $child ($self->get_children()) {
+				$child->set_theme_name($theme_name, $recurse);
+			}
+		}
+	}
 	return $self;
 }
 
@@ -381,8 +390,8 @@ sub get_theme {
 		if (defined $theme_name) {
 			$self->{theme} = $self->get_theme_name()->new($self);
 		} else {
-use Curses::Toolkit::Theme::Default;
-return Curses::Toolkit::Theme::Default->new($self);
+			my $theme_name = Curses::Toolkit->get_default_theme_name();
+			return $theme_name->new($self);
 		}
 	}
 	return $self->{theme};

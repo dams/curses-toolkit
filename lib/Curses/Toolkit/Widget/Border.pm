@@ -112,19 +112,19 @@ sub get_minimum_space {
 
 To set/get a theme properties, you should do :
 
-$border->set_theme_property(property_name => $property_value);
-$value = $border->get_theme_property('property_name')
+  $border->set_theme_property(property_name => $property_value);
+  $value = $border->get_theme_property('property_name');
 
 Here is the list of properties related to the border, that can be changed in
 the associated theme. See the Curses::Toolkit::Theme class used for the default
 (default class to look at is Curses::Toolkit::Theme::Default)
 
 Don't forget to look at properties from the parent class, as these are also
-inherited of !
+inherited from !
 
 =head2 border_width
 
-Sets the with of the window border. If not set, the window border will be invisible
+Sets the width of the border. If not set, the border will be invisible
 
 =cut
 

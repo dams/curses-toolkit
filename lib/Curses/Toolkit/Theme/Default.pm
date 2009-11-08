@@ -45,6 +45,12 @@ sub _get_default_properties {
 					  # inherited from Border
 					  border_width => 1,
 					},
+					'Curses::Toolkit::Widget::Button' => {
+					  # inherited from Border
+					  border_width => 0,
+					  left_enclosing => '< ',
+					  right_enclosing => ' >',
+					},
 #  					'Curses::Toolkit::Widget::Paned' => {
 #  					  gutter_size => 1,
 #  					},

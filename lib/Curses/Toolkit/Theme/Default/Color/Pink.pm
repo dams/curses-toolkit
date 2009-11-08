@@ -35,6 +35,45 @@ sub new {
 	return $class->SUPER::new(@_);
 }
 
+# the values of this theme
+sub _get_default_properties {
+	my ($self, $class_name) = @_;
+	my %default = ( 'Curses::Toolkit::Widget::Window' => {
+			          title_width => 20,
+					  title_bar_position => 'top',
+					  title_position => 'left',
+					  title_brackets_characters => [ '[ ', ' ]' ],
+					  title_left_offset => 1,
+					  title_right_offset => 1,
+					  title_animation => 1,
+					  title_loop_duration => 4,
+					  title_loop_pause => 2/3,
+					  # inherited from Border
+					  border_width => 1,
+					},
+					'Curses::Toolkit::Widget::Border' => {
+					  border_width => 1,
+					},
+					'Curses::Toolkit::Widget::GenericButton' => {
+					  # inherited from Border
+					  border_width => 1,
+					},
+					'Curses::Toolkit::Widget::Button' => {
+					  # inherited from Border
+					  border_width => 1,
+					  left_enclosing => '', #[ ',
+					  right_enclosing => '', # ]',
+					},
+#  					'Curses::Toolkit::Widget::Paned' => {
+#  					  gutter_size => 1,
+#  					},
+# 					'Curses::Toolkit::Widget::Entry' => {
+# 					  default_width => 20,
+# 					},
+				  );
+	return $default{$class_name} || {};
+}
+
 sub HLINE_NORMAL   { shift->_attron(COLOR_PAIR(2)) }
 sub HLINE_FOCUSED  { shift->_attron(COLOR_PAIR(4) | A_BOLD) }
 sub HLINE_CLICKED  { shift->_attron(COLOR_PAIR(2) | A_REVERSE) }

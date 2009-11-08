@@ -4,7 +4,7 @@ use strict;
 package Curses::Toolkit::Widget::Button;
 # ABSTRACT: a simple text button widget
 
-use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
+use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(:all);
 use Curses::Toolkit::Object::Coordinates;
@@ -92,6 +92,14 @@ sub get_text {
 # --^  o1 
 # ------- o2 --^ 
 
+# <----- w1 ---->
+#   <-- w2 --->
+# < button text >
+# <> wl
+#              <> wr
+# --^  o1 
+# ------- o2 --^ 
+
 
 =head2 draw
 
@@ -99,20 +107,28 @@ sub get_text {
 
 sub draw {
 	my ($self) = @_;
+	$self->SUPER::draw(); # draw the border if any
+
 	my $theme = $self->get_theme();
 	my $c = $self->get_coordinates();
 	my $text = $self->get_text();
 
-# TODO : theme this !
-	my $w1 = $c->width();
-	my $w2 = $w1 - 4;
-	my $o1 = 2;
-	my $o2 = $w1 - 2;
-	my $t = ' ' x (($w2 - length $text) / 2);
+	my $left_string = $self->get_theme_property('left_enclosing');
+	my $right_string = $self->get_theme_property('right_enclosing');
+	my $bw = $self->get_theme_property('border_width');
+	my $wl = length $left_string;
+	my $wr = length $right_string;
 
-	$theme->draw_string($c->x1(), $c->y1(), '< ');
-	$theme->draw_string($c->x1() + $o2, $c->y1(), ' >');
-	$theme->draw_string($c->x1() + $o1, $c->y1(), $t . $text . $t);
+	my $w1 = $c->width() - 2 * $bw;
+	my $w2 = $w1 - $wl - $wr;
+	my $o1 = $wl;
+	my $o2 = $w1 - $wr;
+	my $t1 = ' ' x (($w2 - length $text) / 2);
+	my $t2 = ' ' x ($w2 - length($text) - length($t1) );
+
+	$theme->draw_string($c->x1() + $bw, $c->y1() + $bw, $left_string);
+	$theme->draw_string($c->x1() + $bw + $o2, $c->y1() + $bw, $right_string);
+	$theme->draw_string($c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2);
 
 	return;
 }
@@ -143,12 +159,15 @@ sub get_minimum_space {
 	my ($self, $available_space) = @_;
 	my $text = $self->get_text();
 
-	my $desired_space = $available_space->clone();
+	my $minimum_space = $available_space->clone();
 # TODO : theme this !
-	$desired_space->set( x2 => $available_space->x1() + length($text) + 4,
-						 y2 => $available_space->y1() + 1,
+	my $bw = $self->get_theme_property('border_width');
+	my $left_string = $self->get_theme_property('left_enclosing');
+	my $right_string = $self->get_theme_property('right_enclosing');
+	$minimum_space->set( x2 => $available_space->x1() + 2 * $bw + length($left_string) + length($text) + length($right_string),
+						 y2 => $available_space->y1() + 1 + 2 * $bw,
 					   );
-	return $desired_space;
+	return $minimum_space;
 }
 
 =head2 possible_signals
@@ -187,6 +206,62 @@ sub _bind_signal {
 															  )
 							 );
 	return $self;
+}
+
+=head1 Theme related properties
+
+To set/get a theme properties, you should do :
+
+  $button->set_theme_property(property_name => $property_value);
+  $value = $button->get_theme_property('property_name');
+
+Here is the list of properties related to the window, that can be changed in
+the associated theme. See the Curses::Toolkit::Theme class used for the default
+(default class to look at is Curses::Toolkit::Theme::Default)
+
+Don't forget to look at properties from the parent class, as these are also
+inherited from !
+
+=head2 border_width (inherited)
+
+The width of the border of the button.
+
+Example :
+  # set buttons to have a border of 1
+  $button->set_theme_property(border_width => 1 );
+
+=head2 left_enclosing
+
+The string to be displayed at the left of the button. Usually some enclosing characters.
+
+Example :
+  # set left enclosing
+  $button->set_theme_property(left_enclosing => '< ' );
+  $button->set_theme_property(left_enclosing => '[ ' );
+
+=head2 right_enclosing
+
+The string to be displayed at the right of the button. Usually some enclosing characters.
+
+Example :
+  # set left enclosing
+  $button->set_theme_property(left_enclosing => ' >' );
+  $button->set_theme_property(left_enclosing => ' ]' );
+
+=cut
+
+sub _get_theme_properties_definition {
+	my ($self) = @_;
+	return { %{$self->SUPER::_get_theme_properties_definition() },
+			 left_enclosing => {
+			   optional => 1,
+			   type => SCALAR,
+			 },
+			 right_enclosing => {
+			   optional => 1,
+			   type => SCALAR,
+			 },
+		   }
 }
 
 1;

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::GenericButton;
-# ABSTRACT: a button widget
+# ABSTRACT: a button widget that can hold any other widget
 
 use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
 
@@ -17,11 +17,12 @@ function that is called when the button is pressed.
 This widget can hold any valid child widget. That is it can hold most any other
 standard Widget. The most commonly used child is the
 Curses::Toolkit::Widget::Label. This widget consists of a border, and a child
-widget in that border
+widget in that border.
 
-However, if all you need is a simple button, I recommend you use
-L<Curses::Toolkit::Widget::GenericButton>, it will take less space in your
-screen ( it has no border )
+However, if all you need is a simple text button, I recommend you use
+L<Curses::Toolkit::Widget::Button>, it can take less space on the screen ( it
+can have no border ), and has more theme properties that suites best text
+buttons.
 
 This widget can contain 0 or 1 other widget.
 

@@ -583,15 +583,15 @@ sub get_type {
 
 To set/get a theme properties, you should do :
 
-$window->set_theme_property(property_name => $property_value);
-$value = $window->get_theme_property('property_name')
+  $window->set_theme_property(property_name => $property_value);
+  $value = $window->get_theme_property('property_name');
 
 Here is the list of properties related to the window, that can be changed in
 the associated theme. See the Curses::Toolkit::Theme class used for the default
 (default class to look at is Curses::Toolkit::Theme::Default)
 
 Don't forget to look at properties from the parent class, as these are also
-inherit of !
+inherited of !
 
 =head2 title_width
 
