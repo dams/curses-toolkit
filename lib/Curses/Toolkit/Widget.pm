@@ -341,10 +341,17 @@ sub set_theme_name {
 	$self->{theme} = undef;
 	if ($recurse) {
 		if ($self->isa('Curses::Toolkit::Widget::Container')) {		
-			foreach my $child ($self->get_children()) {
+			my @children = $self->get_children();
+			# to avoid rebuilding coordinates at every stage of the recursion,
+			# rebuild them only at leaves
+			@children
+			  or $self->rebuild_all_coordinates();
+			foreach my $child (@children) {
 				$child->set_theme_name($theme_name, $recurse);
 			}
 		}
+	} else {
+		$self->rebuild_all_coordinates();
 	}
 	return $self;
 }
