@@ -3,5 +3,11 @@ _build
 Curses-Toolkit-*
 cover_db
 *~
+*#
+*.bak
+*.old
+*.rej
+*.swp
+*.tmp
 
 
