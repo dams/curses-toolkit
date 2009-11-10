@@ -2,4 +2,6 @@ _build
 .build
 Curses-Toolkit-*
 cover_db
+*~
+
 
