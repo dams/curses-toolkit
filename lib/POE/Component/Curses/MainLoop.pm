@@ -23,12 +23,12 @@ Please look at L<POE::Component::Curses>. Thanks !
 =cut
 
 # constructor arguments
-has session_name => ( is=>'rw', isa=>'Str' );
-has args         => ( is=>'ro', isa=>'HashRef', default=>sub{ {} } );
+has session_name => ( is => 'rw', isa => 'Str' );
+has args         => ( is => 'ro', isa => 'HashRef', default => sub{ {} } );
 
-has toolkit_root => ( is=>'ro',	isa=>'Curses::Toolkit', lazy_build=>1 );
+has toolkit_root => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1 );
 has redraw_needed => (
-      traits    => ['Bool'],
+      traits    => [ 'Bool' ],
       is        => 'rw',
       isa       => 'Bool',
       default   => 0,
@@ -38,7 +38,6 @@ has redraw_needed => (
       },
 
 );
-
 
 sub _build_toolkit_root {
 	my $self = shift;
@@ -119,7 +118,8 @@ sub event_key {
 		key => 1 ,
 	} );
 
-	return unless $params{type} eq 'stroke';
+	$params{type} eq 'stroke'
+	  or return;
 
 	use Curses::Toolkit::Event::Key;
 #		print STDERR " -- Mainloop stroke : [$params{key}] \n";
@@ -143,7 +143,8 @@ sub event_mouse {
 		z => 1,
 	} );
 
-	return unless $params{type} eq 'click';
+	$params{type} eq 'click'
+	  or return;
 	
 	use Curses::Toolkit::Event::Mouse::Click;
 	$params{type} = delete $params{type2};
