@@ -26,7 +26,7 @@ Please look at L<POE::Component::Curses>. Thanks !
 has session_name => ( is => 'rw', isa => 'Str' );
 has args         => ( is => 'ro', isa => 'HashRef', default => sub{ {} } );
 
-has toolkit_root => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1 );
+has toolkit_root => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1, init_arg => undef );
 has redraw_needed => (
       traits    => [ 'Bool' ],
       is        => 'rw',
@@ -36,7 +36,7 @@ has redraw_needed => (
           request_redraw => 'set',
           cancel_redraw  => 'unset',
       },
-
+      init_arg => undef
 );
 
 sub _build_toolkit_root {
