@@ -23,21 +23,11 @@ Please look at L<POE::Component::Curses>. Thanks !
 =cut
 
 # constructor arguments
-has session_name => ( is => 'rw', isa => 'Str' );
-has args         => ( is => 'ro', isa => 'HashRef', default => sub{ {} } );
+has session_name  => ( is => 'rw', isa => 'Str' );
+has args          => ( is => 'ro', isa => 'HashRef', default => sub{ {} } );
 
-has toolkit_root => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1, init_arg => undef );
-has redraw_needed => (
-      traits    => [ 'Bool' ],
-      is        => 'rw',
-      isa       => 'Bool',
-      default   => 0,
-      handles   => {
-          request_redraw => 'set',
-          cancel_redraw  => 'unset',
-      },
-      init_arg => undef
-);
+has toolkit_root  => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1, init_arg => undef );
+has redraw_needed => ( is => 'rw', isa => 'Bool', default => 0, init_arg => undef );
 
 sub _build_toolkit_root {
 	my $self = shift;
@@ -56,8 +46,9 @@ sub _build_toolkit_root {
 sub needs_redraw {
 	my ($self) = @_;
 	# if redraw is already stacked, just quit
-	$self->get_redraw_needed and return;
-	$self->request_redraw;
+	$self->get_redraw_needed
+	  and return;
+	$self->set_redraw_needed(1);
 	$poe_kernel->post($self->get_session_name, 'redraw');
 	return $self;
 }
@@ -68,8 +59,6 @@ sub add_delay {
 	my $code = shift;
 	$poe_kernel->call($self->get_session_name, 'add_delay_handler', $seconds, $code, @_);
 	return;
-#	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
-#	return $poe_kernel->delay_set('delay_handler', $seconds, $code, @_);
 }
 
 
@@ -87,9 +76,9 @@ sub event_rebuild_all {
 # POE::Component::Curses ordered a redraw
 sub event_redraw {
 	my ($self) = @_;
-	# set his to 0 so redraw requests that may appear in the mean time will be
-	# granted
-	$self->cancel_redraw;
+	# unset this early so that redraw requests that may appear in the meantime will
+	# be granted
+	$self->set_redraw_needed(0);
 
 	$self->get_toolkit_root->render();
 	$self->get_toolkit_root->display();
