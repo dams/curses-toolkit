@@ -97,7 +97,7 @@ sub _add_child_at_end {
 sub _add_child_at_beginning {
 	my ($self, $child_widget) = @_;
 	unshift @{$self->{children}}, $child_widget;
-	my $iterator = $self->{children}->forward_from(@{$self->{children}} - 1);
+	my $iterator = $self->{children}->forward_from(0);
 	$child_widget->_set_iterator($iterator);	
 	return $self;
 }

@@ -236,7 +236,9 @@ sub init_root_window {
 					   mainloop => $params{mainloop},
 					   last_stack => 0,
 					   event_listeners => [],
+					   window_iterator => undef,
                      }, $class;
+#	$self->{iterator} = $self->{windows}->forward_from();
 	$self->_recompute_shape();
 
 	use Curses::Toolkit::EventListener;
@@ -283,7 +285,24 @@ sub init_root_window {
 					},
 				},
 				code => sub {
-					
+					my ($event, $widget) = @_;
+					defined $self->{window_iterator}
+					  or return;
+					my $window = $widget->{window_iterator}->next();
+					if ( ! defined $window ) {
+						$widget->{window_iterator}->to_start();
+						$window = $widget->{window_iterator}->value();
+					}
+					# get the currently focused widget, unfocus it
+					my $current_focused_widget = $self->get_focused_widget();
+					if (defined $current_focused_widget && $current_focused_widget->can('set_focus')) {
+						$current_focused_widget->set_focus(0);
+					}
+					$window->bring_to_front();
+					# focus the window or one of its component
+					my $next_focused_widget = $window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
+					defined $next_focused_widget and
+					  $next_focused_widget->set_focus(1);
 				},
 			)
 		);
@@ -341,14 +360,13 @@ sub init_root_window {
 		)
 	);
 
-#$self->{window_iterator}
     return $self;
 }
 
 sub get_default_theme_name {
 	my ($class) = @_;
 	return (has_colors() ?
-			  'Curses::Toolkit::Theme::Default::Color::Pink'
+			  'Curses::Toolkit::Theme::Default::Color::Yellow'
 			: 'Curses::Toolkit::Theme::Default'
 		   );
 }
@@ -547,15 +565,54 @@ sub add_window {
 	$window->_set_curses_handler($self->{curses_handler});
 	$window->set_theme_name($self->{theme_name});
 	$window->set_root_window($self);
-	$self->{last_stack}++;
-	$window->set_property(window => 'stack', $self->{last_stack});
+	$self->bring_window_to_front($window);
 	# in case the window has proportional coordinates depending on the root window
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
-	$self->{window_iterator} ||= $self->{windows}->forward_from(0);
+#	print STDERR Dumper(tied(@{$self->{windows}})); use Data::Dumper;
+	$self->{window_iterator} ||= $self->{windows}->forward_from();
 	$self->needs_redraw();
 	return $self;
+}
+
+=head2 bring_window_to_front()
+
+  $root_window->bring_window_to_front($window)
+
+Brings the window to front
+
+  input : a Curses::Toolkit::Widget::Window
+  output : the root window
+
+=cut
+
+sub bring_window_to_front {
+	my $self = shift;
+    my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
+	$self->{last_stack}++;
+	$window->set_property(window => 'stack', $self->{last_stack});
+	my $last_stack = $self->{last_stack};
+	$last_stack % 5 == 0
+	  and $self->{last_stack} = $self->_cleanup_windows_stacks();
+
+	print STDERR Dumper( [ map { $_->get_property(window => 'stack') } $self->get_windows() ] ); use Data::Dumper;
+	print STDERR $self->{last_stack};
+
+	$self->needs_redraw();
+	return $self;
+}
+
+sub _cleanup_windows_stacks {
+	my ($self) = @_;
+
+	my @sorted_windows = sort { $a->get_property(window => 'stack') <=> $b->get_property(window => 'stack') }
+						 $self->get_windows();
+
+	foreach my $idx (0..@sorted_windows-1) {
+		$sorted_windows[$idx]->set_property(window => 'stack', $idx);
+	}
+	return @sorted_windows-1;
 }
 
 =head2 needs_redraw

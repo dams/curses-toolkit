@@ -324,10 +324,7 @@ sub bring_to_front {
 	my ($self) = @_;
 	my $root_window = $self->get_root_window();
 	defined $root_window or return;
-	my $last_stack = $root_window->{last_stack};
-	$root_window->{last_stack}++;
-	$self->set_property(window => 'stack', $root_window->{last_stack});
-	$self->needs_redraw();
+	$root_window->bring_window_to_front($self);
 	return $self;
 }
 
