@@ -49,11 +49,12 @@ sub main {
  				          ->set_name('button2')
 ->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Mouse::Click',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{button} eq 'button1' or return 0;
-				$event->{type} eq 'pressed' or return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Mouse::Click' =>	sub { 
+					my ($event) = @_;
+					$event->{button} eq 'button1' or return 0;
+					$event->{type} eq 'pressed' or return 0;
+				},
 			},
 			code => sub {
 				$button02->set_focus(1);

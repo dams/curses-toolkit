@@ -50,11 +50,12 @@ sub main {
 	$button1->set_focus(1);
 	$button1->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq ' ' or return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq ' ' or return 0;
+				},
 			},
 			code => sub {
 				$hbox->pack_end(
@@ -62,11 +63,12 @@ sub main {
 				    ->new_with_label('FOO !')
 ->add_event_listener(
 		Curses::Toolkit::EventListener->new(
-			accepted_event_class => 'Curses::Toolkit::Event::Key',
-			conditional_code => sub { 
-				my ($event) = @_;
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq ' ' or return 0;
+			accepted_events => {
+				'Curses::Toolkit::Event::Key' => sub { 
+					my ($event) = @_;
+					$event->{type} eq 'stroke' or return 0;
+					$event->{params}{key} eq ' ' or return 0;
+				},
 			},
 			code => sub {
 				$hbox->pack_end(
