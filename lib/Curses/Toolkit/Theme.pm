@@ -201,21 +201,9 @@ can contain these keys:
 
 sub curses {
 	my ($self, $attr) = @_;
-	$self->_get_curses_handler()->attrset(0);
 	my $caller = (caller(1))[3];
 	my $type = uc( (split('_', $caller))[1] );
 	$self->_compute_attributes($type, $attr);
-	if (defined $attr) {
-		use Curses;
-		if (exists $attr->{bold}) {
-			$attr->{bold} and $self->_attron(A_BOLD);
-			$attr->{bold} or  $self->_attroff(A_BOLD);
-		}
-		if (exists $attr->{reverse}) {
-			$attr->{reverse} and $self->_attron(A_REVERSE);
-			$attr->{reverse} or  $self->_attroff(A_REVERSE);
-		}
-	}
 	return $self->_get_curses_handler();
 }
 
@@ -230,6 +218,7 @@ sub _get_curses_handler {
 
 sub _compute_attributes {
 	my ($self, $type, $attr) = @_;
+	$self->_get_curses_handler()->attrset(0);
 	$attr ||= { };
 	my $method = $type . '_NORMAL';
 	$self->$method();
@@ -246,6 +235,15 @@ sub _compute_attributes {
 	if (delete $attr->{clicked}) {
 		$method = $type . '_CLICKED';
 		$self->$method();
+	}
+	use Curses;
+	if (exists $attr->{bold}) {
+		$attr->{bold} and $self->_attron(A_BOLD);
+		$attr->{bold} or  $self->_attroff(A_BOLD);
+	}
+	if (exists $attr->{reverse}) {
+		$attr->{reverse} and $self->_attron(A_REVERSE);
+		$attr->{reverse} or  $self->_attroff(A_REVERSE);
 	}
 	return;
 }
@@ -265,7 +263,57 @@ sub _attrset {
 	$self->_get_curses_handler()->attrset(@_);
 }
 
+sub _addstr_with_tags {
+	my ($self, $initial_attr, $x, $y, $text) = @_;
+
+	use Curses::Toolkit::Object::MarkupString;
+	ref $text or
+	  $text = Curses::Toolkit::Object::MarkupString->new($text);
+
+	my $struct = $text->get_attr_struct();
+
+	# get the curses handler
+	my $curses = $self->_get_curses_handler();
+
+	my $caller = (caller(1))[3];
+	my $type = uc( (split('_', $caller))[1] );
+
+	foreach my $element (@$struct) {
+		my ($char, @attrs) = @$element;
+		$self->_compute_attributes($type, $initial_attr);
+		my $value = 0;
+		my ($curr_fg, $curr_bg);
+		pair_content(1, $curr_fg, $curr_bg);
+		foreach my $attr (@attrs) {
+			my $weight = $attr->{weight};
+			defined $weight && $weight == 0 and $value = 0;
+			defined $weight and $value = ($value | $weight);
+
+			my ($fgcolor, $bgcolor) = ($curr_fg, $curr_bg);
+ 			defined $attr->{fgcolor}
+ 			  and $fgcolor = $attr->{fgcolor};
+ 			defined $attr->{bgcolor}
+ 			  and $bgcolor = $attr->{bgcolor};
+		if (defined $attr->{fgcolor} || defined $attr->{bgcolor}) {
+			init_pair(63, $fgcolor, $bgcolor);
+			$value = ($value | COLOR_PAIR(63));
+		}
+#			init_pair(1, COLOR_RED, COLOR_BLACK);
+#			$value = ($value | COLOR_PAIR(1));
+
+		}
+		$curses->attron($value);
+#		print STDERR "COLOR : " . Dumper(COLOR_PAIRS); use Data::Dumper;
+		$curses->addstr($y, $x, $char);
+		init_pair(1, $curr_fg, $curr_bg);
+
+		$x++;
+	}
+	return $self;
+}
+
 1;
+
 __END__
 
 =begin Pod::Coverage

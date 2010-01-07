@@ -30,10 +30,15 @@ sub main {
 		  ->set_title("a title")
 	);
 
-	my $label = Curses::Toolkit::Widget::Label->new->set_text("This is <span weight='underline'>underlined text <span weight='bold'>very bold</span> chunk </span> chunk");
+#	my $label = Curses::Toolkit::Widget::Label->new->set_text("<b>AAAAA BBBBB CCCCC DDDDD EEEEE FFFFF GGGGG</b>");
+ 	my $label = Curses::Toolkit::Widget::Label->new->set_text("This is <span weight='underline'>underlined text <span weight='bold'>very bold</span> chunk </span> chunk");
+ 	my $label2 = Curses::Toolkit::Widget::Label->new->set_text("This is <span fgcolor='blue'>in blue, <span bgcolor='red'>red background </span> and blue again</span> chunk");
+ 	my $label3 = Curses::Toolkit::Widget::Label->new->set_text("This is a <span bgcolor='red'>red background </span> chunk");
 	$window->add_widget(
 		my $vbox = Curses::Toolkit::Widget::VBox->new()
 		  ->pack_end($label, { expand => 0 })
+		  ->pack_end($label2, { expand => 0 })
+		  ->pack_end($label3, { expand => 0 })
 	);
 	$window->set_coordinates(x1 => '15%',   y1 => '15%',
 							 x2 => '85%',

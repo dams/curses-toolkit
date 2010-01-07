@@ -153,10 +153,19 @@ sub draw_corner_lr {
 sub draw_string {
 	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
-	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => length($text), height => 1) or return;
-	$text = substr($text, $c->x1()-$x1, $c->width());
-	defined $text && length $text or return;
-	$self->curses($attr)->addstr($c->y1(), $c->x1(), $text);
+
+	use Curses::Toolkit::Object::MarkupString;
+	ref $text or
+	  $text = Curses::Toolkit::Object::MarkupString->new($text);
+
+	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1) or return;
+
+	my $start = $c->x1() - $x1;
+	my $end = $c->x1() - $x1 + $c->width();
+	my $width = $end - $start;
+	$text = $text->substring($start, $width);
+	$text->stripped_length() or return;
+	$self->_addstr_with_tags($attr, $c->x1(), $c->y1(), $text);
 	return $self;
 }
 

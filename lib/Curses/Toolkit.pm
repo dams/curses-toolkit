@@ -6,6 +6,15 @@ package Curses::Toolkit;
 
 use Params::Validate qw(:all);
 
+#use Exporter;
+#our @EXPORT_OK = qw(untag);
+
+use Curses::Toolkit::Theme;
+
+#sub untag {
+#	return Curses::Toolkit::Theme::_untag(@_);
+#}
+
 =head1 SYNOPSIS
 
   # spawn a root window
@@ -366,7 +375,7 @@ sub init_root_window {
 sub get_default_theme_name {
 	my ($class) = @_;
 	return (has_colors() ?
-			  'Curses::Toolkit::Theme::Default::Color::Yellow'
+			  'Curses::Toolkit::Theme::Default::Color::Pink'
 			: 'Curses::Toolkit::Theme::Default'
 		   );
 }
@@ -596,8 +605,8 @@ sub bring_window_to_front {
 	$last_stack % 5 == 0
 	  and $self->{last_stack} = $self->_cleanup_windows_stacks();
 
-	print STDERR Dumper( [ map { $_->get_property(window => 'stack') } $self->get_windows() ] ); use Data::Dumper;
-	print STDERR $self->{last_stack};
+#	print STDERR Dumper( [ map { $_->get_property(window => 'stack') } $self->get_windows() ] ); use Data::Dumper;
+#	print STDERR $self->{last_stack};
 
 	$self->needs_redraw();
 	return $self;
