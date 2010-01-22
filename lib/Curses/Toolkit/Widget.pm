@@ -763,6 +763,8 @@ sub possible_signals {
 	my ($self) = @_;
 	$self->isa('Curses::Toolkit::Role::Focusable')
 	  and return ( focus_changed => 'Curses::Toolkit::Signal::Focused' );
+	  and return ( focused_in => 'Curses::Toolkit::Signal::Focused::In' );
+	  and return ( focused_out => 'Curses::Toolkit::Signal::Focused::Out' );
 	return ();
 }
 

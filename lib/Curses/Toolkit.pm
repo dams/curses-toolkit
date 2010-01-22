@@ -725,6 +725,8 @@ sub display {
 Given an event, dispatch it to the appropriate widgets / windows, or to the root window.
 
   input  : a Curses::Toolkit::Event
+         : optional, a widget. if given, the event will apply on it only
+         : optional, boolean. if true the event won't check parent widgets
   output : true if the event were handled, false if not
 
 =cut
