@@ -18,6 +18,7 @@ Event that is related to keystrokes
 
   input : type   : a type of Key Event. STRING, should be one of Curses::Toolkit::Event::Key->get_types()
           params : parameter of the event. Can be optional or mandatory. Call Curses::Toolkit::Event::Key->get_params_definition($type) to see
+          root_window : the root window
 
 =cut
 

@@ -193,7 +193,7 @@ sub spawn {
 				$kernel->yield('window_resize');
 				$kernel->delay(window_resize => 1/10);
 			},
-			window_resize => sub { 
+			window_resize => sub {
 				my ($kernel, $heap) = @_[ KERNEL, HEAP];
 				$heap->{mainloop}->event_resize();
 			},
@@ -214,6 +214,10 @@ sub spawn {
 			delay_handler => sub {
 				my $code = $_[ARG0];
 				$code->(@_[ARG1..$#_]);
+			},
+			stack_event => sub {
+				my ($kernel, $heap) = @_[KERNEL, HEAP];
+				$heap->{mainloop}->event_generic(@_[ARG0..$#_]);
 			}
         }
 	);

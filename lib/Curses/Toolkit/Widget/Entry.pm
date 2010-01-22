@@ -177,8 +177,12 @@ sub set_text {
 	my ($text) = validate_pos( @_, { type => SCALAR } );
 	$self->{text} = $text;
 
-	return $self;
+	use Curses::Toolkit::Event::Content::Changed;
+	my $event = Curses::Toolkit::Event::Content::Changed->new();
+	# sends event to be managed by the mainloop and redispatched
+	$self->fire_event($event, $self, 1);
 
+	return $self;
 }
 
 =head2 get_text
@@ -418,6 +422,25 @@ sub get_minimum_space {
 						 y2 => $available_space->y1() + 1,
 					   );
 	return $minimum_space;
+}
+
+=head2 possible_signals
+
+my @signals = keys $button->possible_signals();
+
+returns the possible signals that can be used on this widget. See
+L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
+
+  input  : none
+  output : HASH, keys are signal names, values are signal classes
+
+=cut
+
+sub possible_signals {
+	my ($self) = @_;
+	return ( $self->SUPER::possible_signals(),
+			 content_changed => 'Curses::Toolkit::Signal::Content::Changed',
+		   );
 }
 
 # =head1 Theme related properties

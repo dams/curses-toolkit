@@ -230,7 +230,7 @@ sub _get_theme_properties_definition {
 
 Adds an event listener to the widget. That allows the widget to respond to some
 events. You probably don't want to use this method. Please see signal_connect
-and possible_signals below.
+and possible_signals instead.
 
   input : a Curses::Toolkit::EventListener
   output : the root window
@@ -266,9 +266,32 @@ sub get_event_listeners {
 # given its index, unlink the event listener from the widget
 # input  : index
 # output : the widget
+
 sub _remove_event_listener {
 	my ($self, $index) = @_;
 	delete $self->{event_listeners}{$index};
+	return $self;
+}
+
+=head2 fire_event
+
+  $widget->fire_event($event, $widget, 1);
+
+Sends an event to the mainloop so it gets dispatched. You probably don't want
+to use this method. Please see signal_connect and possible_signals instead.
+
+  input  : a Curses::Toolkit::Event
+           optional, a widget. if given, the event will apply on it only
+           optional, boolean. if true the event won't check parent widgets
+  output : the widget
+
+=cut
+
+sub fire_event {
+	my $self = shift;
+	my $root_window = $self->get_root_window()
+	  or return $self;
+	$root_window->fire_event(@_);
 	return $self;
 }
 
@@ -410,10 +433,10 @@ sub get_theme {
   my $window = $widget->get_window();
 
 If the widget has been added in a window, get_window() will return this window.
-If the widget is not part of window, undef is returned.
+If the widget is not part of window, void returned.
 
   input  : none
-  output : the window in which the widget is (Curses::Toolkit::Widget::Window), or undef
+  output : the window in which the widget is (Curses::Toolkit::Widget::Window), or void
 
 =cut
 
@@ -426,6 +449,28 @@ sub get_window {
 	}
 	return $widget;
 }
+
+=head2 get_root_window
+
+  my $window = $widget->get_root_window();
+
+If the widget has been added in a window, get_root_window() will return the root window.
+If the widget is not part of window, void is returned.
+
+  input  : none
+  output : the root window (Curses::Toolkit), or void
+
+=cut
+
+sub get_root_window {
+	my ($self) = @_;
+	my $window = $self->get_window()
+	  or return;
+	my $root_window = $window->get_root_window()
+	  or return;
+	return $root_window;
+}
+
 # =head2 set_border_width
 
 # Sets the border width
@@ -762,9 +807,10 @@ signals to action
 sub possible_signals {
 	my ($self) = @_;
 	$self->isa('Curses::Toolkit::Role::Focusable')
-	  and return ( focus_changed => 'Curses::Toolkit::Signal::Focused' );
-	  and return ( focused_in => 'Curses::Toolkit::Signal::Focused::In' );
-	  and return ( focused_out => 'Curses::Toolkit::Signal::Focused::Out' );
+	  and return ( focus_changed => 'Curses::Toolkit::Signal::Focused',
+				   focused_in => 'Curses::Toolkit::Signal::Focused::In',
+				   focused_out => 'Curses::Toolkit::Signal::Focused::Out',
+				 );
 	return ();
 }
 

@@ -722,11 +722,12 @@ sub display {
   my $event = Curses::Toolkit::Event::SomeEvent->new(...)
   $root->dispatch_event($event);
 
-Given an event, dispatch it to the appropriate widgets / windows, or to the root window.
+Given an event, dispatch it to the appropriate widgets / windows, or to the
+root window. You probably don't want to use this method.
 
   input  : a Curses::Toolkit::Event
-         : optional, a widget. if given, the event will apply on it only
-         : optional, boolean. if true the event won't check parent widgets
+           optional, a widget. if given, the event will apply on it only
+           optional, boolean. if true the event won't check parent widgets
   output : true if the event were handled, false if not
 
 =cut
@@ -763,6 +764,33 @@ sub dispatch_event {
 		defined $widget or return;
 	}
 	return;
+}
+
+=head2 fire_event
+
+  $widget->fire_event($event, $widget, 1);
+
+Sends an event to the mainloop so it gets dispatched. You probably don't want
+to use this method.
+
+  input  : a Curses::Toolkit::Event
+           optional, a widget. if given, the event will apply on it only
+           optional, boolean. if true the event won't check parent widgets
+  output : the root_window
+
+=cut
+
+sub fire_event {
+	my $self = shift;
+	my ($event, $widget, $dont_dispatch_further) = 
+	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
+				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
+				       { type => BOOLEAN, optional => 1 },
+				  );
+	my $mainloop = $self->get_mainloop();
+	defined $mainloop or return $self;
+	$mainloop->stack_event($event, $widget, $dont_dispatch_further);
+	return $self;
 }
 
 =head2 add_delay

@@ -29,7 +29,8 @@ sub main {
 	my $label1 = Curses::Toolkit::Widget::Label->new->set_text(' ');
 	my $label2 = Curses::Toolkit::Widget::Label->new->set_text('You entered in the entry :');
 	my $entry = Curses::Toolkit::Widget::Entry->new()
-	  ->signal_connect(focus_changed => \&focus_changed, $label1);
+	  ->signal_connect(focus_changed => \&focus_changed, $label1)
+	  ->signal_connect(content_changed => \&content_changed, $label2);
 
 	$window->add_widget(
 		my $vbox = Curses::Toolkit::Widget::VBox->new()
@@ -61,8 +62,8 @@ sub focus_changed {
 	$label->set_text("you just focused $focus of the entry");
 	return;
 }
-sub validated {
+sub content_changed {
 	my ($event, $widget, $label) = @_;
-	$label->set_text("You entered [" . $widget->get_text . "] in the entry" );
+	$label->set_text("Entry changed : [" . $widget->get_text . "]" );
 	return;	
 }

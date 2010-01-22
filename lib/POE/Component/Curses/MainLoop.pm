@@ -43,6 +43,7 @@ sub _build_toolkit_root {
 ## Methods called by the Curses::Toolkit objects ##
 ## They usually returns $self, or a return value
 
+# Curses::Toolkit requires a redraw to happen at smoe time
 sub needs_redraw {
 	my ($self) = @_;
 	# if redraw is already stacked, just quit
@@ -53,6 +54,7 @@ sub needs_redraw {
 	return $self;
 }
 
+# Curses::Toolkit asks a code snipets to be after a delay
 sub add_delay {
 	my $self = shift;
 	my $seconds = shift;
@@ -61,6 +63,12 @@ sub add_delay {
 	return;
 }
 
+# Curses::Toolkit needs an event to pe stacked for dispatch
+sub stack_event {
+	my $self = shift;
+	$poe_kernel->post($self->get_session_name, 'stack_event', @_);
+	return;
+}
 
 ## Methods called by the POE Component session ##
 ## They usually return nothing
@@ -149,6 +157,12 @@ sub event_mouse {
 		%params, root_window => $self->get_toolkit_root );
 
 	$self->get_toolkit_root->dispatch_event($event);
+}
+
+# POE::Component::Curses informed on an event
+sub event_generic {
+	my $self = shift;
+	$self->get_toolkit_root->dispatch_event(@_);
 }
 
 no Moose;

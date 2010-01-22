@@ -1,23 +1,23 @@
 use warnings;
 use strict;
 
-package Curses::Toolkit::Event::Focus::Out;
-# ABSTRACT: event that is related to out-focus
+package Curses::Toolkit::Event::Content::Changed;
+# ABSTRACT: event that is related to content change
 
-use parent qw(Curses::Toolkit::Event::Focus);
+use parent qw(Curses::Toolkit::Event::Content);
 
 use Params::Validate qw(:all);
 
 =head1 DESCRIPTION
 
-Event that is related to out-focus
+Event that is related to content change
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
   input  : none
-  output : a Curses::Toolkit::Event::Focus::Out object
+  output : a Curses::Toolkit::Event::Content::Changed
 
 =cut
 

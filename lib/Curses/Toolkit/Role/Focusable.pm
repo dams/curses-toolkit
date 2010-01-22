@@ -62,18 +62,15 @@ sub set_focus {
 	if ($self->can('get_window')) {
 		my $window = $self->get_window();
 		if (defined $window) {
-			my $root_window = $window->get_root_window();
-			if (defined $root_window) {
-				if ($focus) {
-					use Curses::Toolkit::Event::Focus::In;
-					my $event_focus_in = Curses::Toolkit::Event::Focus::In->new( root_window => $root_window );
-					$root_window->dispatch_event($event_focus_in, $self, 1);
-					$window->set_focused_widget($self);
-				} else {
-					use Curses::Toolkit::Event::Focus::Out;
-					my $event_focus_out = Curses::Toolkit::Event::Focus::Out->new( root_window => $root_window );
-					$root_window->dispatch_event($event_focus_out, $self, 1);
-				}
+			if ($focus) {
+				use Curses::Toolkit::Event::Focus::In;
+				my $event_focus_in = Curses::Toolkit::Event::Focus::In->new();
+				$self->fire_event($event_focus_in, $self, 1);
+				$window->set_focused_widget($self);
+			} else {
+				use Curses::Toolkit::Event::Focus::Out;
+				my $event_focus_out = Curses::Toolkit::Event::Focus::Out->new();
+				$self->fire_event($event_focus_out, $self, 1);
 			}
 		}
 	}

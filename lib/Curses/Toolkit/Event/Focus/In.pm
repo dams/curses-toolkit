@@ -16,21 +16,10 @@ Event that is related to in-focus
 
 =head2 new
 
-  input : root_window : Curses::Toolkit : the root window object
+  input  : none
+  output : a Curses::Toolkit::Event::Focus::In object
 
 =cut
-
-sub new {
-	my $class = shift;
-	my $self = $class->SUPER::new();
-	my %args = validate( @_,
-						 { 
-						   root_window => { isa => 'Curses::Toolkit' },
-						 }
-					   );
-	$self = bless(\%args, $class);
-	return $self;
-}
 
 # this event has to be dispatched on a specific widget, so get_matching_widget
 # returns void

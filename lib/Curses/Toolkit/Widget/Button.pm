@@ -174,11 +174,11 @@ sub get_minimum_space {
 
 my @signals = keys $button->possible_signals();
 
-returns the possible signals that can be used. See
+returns the possible signals that can be used on ths widget. See
 L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
 
   input  : none
-  output : HASH, keys are siagnal names, values are signal classes
+  output : HASH, keys are signal names, values are signal classes
 
 =cut
 
