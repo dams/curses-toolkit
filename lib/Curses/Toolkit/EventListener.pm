@@ -49,7 +49,18 @@ sub can_handle {
 	my $self = shift;
 	my ($event) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' } );
 	my $event_class = ref $event;
-	exists $self->{accepted_events}{$event_class} or return;
+#	exists $self->{accepted_events}{$event_class} or return;
+	if (!exists $self->{accepted_events}{$event_class}) {
+		eval "require $event_class";
+		$@ and die "failed requireing event class '$event_class'";
+		my $found;
+		foreach my $class_name (keys %{$self->{accepted_events}}) {
+			$event_class->isa($class_name)
+			  and $found = $class_name;
+		}
+		defined $found or return;
+		$event_class = $found;
+	}
 	$self->{accepted_events}{$event_class}->($event) or return;
 	return 1;
 }

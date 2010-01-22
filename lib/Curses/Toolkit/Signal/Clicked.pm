@@ -26,10 +26,12 @@ sub generate_listener {
 	my %args = validate( @_,
 						 { widget => { isa => 'Curses::Toolkit::Widget' },
 						   code_ref => { type => CODEREF },
+						   arguments => { type => ARRAYREF },
 						 },
 					   );
 	my $widget = $args{widget};
 	my $code_ref = $args{code_ref};
+	my @arguments = @{$args{arguments}};
 
 	return Curses::Toolkit::EventListener->new(
 		accepted_events => {
@@ -49,7 +51,7 @@ sub generate_listener {
 		code => sub {
 			$widget->can('set_focus') and $widget->set_focus(1);
 			$widget->can('flash') and $widget->flash();
-			$code_ref->();
+			$code_ref->(@_, @arguments);
 		},
 	);
 }

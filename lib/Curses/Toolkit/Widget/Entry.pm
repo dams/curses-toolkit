@@ -176,6 +176,7 @@ sub set_text {
 	
 	my ($text) = validate_pos( @_, { type => SCALAR } );
 	$self->{text} = $text;
+
 	return $self;
 
 }

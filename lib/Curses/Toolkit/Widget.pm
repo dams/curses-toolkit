@@ -762,37 +762,54 @@ signals to action
 sub possible_signals {
 	my ($self) = @_;
 	$self->isa('Curses::Toolkit::Role::Focusable')
-	  and return ( focused => 'Curses::Toolkit::Signal::Focused' );
+	  and return ( focus_changed => 'Curses::Toolkit::Signal::Focused' );
 	return ();
 }
 
 =head2 possible_signals
 
+  # quick
   $widget->signal_connect(
       clicked => sub { do_something }
   );
 
+  # additional args passed
+  $widget->signal_connect(
+      clicked => \&click_function, $additional, $arguments
+  );
+
+  # the corresponding method
+  sub click_function {
+    my ($event, $widget, $additional, $arguments) = @_;
+    print STDERR "the signal came from " . ref($widget) . "\n";
+    do_stuff(...)
+  }
+
 Connects an action to a signal.
 
-  input  : HASH, key is the signal_name, value is thecode reference to be executed
+  input  : STRING, signal_name,
+           CODEREF, code reference to be executed,
+           LIST, additional arguments
   output : HASH, keys are siagnal names, values are signal classes
 
 =cut
 
 sub signal_connect {
 	my $self = shift;
-	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
-												      { type => CODEREF },
-												);
-	$self->_bind_signal($signal_name, $code_ref);
+	my ($signal_name, $code_ref, @arguments) = validate_pos( @_, { type => SCALAR },
+															     { type => CODEREF },
+															     (0) x (@_ - 2),
+														   );
+	$self->_bind_signal($signal_name, $code_ref, @arguments);
 	return $self;
 }
 
 sub _bind_signal {
 	my $self = shift;
-	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
-												     { type => CODEREF },
-											   );
+	my ($signal_name, $code_ref, @arguments) = validate_pos( @_, { type => SCALAR },
+															     { type => CODEREF },
+															     (0) x (@_ - 2),
+														   );
 	my %signals = $self->possible_signals();
 	my $signal_class = $signals{$signal_name};
 	defined $signal_class
@@ -803,6 +820,7 @@ sub _bind_signal {
 	  or die $@;
 	$self->add_event_listener($signal_class->generate_listener( widget => $self,
 																code_ref => $code_ref,
+																arguments => [ @arguments ],
 															  )
 							 );
 	return $self;
