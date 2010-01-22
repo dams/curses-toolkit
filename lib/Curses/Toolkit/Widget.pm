@@ -229,7 +229,8 @@ sub _get_theme_properties_definition {
   $widget->add_event_listener($event_listener);
 
 Adds an event listener to the widget. That allows the widget to respond to some
-events
+events. You probably don't want to use this method. Please see signal_connect
+and possible_signals below.
 
   input : a Curses::Toolkit::EventListener
   output : the root window
@@ -745,6 +746,18 @@ sub _recursive_f2 {
 # }
 
 
+=head2 possible_signals
+
+my @signals = keys $widget->possible_signals();
+
+returns the possible signals that can be used. See S<signal_connect> to bind
+signals to action
+
+  input  : none
+  output : HASH, keys are signal names, values are signal classes
+
+=cut
+
 # default widget signals
 sub possible_signals {
 	my ($self) = @_;
@@ -753,14 +766,45 @@ sub possible_signals {
 	return ();
 }
 
+=head2 possible_signals
+
+  $widget->signal_connect(
+      clicked => sub { do_something }
+  );
+
+Connects an action to a signal.
+
+  input  : HASH, key is the signal_name, value is thecode reference to be executed
+  output : HASH, keys are siagnal names, values are signal classes
+
+=cut
+
 sub signal_connect {
 	my $self = shift;
 	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
 												      { type => CODEREF },
 												);
-#	my %s = $self->_possible_signal_names();
-	
 	$self->_bind_signal($signal_name, $code_ref);
+	return $self;
+}
+
+sub _bind_signal {
+	my $self = shift;
+	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
+												     { type => CODEREF },
+											   );
+	my %signals = $self->possible_signals();
+	my $signal_class = $signals{$signal_name};
+	defined $signal_class
+	  or die "signal '$signal_name' doesn't exists for widget of type " . ref($self) . ". Possible signals are : " . join(', ', keys %signals);
+
+	require UNIVERSAL::require;
+	$signal_class->require
+	  or die $@;
+	$self->add_event_listener($signal_class->generate_listener( widget => $self,
+																code_ref => $code_ref,
+															  )
+							 );
 	return $self;
 }
 

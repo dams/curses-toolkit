@@ -174,7 +174,8 @@ sub get_minimum_space {
 
 my @signals = keys $button->possible_signals();
 
-returns the possible signals that can be used
+returns the possible signals that can be used. See
+L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
 
   input  : none
   output : HASH, keys are siagnal names, values are signal classes
@@ -186,26 +187,6 @@ sub possible_signals {
 	return ( $self->SUPER::possible_signals(),
 			 clicked => 'Curses::Toolkit::Signal::Clicked',
 		   );
-}
-
-sub _bind_signal {
-	my $self = shift;
-	my ($signal_name, $code_ref) = validate_pos( @_, { type => SCALAR },
-												     { type => CODEREF },
-											   );
-	my %signals = $self->possible_signals();
-	my $signal_class = $signals{$signal_name};
-	defined $signal_class
-	  or die "signal '$signal_name' doesn't exists for widget of type " . ref($self) . ". Possible signals are : " . join(', ', keys %signals);
-
-	require UNIVERSAL::require;
-	$signal_class->require
-	  or die $@;
-	$self->add_event_listener($signal_class->generate_listener( widget => $self,
-																code_ref => $code_ref,
-															  )
-							 );
-	return $self;
 }
 
 =head1 Theme related properties
