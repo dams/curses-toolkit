@@ -6,14 +6,7 @@ package Curses::Toolkit;
 
 use Params::Validate qw(:all);
 
-#use Exporter;
-#our @EXPORT_OK = qw(untag);
-
 use Curses::Toolkit::Theme;
-
-#sub untag {
-#	return Curses::Toolkit::Theme::_untag(@_);
-#}
 
 =head1 SYNOPSIS
 
@@ -177,37 +170,11 @@ sub init_root_window {
 
 	if (has_colors) {
 		start_color();
-# 		print STDERR "color is supported\n";
-# 		print STDERR "colors number : " . COLORS . "\n";
-# 		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-# 		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+#  		print STDERR "color is supported\n";
+#  		print STDERR "colors number : " . COLORS . "\n";
+#  		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
+#  		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
 
-#  	my $pair_nb = 1;
-#  	foreach my $bg_nb (0..COLORS()-1) {
-#  		foreach my $fg_nb (0..COLORS()-1) {
-#  #			print STDERR "color pairing : $pair_nb, $fg_nb, $bg_nb \n";
-#  			init_pair($pair_nb, $fg_nb, $bg_nb);
-#  			$pair_nb++;
-#  		}
-#  	}
-
-# 	my $curses = $curses_handler;
-# 	foreach my $x (0..7) {
-# 		$curses->addstr(0, ($x+1)*3, $x);
-# 	}
-# 	foreach my $y (0..7) {
-# 		$curses->addstr($y+1, 0, $y);
-# 	}
-
-# 	my $pair = 1;
-# 	foreach my $x (0..7) {
-# 		foreach my $y (0..7) {
-# 			COLOR_PAIR($pair);
-# 			$curses->attrset(COLOR_PAIR($pair));
-# 			$curses->addstr($y+1, ($x+1)*3, "$x$y");
-# 			$pair++;
-# 		}
-# 	}
 
 	}
 
@@ -216,26 +183,14 @@ sub init_root_window {
 	my $old_mouse_mask;
 	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask); 
 
-    # curses basic init
-#    Curses::noecho();
-#    Curses::cbreak();
-#    curs_set(0);
-#    Curses::leaveok(1);
-
-#$curses_handler->erase();
-
     # erase the window if asked.
 #    print STDERR Dumper($params{clear}); use Data::Dumper;
 #    $params{clear} and $curses_handler->erase();
     
-#    use Curses::Toolkit::Widget::Container;
-#    my $container = Curses::Toolkit::Widget::Warper->new();
-
 	use Curses::Toolkit::Theme::Default;
 	use Curses::Toolkit::Theme::Default::Color::Yellow;
 	use Curses::Toolkit::Theme::Default::Color::Pink;
 	use Tie::Array::Iterable;
-#	$params{theme_name} ||= (has_colors() ? 'Curses::Toolkit::Theme::Default::Color::Pink' : 'Curses::Toolkit::Theme::Default');
 	$params{theme_name} ||= Curses::Toolkit->get_default_theme_name();
 	my @windows = ();
     my $self = bless { initialized => 1, 
@@ -247,7 +202,6 @@ sub init_root_window {
 					   event_listeners => [],
 					   window_iterator => undef,
                      }, $class;
-#	$self->{iterator} = $self->{windows}->forward_from();
 	$self->_recompute_shape();
 
 	use Curses::Toolkit::EventListener;
@@ -375,9 +329,11 @@ sub init_root_window {
 sub get_default_theme_name {
 	my ($class) = @_;
 	return (has_colors() ?
-			  'Curses::Toolkit::Theme::Default::Color::Pink'
+			  'Curses::Toolkit::Theme::Default::Color::Yellow'
 			: 'Curses::Toolkit::Theme::Default'
 		   );
+#			  'Curses::Toolkit::Theme::Default::Color::Yellow'
+#			  'Curses::Toolkit::Theme::Default::Color::Pink'
 }
 
 
@@ -579,7 +535,6 @@ sub add_window {
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
     push @{$self->{windows}}, $window;
-#	print STDERR Dumper(tied(@{$self->{windows}})); use Data::Dumper;
 	$self->{window_iterator} ||= $self->{windows}->forward_from();
 	$self->needs_redraw();
 	return $self;
@@ -604,9 +559,6 @@ sub bring_window_to_front {
 	my $last_stack = $self->{last_stack};
 	$last_stack % 5 == 0
 	  and $self->{last_stack} = $self->_cleanup_windows_stacks();
-
-#	print STDERR Dumper( [ map { $_->get_property(window => 'stack') } $self->get_windows() ] ); use Data::Dumper;
-#	print STDERR $self->{last_stack};
 
 	$self->needs_redraw();
 	return $self;

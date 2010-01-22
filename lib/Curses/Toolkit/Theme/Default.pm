@@ -94,9 +94,9 @@ sub RESIZE_NORMAL  { }
 sub RESIZE_FOCUSED { shift->_attron(A_REVERSE) }
 sub RESIZE_CLICKED { shift->_attron(A_BOLD) }
 
-sub BLANK_NORMAL  { shift->_attrset() }
-sub BLANK_FOCUSED { shift->_attrset() }
-sub BLANK_CLICKED { shift->_attrset() }
+sub BLANK_NORMAL  { shift->_set_colors('white', 'black') }
+sub BLANK_FOCUSED { shift->_set_colors('white', 'black') }
+sub BLANK_CLICKED { shift->_set_colors('white', 'black') }
 
 sub draw_hline {
 	my ($self, $x1, $y1, $width, $attr) = @_;

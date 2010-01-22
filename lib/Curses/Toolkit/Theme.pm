@@ -5,6 +5,7 @@ package Curses::Toolkit::Theme;
 # ABSTRACT: base class for widgets themes
 
 use Params::Validate qw(:all);
+use Curses;
 
 =head1 DESCRIPTION
 
@@ -16,14 +17,85 @@ None, this is an abstract class
 
 =cut
 
+# service color initialization;
+my $color_initialized = 0;
+
 sub new {
     my $class = shift;
 	my ($widget) = validate_pos(@_, { isa => 'Curses::Toolkit::Widget' });
     $class eq __PACKAGE__ and die "abstract class";
 	my $self =  bless { widget => $widget }, $class;
 	$self->set_property(ref $widget, $self->_get_default_properties(ref $widget));
+	$color_initialized or $class->_init_themes_colors();
 	return $self;
 }
+
+sub default_fgcolor { 'white' }
+sub default_bgcolor { 'black' }
+
+my %colors_to_pair;
+
+sub _init_themes_colors {
+	my ($class) = @_;
+	if (has_colors()) {
+		# default color 0, can't be changed.
+		$colors_to_pair{'white'}{'black'} = 0;
+		# define all posisble color
+		my $counter = 1;
+		my %colors_to_curses_colors = ( black => COLOR_BLACK,
+										red => COLOR_RED,
+										green => COLOR_GREEN, 
+										yellow => COLOR_YELLOW, 
+										blue => COLOR_BLUE, 
+										magenta => COLOR_MAGENTA, 
+										cyan => COLOR_CYAN, 
+										white => COLOR_WHITE,
+									  );
+		my @color = keys %colors_to_curses_colors;
+		foreach my $fgcolor (@color) {
+			foreach my $bgcolor (@color) {
+				$fgcolor eq 'white' && $bgcolor eq 'black'
+				  and next;
+				init_pair($counter, $colors_to_curses_colors{$fgcolor}, $colors_to_curses_colors{$bgcolor});
+				$colors_to_pair{$fgcolor}{$bgcolor} = COLOR_PAIR($counter);
+				$counter++;
+			}
+		}
+		$color_initialized = 1;
+	}
+}
+
+sub _set_fgcolor{
+	my ($self, $fgcolor) = @_;
+	$self->{_fgcolor} = $fgcolor;
+	return $self;
+}
+
+sub _set_bgcolor {
+	my ($self, $bgcolor) = @_;
+	$self->{_bgcolor} = $bgcolor;
+	my ($package, $filename, $line) = caller;
+	return $self;
+}
+
+sub _set_colors {
+	my ($self, $fgcolor, $bgcolor) = @_;
+	$self->_set_bgcolor($bgcolor);
+	$self->_set_fgcolor($fgcolor);
+	return $self;
+}
+
+sub _get_fg_color { shift->{_fgcolor}; }
+
+sub _get_bg_color { shift->{_bgcolor}; }
+
+sub _get_color_pair {
+	my ($self) = @_;
+	has_colors()
+	  or die "Color is not supported by your terminal";
+	return $colors_to_pair{$self->_get_fg_color()}{$self->_get_bg_color()};
+}
+
 
 =head2 set_property
 
@@ -218,13 +290,15 @@ sub _get_curses_handler {
 
 sub _compute_attributes {
 	my ($self, $type, $attr) = @_;
+	# reset display attributes
 	$self->_get_curses_handler()->attrset(0);
 	$attr ||= { };
+	$self->_set_fgcolor($self->default_fgcolor());
+	$self->_set_bgcolor($self->default_bgcolor());
+
+	# get the type of attributes we want, and call the method
 	my $method = $type . '_NORMAL';
 	$self->$method();
-# 	if ( ! $self->get_widget()->is_visible() ) {
-# 		$method = $type . '_INVISIBLE';
-# 	}
 	if ( ( $self->get_widget()->isa('Curses::Toolkit::Role::Focusable') &&
 		   $self->get_widget()->is_focused() )
 		 || delete $attr->{focused}
@@ -236,7 +310,7 @@ sub _compute_attributes {
 		$method = $type . '_CLICKED';
 		$self->$method();
 	}
-	use Curses;
+	# check if additional attributes need to be applied
 	if (exists $attr->{bold}) {
 		$attr->{bold} and $self->_attron(A_BOLD);
 		$attr->{bold} or  $self->_attroff(A_BOLD);
@@ -245,12 +319,21 @@ sub _compute_attributes {
 		$attr->{reverse} and $self->_attron(A_REVERSE);
 		$attr->{reverse} or  $self->_attroff(A_REVERSE);
 	}
+	if (exists $attr->{fgcolor}) {
+		$self->_set_fgcolor($attr->{fgcolor});
+	}
+	if (exists $attr->{bgcolor}) {
+		$self->_set_bgcolor($attr->{bgcolor});
+	}
+	has_colors() and
+	  $self->_get_curses_handler()->attron($self->_get_color_pair());
 	return;
 }
 
 sub _attron {
 	my $self = shift;
 	$self->_get_curses_handler()->attron(@_);
+	return $self;
 }
 
 sub _attroff {
@@ -282,31 +365,33 @@ sub _addstr_with_tags {
 		my ($char, @attrs) = @$element;
 		$self->_compute_attributes($type, $initial_attr);
 		my $value = 0;
-		my ($curr_fg, $curr_bg);
-		pair_content(1, $curr_fg, $curr_bg);
+
+
+	my %weight_to_const = ( normal => A_NORMAL,
+							standout => A_STANDOUT,
+							underline => A_UNDERLINE,
+							reverse => A_REVERSE,
+							blink => A_BLINK,
+							dim => A_DIM,
+							bold => A_BOLD );
+
 		foreach my $attr (@attrs) {
 			my $weight = $attr->{weight};
-			defined $weight && $weight == 0 and $value = 0;
-			defined $weight and $value = ($value | $weight);
+			if (defined $weight && $weight) {
+				$value = ($value | $weight_to_const{$weight});
+				$weight eq 'normal'
+				  and $value = 0;
+			}
 
-			my ($fgcolor, $bgcolor) = ($curr_fg, $curr_bg);
  			defined $attr->{fgcolor}
- 			  and $fgcolor = $attr->{fgcolor};
+ 			  and $self->_set_fgcolor($attr->{fgcolor});
  			defined $attr->{bgcolor}
- 			  and $bgcolor = $attr->{bgcolor};
-		if (defined $attr->{fgcolor} || defined $attr->{bgcolor}) {
-			init_pair(63, $fgcolor, $bgcolor);
-			$value = ($value | COLOR_PAIR(63));
+ 			  and $self->_set_bgcolor($attr->{bgcolor});
 		}
-#			init_pair(1, COLOR_RED, COLOR_BLACK);
-#			$value = ($value | COLOR_PAIR(1));
-
-		}
+		has_colors() and
+		  $value = ($value | $self->_get_color_pair());
 		$curses->attron($value);
-#		print STDERR "COLOR : " . Dumper(COLOR_PAIRS); use Data::Dumper;
 		$curses->addstr($y, $x, $char);
-		init_pair(1, $curr_fg, $curr_bg);
-
 		$x++;
 	}
 	return $self;

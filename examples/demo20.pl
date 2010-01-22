@@ -31,9 +31,9 @@ sub main {
 	);
 
 #	my $label = Curses::Toolkit::Widget::Label->new->set_text("<b>AAAAA BBBBB CCCCC DDDDD EEEEE FFFFF GGGGG</b>");
- 	my $label = Curses::Toolkit::Widget::Label->new->set_text("This is <span weight='underline'>underlined text <span weight='bold'>very bold</span> chunk </span> chunk");
+ 	my $label = Curses::Toolkit::Widget::Label->new->set_text("This is <span weight='underline'>underlined text <span weight='bold'>underlined + bold</span> chunk </span> chunk");
  	my $label2 = Curses::Toolkit::Widget::Label->new->set_text("This is <span fgcolor='blue'>in blue, <span bgcolor='red'>red background </span> and blue again</span> chunk");
- 	my $label3 = Curses::Toolkit::Widget::Label->new->set_text("This is a <span bgcolor='red'>red background </span> chunk");
+ 	my $label3 = Curses::Toolkit::Widget::Label->new->set_text("This is a <span weight='bold'>bold <span weight='normal'>then normal</span> then back to bold</span> chunk");
 	$window->add_widget(
 		my $vbox = Curses::Toolkit::Widget::VBox->new()
 		  ->pack_end($label, { expand => 0 })

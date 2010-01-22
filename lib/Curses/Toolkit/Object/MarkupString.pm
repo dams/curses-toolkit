@@ -75,23 +75,23 @@ sub _recompute {
 
 	use HTML::Parser;
 
-	my %text_to_const = ( normal => A_NORMAL,
-						  standout => A_STANDOUT,
-						  underline => A_UNDERLINE,
-						  reverse => A_REVERSE,
-						  blink => A_BLINK,
-						  dim => A_DIM,
-						  bold => A_BOLD );
+# 	my %text_to_const = ( normal => A_NORMAL,
+# 						  standout => A_STANDOUT,
+# 						  underline => A_UNDERLINE,
+# 						  reverse => A_REVERSE,
+# 						  blink => A_BLINK,
+# 						  dim => A_DIM,
+# 						  bold => A_BOLD );
 
-	my %text_to_color = (black => COLOR_BLACK,
-						 red => COLOR_RED,
-						 green => COLOR_GREEN,
-						 yellow => COLOR_YELLOW,
-						 blue => COLOR_BLUE,
-						 magenta => COLOR_MAGENTA,
-						 cyan => COLOR_CYAN,
-						 white => COLOR_WHITE,
-						);
+# 	my %text_to_color = (black => COLOR_BLACK,
+# 						 red => COLOR_RED,
+# 						 green => COLOR_GREEN,
+# 						 yellow => COLOR_YELLOW,
+# 						 blue => COLOR_BLUE,
+# 						 magenta => COLOR_MAGENTA,
+# 						 cyan => COLOR_CYAN,
+# 						 white => COLOR_WHITE,
+# 						);
 	my @struct;
 
 	my @current_attrs;
@@ -104,13 +104,13 @@ sub _recompute {
 						   if      ($tagname eq 'span') {
 							   push @stack, $tagname;
 
-							   my $weight = $text_to_const{$attr->{weight}};
+							   my $weight = $attr->{weight}; #$text_to_const{$attr->{weight} || 'normal'};
 							   if (defined $weight) {
 								   $struct{weight} = $weight;
 							   }
 
-							   my $fgcolor = defined $attr->{fgcolor} ? $text_to_color{$attr->{fgcolor}} : undef;
-							   my $bgcolor = defined $attr->{bgcolor} ? $text_to_color{$attr->{bgcolor}} : undef;
+							   my $fgcolor = defined $attr->{fgcolor} ? $attr->{fgcolor} : undef; #$text_to_color{$attr->{fgcolor}}
+							   my $bgcolor = defined $attr->{bgcolor} ? $attr->{bgcolor} : undef; #$text_to_color{$attr->{bgcolor}}
 
 							   defined $fgcolor
 								 and $struct{fgcolor} = $fgcolor;
