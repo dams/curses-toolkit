@@ -378,7 +378,12 @@ sub _addstr_with_tags {
 		foreach my $attr (@attrs) {
 			my $weight = $attr->{weight};
 			if (defined $weight && $weight) {
-				$value = ($value | $weight_to_const{$weight});
+				my $v = $weight_to_const{$weight};
+				if (defined $v) {
+					$value = ($value | $v);
+				} else {
+					warn "WARNING : you used this string as value for the 'weight' attribute in one of the <span> tags in your strings : '$weight'. However it's not supported. Available 'weight' values are : " . join(', ', keys %weight_to_const);
+				}
 				$weight eq 'normal'
 				  and $value = 0;
 			}
