@@ -723,21 +723,19 @@ sub display {
   $root->dispatch_event($event);
 
 Given an event, dispatch it to the appropriate widgets / windows, or to the
-root window. You probably don't want to use this method.
+root window. You probably don't want to use this method directly. Use Signals instead.
 
   input  : a Curses::Toolkit::Event
-           optional, a widget. if given, the event will apply on it only
-           optional, boolean. if true the event won't check parent widgets
+           optional, a widget. if given, the event dispatching will start with this wisget (and not the focused one)
   output : true if the event were handled, false if not
 
 =cut
 
 sub dispatch_event {
 	my $self = shift;
-	my ($event, $widget, $dont_dispatch_further) = 
+	my ($event, $widget) = 
 	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
 				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
-				       { type => BOOLEAN, optional => 1 },
 				  );
 
 	if (! defined $widget) {
@@ -750,10 +748,13 @@ sub dispatch_event {
 	while ( 1 ) {
 		foreach my $listener (grep { $_->is_enabled() } $widget->get_event_listeners()) {
 			if ($listener->can_handle($event)) {
-				return $listener->send_event($event, $widget);
+				$listener->send_event($event, $widget);
+				$event->can_propagate()
+				  or return 1;
 			}
 		}
-		$dont_dispatch_further and return;
+		$event->restricted_to_widget()
+		  and return;
 		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
 			$widget = $widget->get_root_window();
 		} elsif ($widget->isa('Curses::Toolkit::Widget')) {
@@ -768,28 +769,26 @@ sub dispatch_event {
 
 =head2 fire_event
 
-  $widget->fire_event($event, $widget, 1);
+  $widget->fire_event($event, $widget);
 
 Sends an event to the mainloop so it gets dispatched. You probably don't want
 to use this method.
 
   input  : a Curses::Toolkit::Event
-           optional, a widget. if given, the event will apply on it only
-           optional, boolean. if true the event won't check parent widgets
+           optional, a widget. if given, the event dispatching will start with this wisget (and not the focused one)
   output : the root_window
 
 =cut
 
 sub fire_event {
 	my $self = shift;
-	my ($event, $widget, $dont_dispatch_further) = 
+	my ($event, $widget) = 
 	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
 				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
-				       { type => BOOLEAN, optional => 1 },
 				  );
 	my $mainloop = $self->get_mainloop();
 	defined $mainloop or return $self;
-	$mainloop->stack_event($event, $widget, $dont_dispatch_further);
+	$mainloop->stack_event($event, $widget);
 	return $self;
 }
 

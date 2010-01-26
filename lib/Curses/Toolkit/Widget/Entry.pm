@@ -178,9 +178,11 @@ sub set_text {
 	$self->{text} = $text;
 
 	use Curses::Toolkit::Event::Content::Changed;
-	my $event = Curses::Toolkit::Event::Content::Changed->new();
+	my $event = Curses::Toolkit::Event::Content::Changed
+	            ->new
+				->enable_restriction;
 	# sends event to be managed by the mainloop and redispatched
-	$self->fire_event($event, $self, 1);
+	$self->fire_event($event, $self);
 
 	return $self;
 }
@@ -337,11 +339,13 @@ sub draw {
 	my $c = $self->get_coordinates();
 	my $text = $self->get_text();
 
-# TODO : theme this !
+	my $left_enclosing = $self->get_theme_property('left_enclosing');
+	my $right_enclosing = $self->get_theme_property('right_enclosing');
+
 	my $w1 = $c->width();
-	my $w2 = $w1 - 2;
-	my $o1 = 1;
-	my $o2 = $w1 - 1;
+	my $w2 = $w1 - length($left_enclosing) - length($right_enclosing);
+	my $o1 = length $left_enclosing;
+	my $o2 = $w1 - length $right_enclosing;
 
 	# prepare the background text
 	my $display_text = '_' x $w2;
@@ -352,8 +356,8 @@ sub draw {
 		# put the background text below it
 		substr($display_text, 0, length($t)) = $t;
 
-		$theme->draw_string($c->x1(), $c->y1(), '[');
-		$theme->draw_string($c->x1() + $o2, $c->y1(), ']');
+		$theme->draw_string($c->x1(), $c->y1(), $left_enclosing);
+		$theme->draw_string($c->x1() + $o2, $c->y1(), $right_enclosing);
 		$theme->draw_string($c->x1() + $o1, $c->y1(), $display_text);
 
 	} else {
@@ -370,8 +374,8 @@ sub draw {
 		my $t2 = substr($display_text, $relative_cursor_position, 1);
 		my $t3 = substr($display_text, $relative_cursor_position + 1);
 
-		$theme->draw_string($c->x1(), $c->y1(), '[', { reverse => 0 });
-		$theme->draw_string($c->x1() + $o2, $c->y1(), ']', { reverse => 0 });
+		$theme->draw_string($c->x1(), $c->y1(), $left_enclosing, { reverse => 0 });
+		$theme->draw_string($c->x1() + $o2, $c->y1(), $right_enclosing, { reverse => 0 });
 		$theme->draw_string($c->x1() + $o1, $c->y1(), $t1, { reverse => 0 });
 		$theme->draw_string($c->x1() + $o1 + length($t1), $c->y1(), $t2, { reverse => 1 } );
 		$theme->draw_string($c->x1() + $o1 + length($t1) + 1, $c->y1(), $t3, { reverse => 0 } );
@@ -418,7 +422,8 @@ sub get_minimum_space {
 	my ($self, $available_space) = @_;
 
 	my $minimum_space = $available_space->clone();
-	$minimum_space->set( x2 => $available_space->x1() + 3,
+	my $default_width = $self->get_theme_property('default_width');
+	$minimum_space->set( x2 => $available_space->x1() + $default_width,
 						 y2 => $available_space->y1() + 1,
 					   );
 	return $minimum_space;
@@ -443,35 +448,62 @@ sub possible_signals {
 		   );
 }
 
-# =head1 Theme related properties
+=head1 Theme related properties
 
-# To set/get a theme properties, you should do :
+To set/get a theme properties, you should do :
 
-# $entry->set_theme_property(property_name => $property_value);
-# $value = $entry->get_theme_property('property_name')
+$entry->set_theme_property(property_name => $property_value);
+$value = $entry->get_theme_property('property_name')
 
-# Here is the list of properties related to the entry, that can be changed in
-# the associated theme. See the Curses::Toolkit::Theme class used for the default
-# (default class to look at is Curses::Toolkit::Theme::Default)
+Here is the list of properties related to the entry, that can be changed in
+the associated theme. See the Curses::Toolkit::Theme class used for the default
+(default class to look at is Curses::Toolkit::Theme::Default)
 
-# Don't forget to look at properties from the parent class, as these are also
-# inherited of !
+Don't forget to look at properties from the parent class, as these are also
+inherited of !
 
-# =head2 default_width
+=head2 default_width
 
-# Sets the value of the width of the entry by default.
+Sets the value of the width of the entry by default.
 
-# =cut
+=head2 left_enclosing
 
-# sub _get_theme_properties_definition {
-# 	my ($self) = @_;
-# 	return { %{$self->SUPER::_get_theme_properties_definition() },
-# 			 default_width => {
-# 			   optional => 0,
-# 			   type => SCALAR,
-# 			   callbacks => { "positive integer" => sub { $_[0] >= 0 } }
-# 			 },
-# 		   }
-# }
+The string to be displayed at the left of the button. Usually some enclosing characters.
+
+Example :
+  # set left enclosing
+  $entry->set_theme_property(left_enclosing => '< ' );
+  $entry->set_theme_property(left_enclosing => '[ ' );
+
+=head2 right_enclosing
+
+The string to be displayed at the right of the button. Usually some enclosing characters.
+
+Example :
+  # set left enclosing
+  $entry->set_theme_property(left_enclosing => ' >' );
+  $entry->set_theme_property(left_enclosing => ' ]' );
+
+=cut
+
+
+sub _get_theme_properties_definition {
+	my ($self) = @_;
+	return { %{$self->SUPER::_get_theme_properties_definition() },
+			 default_width => {
+			   optional => 0,
+			   type => SCALAR,
+			   callbacks => { "positive integer" => sub { $_[0] >= 0 } },
+			 },
+			 left_enclosing => {
+			   optional => 0,
+			   type => SCALAR,
+			 },
+			 right_enclosing => {
+			   optional => 0,
+			   type => SCALAR,
+			 },
+		   }
+}
 
 1;

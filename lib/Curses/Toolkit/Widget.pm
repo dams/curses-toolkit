@@ -282,7 +282,6 @@ to use this method. Please see signal_connect and possible_signals instead.
 
   input  : a Curses::Toolkit::Event
            optional, a widget. if given, the event will apply on it only
-           optional, boolean. if true the event won't check parent widgets
   output : the widget
 
 =cut

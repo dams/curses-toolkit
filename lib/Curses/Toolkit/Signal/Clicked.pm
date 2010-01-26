@@ -38,7 +38,9 @@ sub generate_listener {
 			'Curses::Toolkit::Event::Key' => sub { 
 				my ($event) = @_;
 				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq ' ' or return 0;
+				   $event->{params}{key} eq ' '    # space key
+				|| $event->{params}{key} eq '<^M>' # enter key
+				   or return 0;
 				return 1;
 			},
 			'Curses::Toolkit::Event::Mouse::Click' => sub { 

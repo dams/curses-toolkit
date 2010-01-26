@@ -64,13 +64,18 @@ sub set_focus {
 		if (defined $window) {
 			if ($focus) {
 				use Curses::Toolkit::Event::Focus::In;
-				my $event_focus_in = Curses::Toolkit::Event::Focus::In->new();
-				$self->fire_event($event_focus_in, $self, 1);
+				# restrict the event to the widget
+				my $event_focus_in = Curses::Toolkit::Event::Focus::In
+				                     ->new
+									 ->enable_restriction;
+				$self->fire_event($event_focus_in, $self);
 				$window->set_focused_widget($self);
 			} else {
 				use Curses::Toolkit::Event::Focus::Out;
-				my $event_focus_out = Curses::Toolkit::Event::Focus::Out->new();
-				$self->fire_event($event_focus_out, $self, 1);
+				my $event_focus_out = Curses::Toolkit::Event::Focus::Out
+				                      ->new
+									  ->enable_restriction;
+				$self->fire_event($event_focus_out, $self);
 			}
 		}
 	}

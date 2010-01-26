@@ -16,8 +16,8 @@ The Curses::Toolkit::Widget::Button widget is a classical button widget, used
 to attach a function that is called when the button is pressed.
 
 This widget cannot hold any widget. If you want a button with a specific
-widget, please use L<Curses::Toolkit::Widget::GenericButton>, however it will
-use more space in your inerface
+widget, please use L<Curses::Toolkit::Widget::GenericButton>, however it may
+use more space in your interface
 
 =head1 CONSTRUCTOR
 
@@ -235,11 +235,11 @@ sub _get_theme_properties_definition {
 	my ($self) = @_;
 	return { %{$self->SUPER::_get_theme_properties_definition() },
 			 left_enclosing => {
-			   optional => 1,
+			   optional => 0,
 			   type => SCALAR,
 			 },
 			 right_enclosing => {
-			   optional => 1,
+			   optional => 0,
 			   type => SCALAR,
 			 },
 		   }

@@ -54,9 +54,11 @@ sub _get_default_properties {
 #  					'Curses::Toolkit::Widget::Paned' => {
 #  					  gutter_size => 1,
 #  					},
-# 					'Curses::Toolkit::Widget::Entry' => {
-# 					  default_width => 20,
-# 					},
+ 					'Curses::Toolkit::Widget::Entry' => {
+ 					  default_width => 3,
+					  left_enclosing => '[[',
+					  right_enclosing => ']]',
+ 					},
 				  );
 	return $default{$class_name} || {};
 }
