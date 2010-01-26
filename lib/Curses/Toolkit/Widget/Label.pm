@@ -12,7 +12,89 @@ use Curses::Toolkit::Object::MarkupString;
 
 =head1 DESCRIPTION
 
-This widget consists of a text label
+This widget consists of a text label. This widget is more powerful than it
+seems : it supports line wrapping, and color, bold, underline, etc.
+
+=head1 MARKUPS SUPPORT
+
+To be able to have more than simple text, the Label widget supports markup tags
+in its text, for example :
+
+  'foo <u>underlined bar</u> <span fgcolor="blue"> blue text <span
+   bgcolor="red"> blue on red </span> normal on red </span> <b>bold</b>.'
+
+=over
+
+=item <u>
+
+  <u>underlined string</u>
+
+The <u> tag makes the enclosing text underlined
+
+=item <b>
+
+  <b>bold string</b>
+
+The <b> tag makes the enclosing text bold
+
+=item <span>
+
+The <span> tag allows more attributes to be set. Attributes can of course be combined :
+
+  <span wight="blink" fgcolor="black" bgcolor="red">Warning text!</span>
+
+There is the list of attributes :
+
+=over
+
+=item weight
+
+  <span weight="reverse">some reverse string</span>
+
+Specifies display attributes. Weight values can be :
+
+  normal : force some text back to normal
+  standout : enable standout property
+  underline : enable underline property
+  blink : enable blink property
+  dim : enable dim property
+  bold : enable bold property
+
+Somme properties may be unsupported on your terminal.
+
+=item fgcolor
+
+  <span fgcolor="blue">some blue text</span>
+
+Change the foreground color. values can be :
+
+  black
+  red
+  green
+  yellow
+  blue
+  magenta
+  cyan
+  white
+
+=item bgcolor
+
+  <span bgcolor="red">some red background text</span>
+
+Change the foreground color. values can be :
+
+  black
+  red
+  green
+  yellow
+  blue
+  magenta
+  cyan
+  white
+
+=back
+
+=back
 
 =head1 CONSTRUCTOR
 
@@ -37,7 +119,8 @@ sub new {
 
 =head2 set_text
 
-Set the text of the label
+Set the text of the label. The text can be either normal text, or text with
+markups, to display colors, bold, underline, etc., see Markup Support above
 
   input  : the text
   output : the label object
