@@ -64,7 +64,7 @@ Enable propagation of the event to other matching listeners
 
 sub enable_propagation {
 	my ($self) = @_;
-	$self->{can_propagate} = 0;
+	$self->{can_propagate} = 1;
 	return $self;
 }
 
@@ -76,7 +76,7 @@ Disable propagation of the event to other matching listeners
 
 sub disable_propagation {
 	my ($self) = @_;
-	$self->{can_propagate} = 1;
+	$self->{can_propagate} = 0;
 	return $self;
 }
 
