@@ -10,6 +10,12 @@ use Params::Validate qw(:all);
 
 use Curses::Toolkit::Object::Coordinates;
 
+=head1 Appearence
+
+  +----------+
+  |          |
+  +----------+
+
 =head1 DESCRIPTION
 
 This widget consists of a border, and a child widget in that border

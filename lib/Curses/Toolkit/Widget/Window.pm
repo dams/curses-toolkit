@@ -12,6 +12,20 @@ use List::MoreUtils qw(any none);
 use List::Util qw(min sum max);
 
 
+=head1 Appearence
+
+
+  +-[ title ]------------+
+  |                      |
+  |                      |
+  |                      |
+  |                      |
+  |                      |
+  |                      |
+  |                      |
+  |                      |
+  +----------------------#
+
 =head1 DESCRIPTION
 
 This is a window widget. This widget is important, as it's the only one that

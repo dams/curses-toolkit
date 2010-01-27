@@ -7,6 +7,17 @@ use parent qw(Curses::Toolkit::Widget::Paned);
 
 use Params::Validate qw(:all);
 
+=head1 Appearence
+
+With a border
+
+  +----------+-----------+
+  |          |           |
+  | Widget 1 | Widget 2  |
+  |          |           |
+  |          |           |
+  +----------+-----------+
+
 =head1 DESCRIPTION
 
 This widget contain 2 widgets. The children are packed horizontally.

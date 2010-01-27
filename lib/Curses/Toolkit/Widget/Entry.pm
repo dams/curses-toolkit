@@ -8,6 +8,10 @@ use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(:all);
 
+=head1 Appearence
+
+  [entry text____]
+
 =head1 DESCRIPTION
 
 This widget consists of an entry
@@ -98,6 +102,9 @@ sub new {
 					$entry->move_cursor_position(length($k));
 				}
 				$entry->needs_redraw();
+				# We consume the event, and don't allow it to propagate to
+				# other widgets
+				$event->disable_propagation();
 			},
 		);
 	$self->{key_listener}->disable();

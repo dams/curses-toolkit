@@ -10,6 +10,18 @@ use Params::Validate qw(:all);
 use Curses::Toolkit::Object::Coordinates;
 
 
+=head1 Appearence
+
+Standard theme :
+
+ < A Button >
+
+With a border
+
+  +----------+
+  | A Button |
+  +----------+
+
 =head1 DESCRIPTION
 
 The Curses::Toolkit::Widget::Button widget is a classical button widget, used
