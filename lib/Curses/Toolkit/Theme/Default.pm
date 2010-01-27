@@ -56,8 +56,8 @@ sub _get_default_properties {
 #  					},
  					'Curses::Toolkit::Widget::Entry' => {
  					  default_width => 3,
-					  left_enclosing => '[[',
-					  right_enclosing => ']]',
+					  left_enclosing => '[',
+					  right_enclosing => ']',
  					},
 				  );
 	return $default{$class_name} || {};
