@@ -64,7 +64,8 @@ use. In this case you would do something like :
 
 =head1 WIDGETS
 
-Curses::Toolkit is based on a widget model, inspired by Gtk. I suggest you read the pod of the following widgets :
+Curses::Toolkit is based on a widget model, inspired by Gtk. I suggest you read
+the POD of the following widgets :
 
 =over
 
@@ -78,7 +79,7 @@ Useful to read, it contains the common methods of all the widgets
 
 =item L<Curses::Toolkit::Widget::Label>
 
-To display simple text
+To display simple text, with text colors and attributes
 
 =item L<Curses::Toolkit::Widget::Button>
 

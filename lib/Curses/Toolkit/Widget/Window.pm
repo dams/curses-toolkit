@@ -14,7 +14,37 @@ use List::Util qw(min sum max);
 
 =head1 DESCRIPTION
 
-This is a window widget
+This is a window widget. This widget is important, as it's the only one that
+you can add on the root window. So all your graphical interface should be
+contained in one or more window.
+
+=head1 SYNOPSIS
+
+  # create a window in the center of the screen
+  my $window = Curses::Toolkit::Widget::Window
+    ->new()
+    ->set_name('main_window')
+    ->set_title('This is a title');
+    ->set_coordinates(x1 => '25%', y1 => '25%'
+                      x2 => '75%', y2 => '75%');
+
+  # create a fullscreen window
+  my $window = Curses::Toolkit::Widget::Window
+    ->new()
+    ->set_name('main_window')
+    ->set_theme_property(border_width => 0); # set no border
+    ->set_coordinates(x1 => 0, y1 => 0
+                      x2 => '100%', y2 => '100%');
+
+  # add one widget to the window. You can add only one widget to the window.
+  # See L<Curses::Toolkit::Widget::VBox> and <Curses::Toolkit::Widget::HBox> to
+  # pack widgets
+  $window->add_widget($vbox)
+
+  # add the window to the root window. See L<Curses::Toolkit> to see how to
+  # spawn a root window
+  $root->add_window($window);
+
 
 =head1 CONSTRUCTOR
 
@@ -588,7 +618,15 @@ the associated theme. See the Curses::Toolkit::Theme class used for the default
 (default class to look at is Curses::Toolkit::Theme::Default)
 
 Don't forget to look at properties from the parent class, as these are also
-inherited of !
+inherited from !
+
+=head2 border_width (inherited)
+
+The width of the border of the window.
+
+Example :
+  # set window to have no border
+  $button->set_theme_property(border_width => 0 );
 
 =head2 title_width
 
