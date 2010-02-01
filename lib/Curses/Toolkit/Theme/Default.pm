@@ -175,7 +175,10 @@ sub draw_title {
 	my ($self, $x1, $y1, $text, $attr) = @_;
 	$self->get_widget->is_visible() or return;
 	my $c = $self->restrict_to_shape(x1 => $x1, y1 => $y1, width => length($text), height => 1) or return;
-	$text = substr($text, $c->x1()-$x1, $c->width());
+
+	$c->x1() - $x1 < length $text
+	  or return;
+	$text = substr($text, $c->x1() - $x1, $c->width());
 	defined $text && length $text or return;
 	$self->curses($attr)->addstr($c->y1(), $c->x1(), $text);
 	return $self;

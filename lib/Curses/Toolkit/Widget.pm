@@ -528,6 +528,24 @@ sub get_relatives_coordinates {
 	return $self->{relatives_coordinates};
 }
 
+=head2 get_visible_shape
+
+Gets the Coordinates of the part of the widget which is visible
+
+  input  : none
+  output : the shape (Curses::Toolkit::Object::Coordinates) or void
+
+=cut
+
+sub get_visible_shape {
+	my ($self) = @_;
+	my $shape = $self->get_coordinates->clone;
+	my $parent = $self->get_parent;
+	defined $parent
+	  and $shape->restrict_to($parent->get_visible_shape);
+	return $shape;
+}
+
 =head2 rebuild_all_coordinates
 
   $widget->rebuild_all_coordinates();

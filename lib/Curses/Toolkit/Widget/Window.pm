@@ -485,7 +485,9 @@ sub draw {
 
 	my $o2 = $self->{_title_offset};
 
-	my $title_to_display = substr($title, $o2, $w4 );
+	my $title_to_display = '';
+	$o2 < length $title
+	  and $title_to_display = substr($title, $o2, $w4 );
 	
 
 	my $o1 = 0;
@@ -509,6 +511,25 @@ sub draw {
 
 #	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
 	$theme->draw_resize($c->x2() - 1, $c->y2() - 1, { clicked => $self->{_resize_pressed} } );
+}
+
+=head2 get_visible_shape
+
+Gets the Coordinates of the part of the window which is visible
+
+  input  : none
+  output : the shape (Curses::Toolkit::Object::Coordinates)
+
+=cut
+
+sub get_visible_shape {
+	my ($self) = @_;
+	my $shape = $self->get_coordinates->clone;
+	my $root_window = $self->get_root_window
+	  or return $shape;
+	my $root_shape = $root_window->get_shape;
+	$shape->restrict_to($root_shape);
+	return $shape;
 }
 
 sub _compute_draw_informations {

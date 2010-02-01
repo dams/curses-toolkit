@@ -45,8 +45,6 @@ sub add_widget {
 	  die 'there is already a child widget';
 	$self->_add_child($child_widget);
 	$child_widget->_set_parent($self);
-#	my $coordinates = $self->_get_available_space();
-#	$child_widget->_set_relatives_coordinates($coordinates);
 	# because it's a Bin container, needs to take care of rebuilding coordinates
 	# from top to bottom
 	$self->rebuild_all_coordinates();

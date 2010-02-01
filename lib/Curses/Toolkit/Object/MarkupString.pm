@@ -62,6 +62,8 @@ sub get_attr_struct {
 
 sub stripped_length {
 	my ($self) = @_;
+	$self->{stripped_string}
+	  or return 0;
 	return length $self->{stripped_string};
 }
 
@@ -163,10 +165,12 @@ sub _deep_copy {
 sub substring {
 	my ($self, $start, $width) = @_;
 	my $class = ref $self;
-
+	my $new_stripped_string = '';
+	$start < length($self->{stripped_string})
+	  and $new_stripped_string = substr($self->{stripped_string}, $start, $width);
 	my $r = $class->new_from_computed_string(
 			undef,                                            # markup string
-			substr($self->{stripped_string}, $start, $width), # stripped string
+			$new_stripped_string, # stripped string
 			[ @{$self->{attr_struct}}[$start..$start+$width-1] ], # attr_struct
 		);
 	return $r;

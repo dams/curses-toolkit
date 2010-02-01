@@ -172,7 +172,6 @@ sub get_minimum_space {
 	my $text = $self->get_text();
 
 	my $minimum_space = $available_space->clone();
-# TODO : theme this !
 	my $bw = $self->get_theme_property('border_width');
 	my $left_string = $self->get_theme_property('left_enclosing');
 	my $right_string = $self->get_theme_property('right_enclosing');

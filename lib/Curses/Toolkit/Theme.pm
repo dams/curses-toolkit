@@ -211,10 +211,13 @@ Returns the shape of the root window of this theme instance, or void
 
 sub get_shape {
 	my ($self) = @_;
-	my $root_window = $self->get_root_window()
-	  or return;
-	my $shape = $root_window->get_shape()
-	  or return;
+	my $shape = $self->get_widget->get_visible_shape();
+
+#	my $root_window = $self->get_root_window()
+#	  or return;
+#	my $shape = $root_window->get_shape()
+#	  or return;
+
 	return $shape;
 }
 

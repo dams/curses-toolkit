@@ -16,7 +16,7 @@ use overload
 
 sub _stringify {
 	my ($self) = @_;
-	return ref($self);
+	return $self->width . 'x' . $self->height . '+' . $self->x1 . 'x' . $self->y1;
 }
 
 sub _equals {
@@ -488,7 +488,7 @@ sub is_inside {
 
 =head2 is_in_widget
 
-Return true if the coordinates is in side the give widget
+Return true if the coordinates is inside the given widget
 
   input  : Curses::Toolkit::Widget : the widget
   output : true or false
