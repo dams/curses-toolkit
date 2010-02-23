@@ -47,8 +47,8 @@ has label    => ( rw, isa=>'PROGRESS_BAR_LABEL', lazy_build );
 
 =method new
 
-  input : none
-  output : a Curses::Toolkit::Widget::ProgressBar
+  input:  none
+  output: a Curses::Toolkit::Widget::ProgressBar
 
 =cut
 
@@ -96,13 +96,15 @@ sub draw {
 	return;
 }
 
-=head2 get_desired_space
+=method get_desired_space
 
 Given a coordinate representing the available space, returns the space desired
 The Button desires the minimum size : text length plus the button brackets
 
-  input : a Curses::Toolkit::Object::Coordinates object
-  output : a Curses::Toolkit::Object::Coordinates object
+  input:  a Curses::Toolkit::Object::Coordinates object
+  output: a Curses::Toolkit::Object::Coordinates object
+
+The minimum space is also the desired space.
 
 =cut
 
@@ -145,6 +147,8 @@ L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
   input:  none
   output: HASH, keys are signal names, values are signal classes
 
+The progress bar accepts no signal.
+
 =cut
 
 sub possible_signals {
@@ -178,23 +182,29 @@ Example:
   $button->set_theme_property(border_width => 1 );
 
 
-=head2 left_enclosing
+=head2 default_width
 
-The string to be displayed at the left of the button. Usually some enclosing characters.
+Sets the value of the default width of the progress bar.
 
-Example :
-  # set left enclosing
-  $button->set_theme_property(left_enclosing => '< ' );
-  $button->set_theme_property(left_enclosing => '[ ' );
 
-=head2 right_enclosing
+=head2 char_done
 
-The string to be displayed at the right of the button. Usually some enclosing characters.
+Sets the value of the char used to represent the done portion of the
+progress bar.
 
 Example :
-  # set left enclosing
-  $button->set_theme_property(left_enclosing => ' >' );
-  $button->set_theme_property(left_enclosing => ' ]' );
+  # set char_done
+  $entry->set_theme_property(char_done => '=' );
+
+
+=head2 char_left
+
+Sets the value of the char used to represent the left portion of the
+progress bar.
+
+Example :
+  # set char_left
+  $entry->set_theme_property(char_left => '=' );
 
 =cut
 
