@@ -59,6 +59,13 @@ sub _get_default_properties {
 					  left_enclosing => '[',
 					  right_enclosing => ']',
  					},
+					'Curses::Toolkit::Widget::ProgressBar' => {
+					  # inherited from Border
+					  border_width => 0,
+					  default_width => 12,
+					  char_done => '=',
+					  char_left => '-',
+					},
 				  );
 	return $default{$class_name} || {};
 }
