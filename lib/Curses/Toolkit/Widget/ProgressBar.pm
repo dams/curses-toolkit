@@ -58,22 +58,9 @@ sub _build_position { 0 }
 sub _build_label    { 'percent' }
 
 
-# <----- w1 ---->
-#   <-- w2 --->
-# < button text >
-# --^  o1 
-# ------- o2 --^ 
+=method draw
 
-# <----- w1 ---->
-#   <-- w2 --->
-# < button text >
-# <> wl
-#              <> wr
-# --^  o1 
-# ------- o2 --^ 
-
-
-=head2 draw
+Redraw the progress bar.
 
 =cut
 
@@ -95,6 +82,8 @@ sub draw {
         my $min = $self->get_minimum;
         my $max = $self->get_maximum;
         my $pos = $self->get_position;
+	$pos = $self->get_minimum if $pos < $self->get_minimum;
+	$pos = $self->get_maximum if $pos > $self->get_maximum;
 
         my $done = ($pos-$min)/($max-$min)*$w;
         my $left = ($max-$pos-$min)/($max-$min)*$w;
