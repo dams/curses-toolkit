@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::EventListener;
+
 # ABSTRACT: base class for event listeners
 
 use Params::Validate qw(:all);
@@ -25,13 +26,15 @@ listener can handle this event
 =cut
 
 sub new {
-    my $class = shift;
-    my %params = validate(@_, { accepted_events => { type => HASHREF },
-								code => { type => CODEREF },
-							  }
-                         );
+	my $class  = shift;
+	my %params = validate(
+		@_,
+		{   accepted_events => { type => HASHREF },
+			code            => { type => CODEREF },
+		}
+	);
 	$params{enabled} = 1;
-	return bless { %params }, $class;
+	return bless {%params}, $class;
 }
 
 =head1 METHODS
@@ -49,14 +52,15 @@ sub can_handle {
 	my $self = shift;
 	my ($event) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' } );
 	my $event_class = ref $event;
-#	exists $self->{accepted_events}{$event_class} or return;
-	if (!exists $self->{accepted_events}{$event_class}) {
+
+	#	exists $self->{accepted_events}{$event_class} or return;
+	if ( !exists $self->{accepted_events}{$event_class} ) {
 		eval "require $event_class";
 		$@ and die "failed requireing event class '$event_class'";
 		my $found;
-		foreach my $class_name (keys %{$self->{accepted_events}}) {
+		foreach my $class_name ( keys %{ $self->{accepted_events} } ) {
 			$event_class->isa($class_name)
-			  and $found = $class_name;
+				and $found = $class_name;
 		}
 		defined $found or return;
 		$event_class = $found;
@@ -77,8 +81,8 @@ Returns the result of the event code.
 
 sub send_event {
 	my $self = shift;
-	my ($event, $widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' }, 1 );
-	return $self->{code}->($event, $widget);	
+	my ( $event, $widget ) = validate_pos( @_, { isa => 'Curses::Toolkit::Event' }, 1 );
+	return $self->{code}->( $event, $widget );
 }
 
 =head2 enable
@@ -153,8 +157,8 @@ sub detach {
 	my ($self) = @_;
 	$self->is_attached() or die "the event listener is not attached";
 	my $widget = $self->{attached_to};
-	my $index = $self->{attached_index};
-	if (defined $widget && defined $index) {
+	my $index  = $self->{attached_index};
+	if ( defined $widget && defined $index ) {
 		$widget->_remove_event_listener($index);
 	}
 	delete $self->{attached_to};
@@ -168,17 +172,18 @@ sub detach {
 # output : the event listener
 sub _set_widget {
 	my $self = shift;
-	my ($widget, $index) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' },
-										     { type => BOOLEAN },
-									   );
-	$self->{attached_to} = $widget;
+	my ( $widget, $index ) = validate_pos(
+		@_, { isa => 'Curses::Toolkit::Widget' },
+		{ type => BOOLEAN },
+	);
+	$self->{attached_to}    = $widget;
 	$self->{attached_index} = $index;
 	return $self;
 }
 
 # destroyer
 DESTROY {
-    my ($self) = @_;
+	my ($self) = @_;
 	$self->is_attached() and $self->detach();
 }
 

@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::VScrollBar;
+
 # ABSTRACT: a vertical scrollbar widget
 
 use parent qw(Curses::Toolkit::Widget);
@@ -24,7 +25,7 @@ Curses::Toolkit::Widget::ScrollArea
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new();
+	my $self  = $class->SUPER::new();
 	$self->{visibility_mode} = 'auto';
 	return $self;
 }

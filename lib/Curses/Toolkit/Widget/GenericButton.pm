@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::GenericButton;
+
 # ABSTRACT: a button widget that can hold any other widget
 
 use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
@@ -46,10 +47,7 @@ sub new_with_label {
 	my $class = shift;
 	my ($label_text) = validate_pos( @_, { type => SCALAR } );
 	my $self = $class->new();
-	$self->add_widget( Curses::Toolkit::Widget::Label
-					   ->new()
-					   ->set_text($label_text)
-					 );
+	$self->add_widget( Curses::Toolkit::Widget::Label->new()->set_text($label_text) );
 	return $self;
 }
 

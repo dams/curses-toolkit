@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Key;
+
 # ABSTRACT: event that is related to keystrokes
 
 use parent qw(Curses::Toolkit::Event);
@@ -24,25 +25,27 @@ Event that is related to keystrokes
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new();
-	my %args = validate( @_,
-						 { type => 
-						   { type => SCALAR,
-							 callbacks => { 'must be one of ' . join(', ', $self->get_types()) =>
-											sub { my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] }; },
-										  }
-						   },
-						   params => 0,
-						   root_window => { isa => 'Curses::Toolkit' },
-						 },
-					   );
+	my $self  = $class->SUPER::new();
+	my %args  = validate(
+		@_,
+		{   type => {
+				type      => SCALAR,
+				callbacks => {
+					'must be one of ' . join( ', ', $self->get_types() ) => sub {
+						my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] };
+					},
+				}
+			},
+			params      => 0,
+			root_window => { isa => 'Curses::Toolkit' },
+		},
+	);
 	$args{params} ||= {};
-	my @args = $args{params};
-	my $definition = $self->get_params_definition($args{type});
-	my %params = validate( @args, $definition ),
-	$self->{type}   = $args{type};
-	$self->{root_window}   = $args{root_window};
-	$self->{params} = \%params;
+	my @args       = $args{params};
+	my $definition = $self->get_params_definition( $args{type} );
+	my %params     = validate( @args, $definition ), $self->{type} = $args{type};
+	$self->{root_window} = $args{root_window};
+	$self->{params}      = \%params;
 	return $self;
 }
 
@@ -63,15 +66,19 @@ Returns the types that this Event Class supports
 
 =cut
 
-my %types = ( stroke => { key => { type => SCALAR,
-								   callbacks => { 
-												 non_empty => sub { length($_[0]) }
-												}
-								 }
-						},
-			  press => {},
-			  release => {},
-			);
+my %types = (
+	stroke => {
+		key => {
+			type      => SCALAR,
+			callbacks => {
+				non_empty => sub { length( $_[0] ) }
+			}
+		}
+	},
+	press   => {},
+	release => {},
+);
+
 sub get_types {
 	my ($self) = @_;
 	return keys %types;
@@ -87,7 +94,7 @@ Returns the parameter definition for a given type, as specified in Params::Valid
 =cut
 
 sub get_params_definition {
-	my ($self, $type) = @_;
+	my ( $self, $type ) = @_;
 	return $types{$type};
 }
 
@@ -105,12 +112,12 @@ sub get_matching_widget {
 	my ($self) = @_;
 	my $root = $self->{root_window};
 	my $widget;
-	defined $widget or
-	  $widget = $root->get_focused_widget();
-	defined $widget or
-	  $widget = $root->get_focused_window();
-	defined $widget or
-	  $widget = $root;
+	defined $widget
+		or $widget = $root->get_focused_widget();
+	defined $widget
+		or $widget = $root->get_focused_window();
+	defined $widget
+		or $widget = $root;
 	return $widget;
 }
 

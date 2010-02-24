@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit;
+
 # ABSTRACT: a modern Curses toolkit
 
 use Params::Validate qw(:all);
@@ -140,72 +141,80 @@ service.
 =cut
 
 sub init_root_window {
-    my $class = shift;
-    
-    my %params = validate(@_, { clear => { type => BOOLEAN,
-										   default => 1,
-										 },
-								theme_name => { type => SCALAR,
-												optional => 1,
-											   },
-								mainloop => { optional => 1
-												},
-								quit_key => { type => SCALAR,
-											  default => 'q',
-											},
-								switch_key => { type => SCALAR,
-												default => 'r',
-											  },
-							  }
-                         );
+	my $class = shift;
 
-    # get the Curses handler
-    use Curses;
-    my $curses_handler = Curses->new();
+	my %params = validate(
+		@_,
+		{   clear => {
+				type    => BOOLEAN,
+				default => 1,
+			},
+			theme_name => {
+				type     => SCALAR,
+				optional => 1,
+			},
+			mainloop => { optional => 1 },
+			quit_key => {
+				type    => SCALAR,
+				default => 'q',
+			},
+			switch_key => {
+				type    => SCALAR,
+				default => 'r',
+			},
+		}
+	);
 
-# already done ?
-# 	raw();
-# 	cbreak();
-# 	noecho();
-# 	$curses_handler->keypad(1);
+	# get the Curses handler
+	use Curses;
+	my $curses_handler = Curses->new();
+
+	# already done ?
+	# 	raw();
+	# 	cbreak();
+	# 	noecho();
+	# 	$curses_handler->keypad(1);
 
 	if (has_colors) {
 		start_color();
-#  		print STDERR "color is supported\n";
-#  		print STDERR "colors number : " . COLORS . "\n";
-#  		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-#  		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
+
+		#  		print STDERR "color is supported\n";
+		#  		print STDERR "colors number : " . COLORS . "\n";
+		#  		print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
+		#  		print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
 
 
 	}
 
-    eval { Curses->can('NCURSES_MOUSE_VERSION') && (NCURSES_MOUSE_VERSION() >= 1 ) };
+	eval { Curses->can('NCURSES_MOUSE_VERSION') && ( NCURSES_MOUSE_VERSION() >= 1 ) };
 
 	my $old_mouse_mask;
-	my $mouse_mask = mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask); 
+	my $mouse_mask = mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask );
 
-    # erase the window if asked.
-#    print STDERR Dumper($params{clear}); use Data::Dumper;
-#    $params{clear} and $curses_handler->erase();
-    
+	# erase the window if asked.
+	#    print STDERR Dumper($params{clear}); use Data::Dumper;
+	#    $params{clear} and $curses_handler->erase();
+
 	use Curses::Toolkit::Theme::Default;
 	use Curses::Toolkit::Theme::Default::Color::Yellow;
 	use Curses::Toolkit::Theme::Default::Color::Pink;
 	use Tie::Array::Iterable;
 	$params{theme_name} ||= Curses::Toolkit->get_default_theme_name();
 	my @windows = ();
-    my $self = bless { initialized => 1, 
-                       curses_handler => $curses_handler,
-                       windows => Tie::Array::Iterable->new( @windows ),
-					   theme_name => $params{theme_name},
-					   mainloop => $params{mainloop},
-					   last_stack => 0,
-					   event_listeners => [],
-					   window_iterator => undef,
-                     }, $class;
+	my $self    = bless {
+		initialized     => 1,
+		curses_handler  => $curses_handler,
+		windows         => Tie::Array::Iterable->new(@windows),
+		theme_name      => $params{theme_name},
+		mainloop        => $params{mainloop},
+		last_stack      => 0,
+		event_listeners => [],
+		window_iterator => undef,
+	}, $class;
 	$self->_recompute_shape();
 
 	use Curses::Toolkit::EventListener;
+
 	# add a default listener that listen to any Shape event
 	$self->add_event_listener(
 		Curses::Toolkit::EventListener->new(
@@ -213,8 +222,9 @@ sub init_root_window {
 				'Curses::Toolkit::Event::Shape' => sub { 1; },
 			},
 			code => sub {
-				my ($screen_h, $screen_w);
+				my ( $screen_h, $screen_w );
 				$self->_recompute_shape();
+
 				# for now we rebuild all coordinates
 				foreach my $window ( $self->get_windows() ) {
 					$window->rebuild_all_coordinates();
@@ -222,11 +232,11 @@ sub init_root_window {
 			},
 		)
 	);
-	if (defined $params{quit_key}) { 
+	if ( defined $params{quit_key} ) {
 		$self->add_event_listener(
 			Curses::Toolkit::EventListener->new(
 				accepted_events => {
-					'Curses::Toolkit::Event::Key' => sub { 
+					'Curses::Toolkit::Event::Key' => sub {
 						my ($event) = @_;
 						$event->{type} eq 'stroke' or return 0;
 						lc $event->{params}{key} eq $params{quit_key} or return 0;
@@ -238,35 +248,38 @@ sub init_root_window {
 			)
 		);
 	}
-	if (defined $params{switch_key}) { 
+	if ( defined $params{switch_key} ) {
 		$self->add_event_listener(
 			Curses::Toolkit::EventListener->new(
 				accepted_events => {
-					'Curses::Toolkit::Event::Key' => sub { 
+					'Curses::Toolkit::Event::Key' => sub {
 						my ($event) = @_;
 						$event->{type} eq 'stroke' or return 0;
 						lc $event->{params}{key} eq $params{switch_key} or return 0;
 					},
 				},
 				code => sub {
-					my ($event, $widget) = @_;
+					my ( $event, $widget ) = @_;
 					defined $self->{window_iterator}
-					  or return;
+						or return;
 					my $window = $widget->{window_iterator}->next();
-					if ( ! defined $window ) {
+					if ( !defined $window ) {
 						$widget->{window_iterator}->to_start();
 						$window = $widget->{window_iterator}->value();
 					}
+
 					# get the currently focused widget, unfocus it
 					my $current_focused_widget = $self->get_focused_widget();
-					if (defined $current_focused_widget && $current_focused_widget->can('set_focus')) {
+					if ( defined $current_focused_widget && $current_focused_widget->can('set_focus') ) {
 						$current_focused_widget->set_focus(0);
 					}
 					$window->bring_to_front();
+
 					# focus the window or one of its component
-					my $next_focused_widget = $window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
-					defined $next_focused_widget and
-					  $next_focused_widget->set_focus(1);
+					my $next_focused_widget =
+						$window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
+					defined $next_focused_widget
+						and $next_focused_widget->set_focus(1);
 				},
 			)
 		);
@@ -284,15 +297,15 @@ sub init_root_window {
 			},
 			code => sub {
 				my $focused_widget = $self->get_focused_widget();
-				if (defined $focused_widget) {
+				if ( defined $focused_widget ) {
 					my $next_focused_widget = $focused_widget->get_next_focused_widget();
-					defined $next_focused_widget and 
-					  $next_focused_widget->set_focus(1);
+					defined $next_focused_widget
+						and $next_focused_widget->set_focus(1);
 				} else {
-					my $focused_window = $self->get_focused_window();
+					my $focused_window      = $self->get_focused_window();
 					my $next_focused_widget = $focused_window->get_next_focused_widget();
-					defined $next_focused_widget and 
-					  $next_focused_widget->set_focus(1);
+					defined $next_focused_widget
+						and $next_focused_widget->set_focus(1);
 				}
 			},
 		)
@@ -309,41 +322,45 @@ sub init_root_window {
 				},
 			},
 			code => sub {
-#  				my $focused_widget = $self->get_focused_widget();
-#  				if (defined $focused_widget) {
-#  					my $prev_focused_widget = $focused_widget->get_prev_focused_widget();
-#  					defined $prev_focused_widget and 
-#  					  $prev_focused_widget->set_focus(1);
-#  				} else {
-#  					my $focused_window = $self->get_focused_window();
-#  					my $prev_focused_widget = $focused_window->get_prev_focused_widget();
-#  					defined $prev_focused_widget and 
-#  					  $prev_focused_widget->set_focus(1);
-#  				}
+
+				#  				my $focused_widget = $self->get_focused_widget();
+				#  				if (defined $focused_widget) {
+				#  					my $prev_focused_widget = $focused_widget->get_prev_focused_widget();
+				#  					defined $prev_focused_widget and
+				#  					  $prev_focused_widget->set_focus(1);
+				#  				} else {
+				#  					my $focused_window = $self->get_focused_window();
+				#  					my $prev_focused_widget = $focused_window->get_prev_focused_widget();
+				#  					defined $prev_focused_widget and
+				#  					  $prev_focused_widget->set_focus(1);
+				#  				}
 			},
 		)
 	);
 
-    return $self;
+	return $self;
 }
 
 sub get_default_theme_name {
 	my ($class) = @_;
-	return (has_colors() ?
-			  'Curses::Toolkit::Theme::Default::Color::Yellow'
-			: 'Curses::Toolkit::Theme::Default'
-		   );
-#			  'Curses::Toolkit::Theme::Default::Color::Yellow'
-#			  'Curses::Toolkit::Theme::Default::Color::Pink'
+	return (
+		has_colors()
+		? 'Curses::Toolkit::Theme::Default::Color::Yellow'
+		: 'Curses::Toolkit::Theme::Default'
+	);
+
+	#			  'Curses::Toolkit::Theme::Default::Color::Yellow'
+	#			  'Curses::Toolkit::Theme::Default::Color::Pink'
 }
 
 
 # destroyer
 DESTROY {
-    my ($obj) = @_;
-    # ending Curses
-    ref($obj) eq 'Curses::Toolkit' and
-	  Curses::endwin;
+	my ($obj) = @_;
+
+	# ending Curses
+	ref($obj) eq 'Curses::Toolkit'
+		and Curses::endwin;
 }
 
 
@@ -380,7 +397,7 @@ respond to some events
 sub add_event_listener {
 	my $self = shift;
 	my ($listener) = validate_pos( @_, { isa => 'Curses::Toolkit::EventListener' } );
-	push @{$self->{event_listeners}}, $listener;
+	push @{ $self->{event_listeners} }, $listener;
 	return $self;
 }
 
@@ -397,7 +414,7 @@ Returns the list of listeners connected to the root window.
 
 sub get_event_listeners {
 	my ($self) = @_;
-	return @{$self->{event_listeners}};
+	return @{ $self->{event_listeners} };
 }
 
 =head2 get_focused_widget
@@ -434,7 +451,8 @@ sub get_focused_window {
 	my ($self) = @_;
 	my @windows = $self->get_windows();
 	@windows or return;
-	my $window = (sort { $b->get_property(window => 'stack') <=> $a->get_property(window => 'stack') } @windows)[0];
+	my $window =
+		( sort { $b->get_property( window => 'stack' ) <=> $a->get_property( window => 'stack' ) } @windows )[0];
 	return $window;
 }
 
@@ -526,16 +544,17 @@ Adds a window on the root window. Returns the root window
 =cut
 
 sub add_window {
-    my $self = shift;
-    my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
-	$window->_set_curses_handler($self->{curses_handler});
-	$window->set_theme_name($self->{theme_name});
+	my $self = shift;
+	my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
+	$window->_set_curses_handler( $self->{curses_handler} );
+	$window->set_theme_name( $self->{theme_name} );
 	$window->set_root_window($self);
 	$self->bring_window_to_front($window);
+
 	# in case the window has proportional coordinates depending on the root window
 	# TODO : do that only if window has proportional coordinates, not always
 	$window->rebuild_all_coordinates();
-    push @{$self->{windows}}, $window;
+	push @{ $self->{windows} }, $window;
 	$self->{window_iterator} ||= $self->{windows}->forward_from();
 	$self->needs_redraw();
 	return $self;
@@ -554,12 +573,12 @@ Brings the window to front
 
 sub bring_window_to_front {
 	my $self = shift;
-    my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
+	my ($window) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget::Window' } );
 	$self->{last_stack}++;
-	$window->set_property(window => 'stack', $self->{last_stack});
+	$window->set_property( window => 'stack', $self->{last_stack} );
 	my $last_stack = $self->{last_stack};
 	$last_stack % 5 == 0
-	  and $self->{last_stack} = $self->_cleanup_windows_stacks();
+		and $self->{last_stack} = $self->_cleanup_windows_stacks();
 
 	$self->needs_redraw();
 	return $self;
@@ -568,13 +587,13 @@ sub bring_window_to_front {
 sub _cleanup_windows_stacks {
 	my ($self) = @_;
 
-	my @sorted_windows = sort { $a->get_property(window => 'stack') <=> $b->get_property(window => 'stack') }
-						 $self->get_windows();
+	my @sorted_windows =
+		sort { $a->get_property( window => 'stack' ) <=> $b->get_property( window => 'stack' ) } $self->get_windows();
 
-	foreach my $idx (0..@sorted_windows-1) {
-		$sorted_windows[$idx]->set_property(window => 'stack', $idx);
+	foreach my $idx ( 0 .. @sorted_windows - 1 ) {
+		$sorted_windows[$idx]->set_property( window => 'stack', $idx );
 	}
-	return @sorted_windows-1;
+	return @sorted_windows - 1;
 }
 
 =head2 needs_redraw
@@ -609,8 +628,8 @@ Returns the list of windows loaded
 =cut
 
 sub get_windows {
-    my ($self) = @_;
-    return @{$self->{windows}};
+	my ($self) = @_;
+	return @{ $self->{windows} };
 }
 
 =head2 set_modal_widget
@@ -624,7 +643,7 @@ Set a widget to be modal
 
 sub set_modal_widget {
 	my $self = shift;
-    my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
+	my ($widget) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' } );
 	$self->{_modal_widget} = $widget;
 	return $self;
 }
@@ -673,11 +692,11 @@ Set visibility property to true for every element. Returns the root windows
 =cut
 
 sub show_all {
-    my ($self) = @_;
-    foreach my $window ($self->get_windows()) {
-        $window->show_all();
-    }
-    return $self;
+	my ($self) = @_;
+	foreach my $window ( $self->get_windows() ) {
+		$window->show_all();
+	}
+	return $self;
 }
 
 
@@ -693,9 +712,11 @@ Build everything in the buffer. You need to call 'display' after that to display
 =cut
 
 sub render {
-    my ($self) = @_;
+	my ($self) = @_;
 	$self->{curses_handler}->erase();
-	foreach my $window (sort { $a->get_property(window => 'stack') <=> $b->get_property(window => 'stack') } $self->get_windows()) {
+	foreach my $window ( sort { $a->get_property( window => 'stack' ) <=> $b->get_property( window => 'stack' ) }
+		$self->get_windows() )
+	{
 		$window->render();
 	}
 	return $self;
@@ -734,31 +755,31 @@ root window. You probably don't want to use this method directly. Use Signals in
 
 sub dispatch_event {
 	my $self = shift;
-	my ($event, $widget) = 
-	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
-				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
-				  );
+	my ( $event, $widget ) = validate_pos(
+		@_, { isa => 'Curses::Toolkit::Event' },
+		{ isa => 'Curses::Toolkit::Widget', optional => 1 },
+	);
 
-	if (! defined $widget) {
+	if ( !defined $widget ) {
 		$widget = $self->get_modal_widget();
 		defined $widget and $self->unset_modal_widget();
 	}
 	$widget ||= $event->get_matching_widget();
 	defined $widget or return;
 
-	while ( 1 ) {
-		foreach my $listener (grep { $_->is_enabled() } $widget->get_event_listeners()) {
-			if ($listener->can_handle($event)) {
-				$listener->send_event($event, $widget);
+	while (1) {
+		foreach my $listener ( grep { $_->is_enabled() } $widget->get_event_listeners() ) {
+			if ( $listener->can_handle($event) ) {
+				$listener->send_event( $event, $widget );
 				$event->can_propagate()
-				  or return 1;
+					or return 1;
 			}
 		}
 		$event->restricted_to_widget()
-		  and return;
-		if ($widget->isa('Curses::Toolkit::Widget::Window')) {
+			and return;
+		if ( $widget->isa('Curses::Toolkit::Widget::Window') ) {
 			$widget = $widget->get_root_window();
-		} elsif ($widget->isa('Curses::Toolkit::Widget')) {
+		} elsif ( $widget->isa('Curses::Toolkit::Widget') ) {
 			$widget = $widget->get_parent();
 		} else {
 			return;
@@ -783,13 +804,13 @@ to use this method.
 
 sub fire_event {
 	my $self = shift;
-	my ($event, $widget) = 
-	  validate_pos(@_, { isa => 'Curses::Toolkit::Event' },
-				       { isa => 'Curses::Toolkit::Widget', optional => 1 },
-				  );
+	my ( $event, $widget ) = validate_pos(
+		@_, { isa => 'Curses::Toolkit::Event' },
+		{ isa => 'Curses::Toolkit::Widget', optional => 1 },
+	);
 	my $mainloop = $self->get_mainloop();
 	defined $mainloop or return $self;
-	$mainloop->stack_event($event, $widget);
+	$mainloop->stack_event( $event, $widget );
 	return $self;
 }
 
@@ -811,7 +832,7 @@ can be a fraction. @args will be passed to the code reference
 =cut
 
 sub add_delay {
-	my $self = shift;
+	my $self     = shift;
 	my $mainloop = $self->get_mainloop();
 	defined $mainloop or return;
 	$mainloop->add_delay(@_);
@@ -840,19 +861,19 @@ sub add_delay {
 sub _event_shape_change {
 	my ($self) = @_;
 
-	my ($screen_h, $screen_w);
+	my ( $screen_h, $screen_w );
 	$self->_recompute_shape();
 
-# for now we rebuild all coordinates
- 	foreach my $window ( $self->get_windows() ) {
+	# for now we rebuild all coordinates
+	foreach my $window ( $self->get_windows() ) {
 		$window->rebuild_all_coordinates();
- 	}
+	}
 
-# for now rebuild everything
-#	my $mainloop = $self->get_mainloop();
-#	if (defined $mainloop) {
-#		$mainloop->needs_redraw();
-#	}
+	# for now rebuild everything
+	#	my $mainloop = $self->get_mainloop();
+	#	if (defined $mainloop) {
+	#		$mainloop->needs_redraw();
+	#	}
 
 	# event suceeded
 	return 1;
@@ -862,10 +883,10 @@ sub _event_shape_change {
 sub _recompute_shape {
 	my ($self) = @_;
 	use Curses::Toolkit::Object::Coordinates;
-	my ($screen_h, $screen_w);
-    use Curses;
+	my ( $screen_h, $screen_w );
+	use Curses;
 	endwin;
-	$self->{curses_handler}->getmaxyx($screen_h, $screen_w);
+	$self->{curses_handler}->getmaxyx( $screen_h, $screen_w );
 	use Curses::Toolkit::Object::Shape;
 	$self->{shape} ||= Curses::Toolkit::Object::Shape->new_zero();
 	$self->{shape}->_set(
@@ -877,7 +898,7 @@ sub _recompute_shape {
 
 sub _rebuild_all {
 	my ($self) = @_;
-	foreach my $window ($self->get_windows()) {
+	foreach my $window ( $self->get_windows() ) {
 		$window->rebuild_all_coordinates();
 	}
 	return $self;

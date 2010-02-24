@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Border;
+
 # ABSTRACT: a border widget
 
 use parent qw(Curses::Toolkit::Widget::Bin);
@@ -32,23 +33,23 @@ This widget can contain 0 or 1 other widget.
 =cut
 
 sub draw {
-	my ($self) = @_;
-	my $theme = $self->get_theme();
-	my $c = $self->get_coordinates();
+	my ($self)       = @_;
+	my $theme        = $self->get_theme();
+	my $c            = $self->get_coordinates();
 	my $border_width = $self->get_theme_property('border_width');
 
 	$border_width > 0 or return;
 
-	for my $i (0..$border_width-1) {
-		$theme->draw_hline($c->x1() + $i,     $c->y1() + $i,      $c->width() - 2 * $i);
-		$theme->draw_hline($c->x1() + $i,     $c->y2() - $i - 1 , $c->width() - 2 * $i);
-		$theme->draw_vline($c->x1() + $i,     $c->y1() + $i,      $c->height() - 2 * $i);
-		$theme->draw_vline($c->x2() - $i - 1, $c->y1() + $i,      $c->height() - 2 * $i);
+	for my $i ( 0 .. $border_width - 1 ) {
+		$theme->draw_hline( $c->x1() + $i, $c->y1() + $i,     $c->width() - 2 * $i );
+		$theme->draw_hline( $c->x1() + $i, $c->y2() - $i - 1, $c->width() - 2 * $i );
+		$theme->draw_vline( $c->x1() + $i,     $c->y1() + $i, $c->height() - 2 * $i );
+		$theme->draw_vline( $c->x2() - $i - 1, $c->y1() + $i, $c->height() - 2 * $i );
 
-		$theme->draw_corner_ul($c->x1() + $i,     $c->y1() + $i);
-		$theme->draw_corner_ll($c->x1() + $i,     $c->y2() - $i - 1);
-		$theme->draw_corner_ur($c->x2() - $i - 1, $c->y1() + $i);
-		$theme->draw_corner_lr($c->x2() - $i - 1, $c->y2() - $i - 1);
+		$theme->draw_corner_ul( $c->x1() + $i, $c->y1() + $i );
+		$theme->draw_corner_ll( $c->x1() + $i, $c->y2() - $i - 1 );
+		$theme->draw_corner_ur( $c->x2() - $i - 1, $c->y1() + $i );
+		$theme->draw_corner_lr( $c->x2() - $i - 1, $c->y2() - $i - 1 );
 	}
 	return;
 }
@@ -61,11 +62,11 @@ sub draw {
 
 sub _get_available_space {
 	my ($self) = @_;
-	my $rc = $self->get_relatives_coordinates();
-	my $bw = $self->get_theme_property('border_width');
+	my $rc     = $self->get_relatives_coordinates();
+	my $bw     = $self->get_theme_property('border_width');
 	return Curses::Toolkit::Object::Coordinates->new(
-		x1 => $bw, y1 => $bw,
-        x2 => $rc->width() - $bw, y2 => $rc->height() - $bw,
+		x1 => $bw,                y1 => $bw,
+		x2 => $rc->width() - $bw, y2 => $rc->height() - $bw,
 	);
 }
 
@@ -80,7 +81,7 @@ The Border desires all the space available, so it returns the available space
 =cut
 
 sub get_desired_space {
-	my ($self, $available_space) = @_;
+	my ( $self, $available_space ) = @_;
 	my $desired_space = $available_space->clone();
 	return $desired_space;
 }
@@ -96,21 +97,23 @@ needed to properly display itself
 =cut
 
 sub get_minimum_space {
-	my ($self, $available_space) = @_;
-	my ($child) = $self->get_children();
+	my ( $self, $available_space ) = @_;
+	my ($child)     = $self->get_children();
 	my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
-	my $bw = $self->get_theme_property('border_width');
-	if (defined $child) {
+	my $bw          = $self->get_theme_property('border_width');
+	if ( defined $child ) {
 		my $child_available_space = $available_space->clone();
-		$child_available_space->set( x1 => $available_space->x1() + $bw, y1 => $available_space->y1() + $bw,
-									 x2 => $available_space->x2() - $bw, y2 => $available_space->y2() - $bw,
-								   );
+		$child_available_space->set(
+			x1 => $available_space->x1() + $bw, y1 => $available_space->y1() + $bw,
+			x2 => $available_space->x2() - $bw, y2 => $available_space->y2() - $bw,
+		);
 		$child_space = $child->get_minimum_space($child_available_space);
 	}
 	my $minimum_space = $available_space->clone();
-	$minimum_space->set( x2 => $available_space->x1() + $child_space->width() + 2 * $bw,
-						 y2 => $available_space->y1() + $child_space->height() + 2 * $bw,
-					   );
+	$minimum_space->set(
+		x2 => $available_space->x1() + $child_space->width() + 2 * $bw,
+		y2 => $available_space->y1() + $child_space->height() + 2 * $bw,
+	);
 	return $minimum_space;
 }
 
@@ -136,13 +139,16 @@ Sets the width of the border. If not set, the border will be invisible
 
 sub _get_theme_properties_definition {
 	my ($self) = @_;
-	return { %{$self->SUPER::_get_theme_properties_definition() },
-			 border_width => {
-			   optional => 1,
-			   type => SCALAR,
-			   callbacks => { "positive integer" => sub { $_[0] >= 0 } }
-			 },
-		   }
+	return {
+		%{ $self->SUPER::_get_theme_properties_definition() },
+		border_width => {
+			optional  => 1,
+			type      => SCALAR,
+			callbacks => {
+				"positive integer" => sub { $_[0] >= 0 }
+			}
+		},
+	};
 }
 
 1;

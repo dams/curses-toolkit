@@ -9,9 +9,9 @@
 
 use Curses;
 
-my           $win = new Curses();
-           addstr(10, 10, 'foo');
-           $win->refresh;
+my $win = new Curses();
+addstr( 10, 10, 'foo' );
+$win->refresh;
 
 # my $c = Curses->new();
 
@@ -75,13 +75,13 @@ my           $win = new Curses();
 # refresh();
 # $ch = getch();
 # eval
-# { 
+# {
 #     if ($ch == KEY_UP) { addstr(22, 0, "KEY_UP was pressed!") }
 #     else               { addstr(22, 0, "Something else was pressed.") }
 #     1;
 # } || addstr(22, 0, "You don't seem to have the KEY_UP macro");
 
 # move($LINES - 1, 0);
- refresh();
- sleep 2;
- endwin();
+refresh();
+sleep 2;
+endwin();

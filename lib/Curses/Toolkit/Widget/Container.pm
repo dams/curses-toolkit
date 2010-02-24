@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Container;
+
 # ABSTRACT: a container widget
 
 use parent qw(Curses::Toolkit::Widget);
@@ -24,12 +25,12 @@ This widget can contain 0 or more other widgets.
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new(@_);
+	my $self  = $class->SUPER::new(@_);
 
 	use Tie::Array::Iterable;
 	my @children = ();
 
-	$self->{children} = Tie::Array::Iterable->new( @children );
+	$self->{children} = Tie::Array::Iterable->new(@children);
 
 	return $self;
 }
@@ -48,21 +49,22 @@ Default rendering method for the widget. All render() method should call draw()
 sub render {
 	my ($self) = @_;
 	$self->blank();
-	foreach my $child ($self->get_children()) {
+	foreach my $child ( $self->get_children() ) {
 		$child->render();
 	}
 	$self->draw();
-    return;
+	return;
 }
 
 # default method for blanking
 sub blank {
 	my ($self) = @_;
-	my $theme = $self->get_theme();
-	my $c = $self->get_coordinates();
-	my $bc = $self->_get_available_space()
-	  + { x1 => $c->x1(), y1 => $c->y1(),
-		  x2 => $c->x1(), y2 => $c->y1(), };
+	my $theme  = $self->get_theme();
+	my $c      = $self->get_coordinates();
+	my $bc     = $self->_get_available_space() + {
+		x1 => $c->x1(), y1 => $c->y1(),
+		x2 => $c->x1(), y2 => $c->y1(),
+	};
 	$theme->draw_blank($bc);
 	return $self;
 }
@@ -78,27 +80,27 @@ Returns the list of children of the widget
 
 sub get_children {
 	my ($self) = @_;
-	return @{$self->{children}};
+	return @{ $self->{children} };
 }
 
 sub _add_child {
 	my $self = shift;
 	return $self->_add_child_at_end(@_);
 }
-	
+
 sub _add_child_at_end {
-	my ($self, $child_widget) = @_;
-	push @{$self->{children}}, $child_widget;
-	my $iterator = $self->{children}->forward_from(@{$self->{children}} - 1);
+	my ( $self, $child_widget ) = @_;
+	push @{ $self->{children} }, $child_widget;
+	my $iterator = $self->{children}->forward_from( @{ $self->{children} } - 1 );
 	$child_widget->_set_iterator($iterator);
 	return $self;
 }
 
 sub _add_child_at_beginning {
-	my ($self, $child_widget) = @_;
-	unshift @{$self->{children}}, $child_widget;
+	my ( $self, $child_widget ) = @_;
+	unshift @{ $self->{children} }, $child_widget;
 	my $iterator = $self->{children}->forward_from(0);
-	$child_widget->_set_iterator($iterator);	
+	$child_widget->_set_iterator($iterator);
 	return $self;
 }
 
@@ -120,8 +122,8 @@ sub _get_available_space {
 	my $rc = $self->get_relatives_coordinates();
 	use Curses::Toolkit::Object::Coordinates;
 	return Curses::Toolkit::Object::Coordinates->new(
-		x1 => 0, y1 => 0,
-        x2 => $rc->width(), y2 => $rc->height(),
+		x1 => 0,            y1 => 0,
+		x2 => $rc->width(), y2 => $rc->height(),
 	);
 }
 

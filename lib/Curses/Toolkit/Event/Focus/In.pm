@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Focus::In;
+
 # ABSTRACT: event that is related to in-focus
 
 use parent qw(Curses::Toolkit::Event::Focus);
@@ -23,6 +24,6 @@ Event that is related to in-focus
 
 # this event has to be dispatched on a specific widget, so get_matching_widget
 # returns void
-sub get_matching_widget { return }
+sub get_matching_widget {return}
 
 1;

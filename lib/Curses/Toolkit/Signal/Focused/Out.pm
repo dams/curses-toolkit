@@ -21,25 +21,26 @@ Signal triggered when a widget is focused in
 
 sub generate_listener {
 	my $class = shift;
-	my %args = validate( @_,
-						 { widget => { isa => 'Curses::Toolkit::Widget' },
-						   code_ref => { type => CODEREF },
-						   arguments => { type => ARRAYREF },
-						 },
-					   );
-	my $widget = $args{widget};
-	my $code_ref = $args{code_ref};
-	my @arguments = @{$args{arguments}};
+	my %args  = validate(
+		@_,
+		{   widget    => { isa  => 'Curses::Toolkit::Widget' },
+			code_ref  => { type => CODEREF },
+			arguments => { type => ARRAYREF },
+		},
+	);
+	my $widget    = $args{widget};
+	my $code_ref  = $args{code_ref};
+	my @arguments = @{ $args{arguments} };
 
 	return Curses::Toolkit::EventListener->new(
 		accepted_events => {
-			'Curses::Toolkit::Event::Focus::Out' => sub { 
+			'Curses::Toolkit::Event::Focus::Out' => sub {
 				my ($event) = @_;
 				return 1;
 			},
 		},
 		code => sub {
-			$code_ref->(@_, @arguments);
+			$code_ref->( @_, @arguments );
 		},
 	);
 }

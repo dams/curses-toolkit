@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 package Curses::Toolkit::Widget::ProgressBar;
+
 # ABSTRACT: a simple progress bar widget
 
 use Moose;
@@ -37,10 +38,10 @@ C<percent>.
 
 =cut
 
-has minimum  => ( rw, isa=>'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has maximum  => ( rw, isa=>'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has position => ( rw, isa=>'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has label    => ( rw, isa=>'PROGRESS_BAR_LABEL', lazy_build );
+has minimum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
+has maximum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
+has position => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
+has label => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
 
 
 # -- builders & initializers
@@ -52,10 +53,10 @@ has label    => ( rw, isa=>'PROGRESS_BAR_LABEL', lazy_build );
 
 =cut
 
-sub _build_minimum  { 0 }
-sub _build_maximum  { 100 }
-sub _build_position { 0 }
-sub _build_label    { 'percent' }
+sub _build_minimum  {0}
+sub _build_maximum  {100}
+sub _build_position {0}
+sub _build_label    {'percent'}
 
 
 =method draw
@@ -69,27 +70,27 @@ sub draw {
 	$self->SUPER::draw(); # draw the border if any
 
 	my $theme = $self->get_theme();
-	my $c = $self->get_coordinates();
-        my $w = $c->width();
+	my $c     = $self->get_coordinates();
+	my $w     = $c->width();
 
-        # [|||||||||||----34%--------------]
+	# [|||||||||||----34%--------------]
 	#  <- $done -><-       $left     ->
-	
+
 	my $cdone = $self->get_theme_property('char_done');
 	my $cleft = $self->get_theme_property('char_left');
-	my $bw = $self->get_theme_property('border_width');
+	my $bw    = $self->get_theme_property('border_width');
 
-        my $min = $self->get_minimum;
-        my $max = $self->get_maximum;
-        my $pos = $self->get_position;
+	my $min = $self->get_minimum;
+	my $max = $self->get_maximum;
+	my $pos = $self->get_position;
 	$pos = $self->get_minimum if $pos < $self->get_minimum;
 	$pos = $self->get_maximum if $pos > $self->get_maximum;
 
-        my $done = ($pos-$min)/($max-$min)*$w;
-        my $left = ($max-$pos-$min)/($max-$min)*$w;
+	my $done = ( $pos - $min ) / ( $max - $min ) * $w;
+	my $left = ( $max - $pos - $min ) / ( $max - $min ) * $w;
 
-	$theme->draw_string($c->x1() + $bw, $c->y1() + $bw, $cdone x $done);
-	$theme->draw_string($c->x1() + $bw + $done, $c->y1() + $bw, $cleft x $left);
+	$theme->draw_string( $c->x1() + $bw,         $c->y1() + $bw, $cdone x $done );
+	$theme->draw_string( $c->x1() + $bw + $done, $c->y1() + $bw, $cleft x $left );
 
 	#$theme->draw_string($c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2);
 
@@ -125,14 +126,14 @@ The ProgressBar requires 12x1 minimum.
 =cut
 
 sub get_minimum_space {
-	my ($self, $available_space) = @_;
+	my ( $self, $available_space ) = @_;
 
 	my $minimum_space = $available_space->clone;
 	my $default_width = $self->get_theme_property('default_width');
 	$minimum_space->set(
-                x2 => $available_space->x1() + $default_width,
+		x2 => $available_space->x1() + $default_width,
 		y2 => $available_space->y1() + 1,
-        );
+	);
 	return $minimum_space;
 }
 
@@ -210,11 +211,12 @@ Example :
 
 sub _get_theme_properties_definition {
 	my ($self) = @_;
-	return { %{$self->SUPER::_get_theme_properties_definition() },
-                default_width => { optional => 0, type => SCALAR, },
-                char_done     => { optional => 0, type => SCALAR, },
-                char_left     => { optional => 0, type => SCALAR, },
-        };
+	return {
+		%{ $self->SUPER::_get_theme_properties_definition() },
+		default_width => { optional => 0, type => SCALAR, },
+		char_done     => { optional => 0, type => SCALAR, },
+		char_left     => { optional => 0, type => SCALAR, },
+	};
 }
 
 1;

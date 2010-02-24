@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 package Curses::Toolkit::Types;
+
 # ABSTRACT: various types used within the dist
 
 use Moose::Util::TypeConstraints;

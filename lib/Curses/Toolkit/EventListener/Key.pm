@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::EventListener::Key;
+
 # ABSTRACT: event listener listening for a keyboard action
 
 use parent qw(Curses::Toolkit::EventListener);

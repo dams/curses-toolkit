@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Mouse::Click;
+
 # ABSTRACT: event that is related to mouse click
 
 use parent qw(Curses::Toolkit::Event::Mouse);
@@ -32,25 +33,30 @@ Event that is related to mouse click
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new();
-	my %args = validate( @_,
-						 { type => 
-						   { type => SCALAR,
-							 callbacks => { 'must be one of ' . join(', ', $self->get_possible_types()) =>
-											sub { my %h = map { $_ => 1 } $self->get_possible_types(); $h{ $_[0] }; },
-										  },
-						   },
-						   button =>
-						   { type => SCALAR,
-							 callbacks => { 'must be one of ' . join(', ', $self->get_possible_buttons()) =>
-											sub { my %h = map { $_ => 1 } $self->get_possible_buttons(); $h{ $_[0] }; },
-										  },
-						   },
-						   coordinates => { isa => 'Curses::Toolkit::Object::Coordinates' },
-						   root_window => { isa => 'Curses::Toolkit' },
-						 }
-					   );
-	$self = bless(\%args, $class);
+	my $self  = $class->SUPER::new();
+	my %args  = validate(
+		@_,
+		{   type => {
+				type      => SCALAR,
+				callbacks => {
+					'must be one of ' . join( ', ', $self->get_possible_types() ) => sub {
+						my %h = map { $_ => 1 } $self->get_possible_types(); $h{ $_[0] };
+					},
+				},
+			},
+			button => {
+				type      => SCALAR,
+				callbacks => {
+					'must be one of ' . join( ', ', $self->get_possible_buttons() ) => sub {
+						my %h = map { $_ => 1 } $self->get_possible_buttons(); $h{ $_[0] };
+					},
+				},
+			},
+			coordinates => { isa => 'Curses::Toolkit::Object::Coordinates' },
+			root_window => { isa => 'Curses::Toolkit' },
+		}
+	);
+	$self = bless( \%args, $class );
 	return $self;
 }
 
@@ -78,25 +84,27 @@ sub get_matching_widget {
 	my ($self) = @_;
 
 	my $recurse;
-	$recurse = sub { 
+	$recurse = sub {
 		my $deepness = shift;
-		my $stack = shift;
+		my $stack    = shift;
 		$deepness++;
-		my @result = map { 
-			my $stack = ( $_->isa('Curses::Toolkit::Widget::Window') ? 
-						  $_->get_property(window => 'stack') : $stack
-						);
-			[ $deepness,
-			  $stack,
-			  $_
-			], ( $_->can('get_children') ? $recurse->($deepness, $stack, $_->get_children()) : () )	  
+		my @result = map {
+			my $stack = ( $_->isa('Curses::Toolkit::Widget::Window') ? $_->get_property( window => 'stack' ) : $stack );
+			[   $deepness,
+				$stack,
+				$_
+			],
+				( $_->can('get_children') ? $recurse->( $deepness, $stack, $_->get_children() ) : () )
 		} @_;
 		return @result;
 	};
 
-	my @all_widgets = $recurse->(0, 0, $self->{root_window}->get_windows());
+	my @all_widgets = $recurse->( 0, 0, $self->{root_window}->get_windows() );
+
 	# sort by window stack then deepnes in the widget tree
-	@all_widgets = sort { $b->[1] <=> $a->[1] || $b->[0] <=> $a->[0] } grep { $self->{coordinates}->is_in_widget($_->[2]) } @all_widgets;
+	@all_widgets =
+		sort { $b->[1] <=> $a->[1] || $b->[0] <=> $a->[0] }
+		grep { $self->{coordinates}->is_in_widget( $_->[2] ) } @all_widgets;
 
 
 	@all_widgets and return $all_widgets[0]->[2];

@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object::Shape;
+
 # ABSTRACT: simple shape class
 
 use parent qw(Curses::Toolkit::Object::Coordinates);
@@ -25,11 +26,14 @@ Nothing more than L<Curses::Toolkit::Object::Coordinates> for now
 
 # Making it readonly
 
-sub set { _die() }
-sub add { _die() }
-sub substract { _die() }
+sub set         { _die() }
+sub add         { _die() }
+sub substract   { _die() }
 sub restrict_to { _die() }
-sub _die { die " You should not be calling '" . (caller(1))[3] . "' on a '" . __PACKAGE__ . "' object, as it's read only." }
+
+sub _die {
+	die " You should not be calling '" . ( caller(1) )[3] . "' on a '" . __PACKAGE__ . "' object, as it's read only.";
+}
 
 # private methods
 

@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Window::Dialog::About;
+
 # ABSTRACT: an about dialog window
 
 use parent qw(Curses::Toolkit::Widget::Window::Dialog);

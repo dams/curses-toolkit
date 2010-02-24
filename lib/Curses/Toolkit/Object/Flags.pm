@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object::Flags;
+
 # ABSTRACT: simple collection of flags
 
 use parent qw(Curses::Toolkit::Object);
@@ -26,10 +27,11 @@ The list of flags is :
 
 sub new {
 	my $class = shift;
-	my $self = bless { focused  => 0,
-				 selected => 0,
-				 clicked  => 0,
-			   }, $class;
+	my $self  = bless {
+		focused  => 0,
+		selected => 0,
+		clicked  => 0,
+	}, $class;
 	return $self;
 }
 
