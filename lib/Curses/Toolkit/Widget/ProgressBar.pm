@@ -105,12 +105,16 @@ The Button desires the minimum size : text length plus the button brackets
   input:  a Curses::Toolkit::Object::Coordinates object
   output: a Curses::Toolkit::Object::Coordinates object
 
-The minimum space is also the desired space.
+The desired space is as much horizontal space as possible, with a height of 1.
 
 =cut
 
-sub get_desired_space { shift->get_minimum_space(@_) }
-
+sub get_desired_space {
+	my ( $self, $available_space ) = @_;
+	my $desired = $available_space->clone;
+	$desired->set( y2 => $desired->y1 + 1 );
+	return $desired;
+}
 
 =method get_minimum_space
 
