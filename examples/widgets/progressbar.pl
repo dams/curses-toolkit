@@ -12,27 +12,33 @@ sub main {
 
 	use Curses::Toolkit::Widget::Window;
 	use Curses::Toolkit::Widget::HBox;
+	use Curses::Toolkit::Widget::VBox;
 	use Curses::Toolkit::Widget::Button;
 	use Curses::Toolkit::Widget::ProgressBar;
 
 	my $root = POE::Component::Curses->spawn;
 
+	# create the main window
+	my $window = Curses::Toolkit::Widget::Window->new
+		->set_name('window')
+		->set_title("progress bar demo")
+		->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => '100%' );
+	$root->add_window( $window );
 
-	my $window;
-	$root->add_window( $window =
-			Curses::Toolkit::Widget::Window->new()->set_name('window')->set_title("progress bar demo")
-			->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => '100%' ) );
+	# vbox holding the widgets
+	my $vbox = Curses::Toolkit::Widget::HBox->new;
+	$window->add_widget($vbox);
 
 
 	my $but1 = Curses::Toolkit::Widget::Button->new_with_label('-')->set_name('but1');
 	my $but2 = Curses::Toolkit::Widget::Button->new_with_label('+')->set_name('but2');
-	my $bar  = Curses::Toolkit::Widget::ProgressBar->new->set_maximum(10);
+	my $bar  = Curses::Toolkit::Widget::ProgressBar->new;
 
 	my $hbox = Curses::Toolkit::Widget::HBox->new;
 	$hbox->pack_end($but1);
 	$hbox->pack_end( $bar, { expand => 1 } );
 	$hbox->pack_end($but2);
-	$window->add_widget($hbox);
+	$vbox->pack_end( $hbox, { expand => 1 } );
 
 	$but1->add_event_listener(
 		Curses::Toolkit::EventListener->new(
