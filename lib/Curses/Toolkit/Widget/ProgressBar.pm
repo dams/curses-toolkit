@@ -3,7 +3,7 @@ use warnings;
 
 package Curses::Toolkit::Widget::ProgressBar;
 
-# ABSTRACT: a simple progress bar widget
+# ABSTRACT: progress bar widget base class
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -15,6 +15,7 @@ use Curses::Toolkit::Types;
 
 extends qw(Curses::Toolkit::Widget::Border);
 
+# FIXME this is an abstract class. How do you specify this in moose ?
 
 # -- attributes
 
@@ -30,7 +31,7 @@ The maximum value (a float) for the progress bar. Default to 100.
 
 The current value of the progress bar. Default to 0.
 
-=attr label
+=attr label_type
 
 What to show in the progress bar. Must be a C<PROGRESS_BAR_LABEL> -
 check L<Curses::Toolkit::Types> for valid options. Default to
@@ -41,7 +42,7 @@ C<percent>.
 has minimum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
 has maximum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
 has position => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has label => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
+has label_type => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
 
 
 # -- builders & initializers
@@ -53,100 +54,21 @@ has label => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
 
 =cut
 
-sub _build_minimum  {0}
-sub _build_maximum  {100}
-sub _build_position {0}
-sub _build_label    {'percent'}
+sub _build_minimum  { 0; }
+sub _build_maximum  { 100; }
+sub _build_position { 0; }
+sub _build_label_type    { 'percent'; }
 
 #
 # prevent position attribute to be out of bounds
 around set_position => sub {
 	my ($orig, $self, $pos) = @_;
-	$pos = $self->get_minimum if $pos < $self->get_minimum;
-	$pos = $self->get_maximum if $pos > $self->get_maximum;
+	$pos < $self->get_minimum
+	  and $pos = $self->get_minimum;
+	$pos > $self->get_maximum
+	  and $pos = $self->get_maximum;
 	$self->$orig($pos);
 };
-
-=method draw
-
-Redraw the progress bar.
-
-=cut
-
-sub draw {
-	my ($self) = @_;
-	$self->SUPER::draw(); # draw the border if any
-
-	my $theme = $self->get_theme();
-	my $c     = $self->get_coordinates();
-	my $w     = $c->width();
-
-	# [|||||||||||----34%--------------]
-	#  <- $done -><-       $left     ->
-
-	my $cdone = $self->get_theme_property('char_done');
-	my $cleft = $self->get_theme_property('char_left');
-	my $bw    = $self->get_theme_property('border_width');
-
-	my $min = $self->get_minimum;
-	my $max = $self->get_maximum;
-	my $pos = $self->get_position;
-
-	my $done = ( $pos - $min ) / ( $max - $min ) * $w;
-	my $left = ( $max - $pos - $min ) / ( $max - $min ) * $w;
-
-	$theme->draw_string( $c->x1() + $bw,         $c->y1() + $bw, $cdone x $done );
-	$theme->draw_string( $c->x1() + $bw + $done, $c->y1() + $bw, $cleft x $left );
-
-	#$theme->draw_string($c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2);
-
-	return;
-}
-
-=method get_desired_space
-
-Given a coordinate representing the available space, returns the space desired
-The Button desires the minimum size : text length plus the button brackets
-
-  input:  a Curses::Toolkit::Object::Coordinates object
-  output: a Curses::Toolkit::Object::Coordinates object
-
-The desired space is as much horizontal space as possible, with a height of 1.
-
-=cut
-
-sub get_desired_space {
-	my ( $self, $available_space ) = @_;
-	my $desired = $available_space->clone;
-	$desired->set( y2 => $desired->y1 + 1 );
-	return $desired;
-}
-
-=method get_minimum_space
-
-Given a coordinate representing the available space, returns the
-minimum space required The Button requires the text length plus the
-button brackets.
-
-  input:  a Curses::Toolkit::Object::Coordinates object
-  output: a Curses::Toolkit::Object::Coordinates object
-
-The ProgressBar requires 12x1 minimum.
-
-=cut
-
-sub get_minimum_space {
-	my ( $self, $available_space ) = @_;
-
-	my $minimum_space = $available_space->clone;
-	my $default_width = $self->get_theme_property('default_width');
-	$minimum_space->set(
-		x2 => $available_space->x1() + $default_width,
-		y2 => $available_space->y1() + 1,
-	);
-	return $minimum_space;
-}
-
 
 =method possible_signals
 
@@ -223,33 +145,25 @@ sub _get_theme_properties_definition {
 	my ($self) = @_;
 	return {
 		%{ $self->SUPER::_get_theme_properties_definition() },
-		default_width => { optional => 0, type => SCALAR, },
 		char_done     => { optional => 0, type => SCALAR, },
 		char_left     => { optional => 0, type => SCALAR, },
 	};
 }
 
 1;
+
 __END__
 
+=head1 SYNOPSIS
 
-=head1 Appearence
-
-Standard theme:
-
-  ||||||||---------- 14% ------------------
-
-With a border:
-
-  +------------------------------------------+
-  |||||||||---------- 14% -------------------|
-  +------------------------------------------+
-
+    # don't use this widget directly
 
 =head1 DESCRIPTION
 
-The C<Curses::Toolkit::Widget::ProgressBar> widget is a classical
-progress bar widget, used to provide some sort of progress information
-to your program user.
+A ProgressBar widget is a widget that displays a progress bar horizontally or
+vertically
 
+Don't use this widget directly. Please see
+L<Curses::Toolkit::Widget::HProgressBar> and
+L<Curses::Toolkit::Widget::VProgressBar>.
 

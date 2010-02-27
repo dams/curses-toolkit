@@ -65,12 +65,15 @@ sub _get_default_properties {
 			left_enclosing  => '[',
 			right_enclosing => ']',
 		},
-		'Curses::Toolkit::Widget::ProgressBar' => {
+		'Curses::Toolkit::Widget::HProgressBar' => {
 
 			# inherited from Border
 			border_width  => 0,
+
+			left_enclosing  => '[',
+			right_enclosing => ']',
 			default_width => 12,
-			char_done     => '=',
+			char_done     => '|',
 			char_left     => '-',
 		},
 	);

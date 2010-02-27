@@ -14,7 +14,7 @@ sub main {
 	use Curses::Toolkit::Widget::HBox;
 	use Curses::Toolkit::Widget::VBox;
 	use Curses::Toolkit::Widget::Button;
-	use Curses::Toolkit::Widget::ProgressBar;
+	use Curses::Toolkit::Widget::HProgressBar;
 
 	my $root = POE::Component::Curses->spawn;
 
@@ -22,7 +22,7 @@ sub main {
 	my $window = Curses::Toolkit::Widget::Window->new
 		->set_name('window')
 		->set_title("progress bar demo")
-		->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => '100%' );
+		->set_coordinates( x1 => '10%', y1 => '10%', x2 => '90%', y2 => '90%' );
 	$root->add_window( $window );
 
 	# vbox holding the widgets
@@ -32,7 +32,7 @@ sub main {
 
 	my $but1 = Curses::Toolkit::Widget::Button->new_with_label('-')->set_name('but1');
 	my $but2 = Curses::Toolkit::Widget::Button->new_with_label('+')->set_name('but2');
-	my $bar  = Curses::Toolkit::Widget::ProgressBar->new;
+	my $bar  = Curses::Toolkit::Widget::HProgressBar->new;
 
 	my $hbox = Curses::Toolkit::Widget::HBox->new;
 	$hbox->pack_end($but1);

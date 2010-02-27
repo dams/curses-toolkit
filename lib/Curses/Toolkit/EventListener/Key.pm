@@ -5,6 +5,8 @@ package Curses::Toolkit::EventListener::Key;
 
 # ABSTRACT: event listener listening for a keyboard action
 
+# XXX : THIS STUFF IS NEVER USED
+
 use parent qw(Curses::Toolkit::EventListener);
 
 use Params::Validate qw(:all);

@@ -81,9 +81,31 @@ The Border desires all the space available, so it returns the available space
 =cut
 
 sub get_desired_space {
+
 	my ( $self, $available_space ) = @_;
+
+	my ($child)     = $self->get_children();
+	my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
+	my $bw          = $self->get_theme_property('border_width');
+	if ( defined $child ) {
+		my $child_available_space = $available_space->clone();
+		$child_available_space->set(
+			x1 => $available_space->x1() + $bw, y1 => $available_space->y1() + $bw,
+			x2 => $available_space->x2() - $bw, y2 => $available_space->y2() - $bw,
+		);
+		$child_space = $child->get_desired_space($child_available_space);
+
+		my $desired_space = $available_space->clone();
+		$desired_space->set(
+			x2 => $desired_space->x1() + $child_space->width() + 2 * $bw,
+			y2 => $desired_space->y1() + $child_space->height() + 2 * $bw,
+		);
+		return $desired_space;
+	}
+
 	my $desired_space = $available_space->clone();
 	return $desired_space;
+
 }
 
 =head2 get_minimum_space

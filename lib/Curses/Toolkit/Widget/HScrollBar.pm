@@ -5,7 +5,7 @@ package Curses::Toolkit::Widget::HScrollBar;
 
 # ABSTRACT: a horizontal scrollbar widget
 
-use parent qw{ Curses::Toolkit::Widget };
+use parent qw(Curses::Toolkit::Widget);
 
 1;
 __END__

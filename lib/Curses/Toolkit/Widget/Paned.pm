@@ -268,13 +268,8 @@ sub draw {
 	my $c  = $self->get_coordinates();
 	my $gp = $self->get_gutter_position();
 
-	#	my $gw = $self->get_theme_property('gutter_width');
 	my $gw = 1;
 
-	# 	if ($gp + $gw >= $c->x2()) {
-	# 		$gp = $c->x2() - $gw - 1;
-	# 		$self->_set_actual_gutter_position($gp);
-	# 	}
 	$gw > 0 or return;
 	for my $i ( 0 .. $gw - 1 ) {
 		$self->_p7( $theme, $c, $i, $gp, $attr );
