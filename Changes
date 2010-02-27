@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+0.100320
+	more signals
+	additional examples
+	introducing "visible shape" concept
 0.100260
 	the Label widget now supports color, underline, bold, etc
 	more signals and events
