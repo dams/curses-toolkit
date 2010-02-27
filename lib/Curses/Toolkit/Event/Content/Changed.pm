@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Content::Changed;
+
 # ABSTRACT: event that is related to content change
 
 use parent qw(Curses::Toolkit::Event::Content);
@@ -23,6 +24,6 @@ Event that is related to content change
 
 # this event has to be dispatched on a specific widget, so get_matching_widget
 # returns void
-sub get_matching_widget { return }
+sub get_matching_widget {return}
 
 1;

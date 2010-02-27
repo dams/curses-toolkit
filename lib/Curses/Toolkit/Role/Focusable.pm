@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Role::Focusable;
+
 # ABSTRACT: This role implements the fact that a widget can have focus
 
 use parent qw(Curses::Toolkit::Role);
@@ -23,9 +24,10 @@ None, this is a role, so it has no constructor
 =cut
 
 sub new {
-    my ($class) = shift;
-    # TODO : use Exception;
-    # $class eq __PACKAGE__ and;
+	my ($class) = shift;
+
+	# TODO : use Exception;
+	# $class eq __PACKAGE__ and;
 	die "role class, has no constructor";
 }
 
@@ -36,8 +38,8 @@ Returns 1, except if the widget has its sensitivity set to false
 =cut
 
 sub is_focusable {
-    my ($self) = @_;
-	return($self->is_sensitive() ? 1 : 0);
+	my ($self) = @_;
+	return ( $self->is_sensitive() ? 1 : 0 );
 }
 
 =head2 set_focus
@@ -57,29 +59,26 @@ sub set_focus {
 	my ($focus) = validate_pos( @_, { type => BOOLEAN } );
 
 	$self->is_focusable()
-	  or return $self;
-	
-	if ($self->can('get_window')) {
+		or return $self;
+
+	if ( $self->can('get_window') ) {
 		my $window = $self->get_window();
-		if (defined $window) {
+		if ( defined $window ) {
 			if ($focus) {
 				use Curses::Toolkit::Event::Focus::In;
+
 				# restrict the event to the widget
-				my $event_focus_in = Curses::Toolkit::Event::Focus::In
-				                     ->new
-									 ->enable_restriction;
-				$self->fire_event($event_focus_in, $self);
+				my $event_focus_in = Curses::Toolkit::Event::Focus::In->new->enable_restriction;
+				$self->fire_event( $event_focus_in, $self );
 				$window->set_focused_widget($self);
 			} else {
 				use Curses::Toolkit::Event::Focus::Out;
-				my $event_focus_out = Curses::Toolkit::Event::Focus::Out
-				                      ->new
-									  ->enable_restriction;
-				$self->fire_event($event_focus_out, $self);
+				my $event_focus_out = Curses::Toolkit::Event::Focus::Out->new->enable_restriction;
+				$self->fire_event( $event_focus_out, $self );
 			}
 		}
 	}
-	$self->set_property(basic => 'focused', $focus ? 1 : 0);
+	$self->set_property( basic => 'focused', $focus ? 1 : 0 );
 	$self->needs_redraw();
 	return $self;
 }
@@ -95,7 +94,7 @@ Retrieves the focus setting of the widget.
 
 sub is_focused {
 	my ($self) = @_;
-	return $self->get_property(basic => 'focused');
+	return $self->get_property( basic => 'focused' );
 }
 
 1;

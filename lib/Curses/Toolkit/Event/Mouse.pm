@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Mouse;
+
 # ABSTRACT: base class for mouse events
 
 use parent qw(Curses::Toolkit::Event);

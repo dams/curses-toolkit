@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Widget::Button;
+
 # ABSTRACT: a simple text button widget
 
 use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
@@ -77,7 +78,7 @@ Set the text of the entry
 
 sub set_text {
 	my $self = shift;
-	
+
 	my ($text) = validate_pos( @_, { type => SCALAR } );
 	$self->{text} = $text;
 	return $self;
@@ -101,16 +102,16 @@ sub get_text {
 # <----- w1 ---->
 #   <-- w2 --->
 # < button text >
-# --^  o1 
-# ------- o2 --^ 
+# --^  o1
+# ------- o2 --^
 
 # <----- w1 ---->
 #   <-- w2 --->
 # < button text >
 # <> wl
 #              <> wr
-# --^  o1 
-# ------- o2 --^ 
+# --^  o1
+# ------- o2 --^
 
 
 =head2 draw
@@ -122,25 +123,25 @@ sub draw {
 	$self->SUPER::draw(); # draw the border if any
 
 	my $theme = $self->get_theme();
-	my $c = $self->get_coordinates();
-	my $text = $self->get_text();
+	my $c     = $self->get_coordinates();
+	my $text  = $self->get_text();
 
-	my $left_string = $self->get_theme_property('left_enclosing');
+	my $left_string  = $self->get_theme_property('left_enclosing');
 	my $right_string = $self->get_theme_property('right_enclosing');
-	my $bw = $self->get_theme_property('border_width');
-	my $wl = length $left_string;
-	my $wr = length $right_string;
+	my $bw           = $self->get_theme_property('border_width');
+	my $wl           = length $left_string;
+	my $wr           = length $right_string;
 
 	my $w1 = $c->width() - 2 * $bw;
 	my $w2 = $w1 - $wl - $wr;
 	my $o1 = $wl;
 	my $o2 = $w1 - $wr;
-	my $t1 = ' ' x (($w2 - length $text) / 2);
-	my $t2 = ' ' x ($w2 - length($text) - length($t1) );
+	my $t1 = ' ' x ( ( $w2 - length $text ) / 2 );
+	my $t2 = ' ' x ( $w2 - length($text) - length($t1) );
 
-	$theme->draw_string($c->x1() + $bw, $c->y1() + $bw, $left_string);
-	$theme->draw_string($c->x1() + $bw + $o2, $c->y1() + $bw, $right_string);
-	$theme->draw_string($c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2);
+	$theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
+	$theme->draw_string( $c->x1() + $bw + $o2, $c->y1() + $bw, $right_string );
+	$theme->draw_string( $c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2 );
 
 	return;
 }
@@ -155,7 +156,7 @@ The Button desires the minimum size : text length plus the button brackets
 
 =cut
 
-sub get_desired_space {	shift->get_minimum_space(@_) }
+sub get_desired_space { shift->get_minimum_space(@_) }
 
 =head2 get_minimum_space
 
@@ -168,16 +169,17 @@ The Button requires the text length plus the button brackets
 =cut
 
 sub get_minimum_space {
-	my ($self, $available_space) = @_;
+	my ( $self, $available_space ) = @_;
 	my $text = $self->get_text();
 
 	my $minimum_space = $available_space->clone();
-	my $bw = $self->get_theme_property('border_width');
-	my $left_string = $self->get_theme_property('left_enclosing');
-	my $right_string = $self->get_theme_property('right_enclosing');
-	$minimum_space->set( x2 => $available_space->x1() + 2 * $bw + length($left_string) + length($text) + length($right_string),
-						 y2 => $available_space->y1() + 1 + 2 * $bw,
-					   );
+	my $bw            = $self->get_theme_property('border_width');
+	my $left_string   = $self->get_theme_property('left_enclosing');
+	my $right_string  = $self->get_theme_property('right_enclosing');
+	$minimum_space->set(
+		x2 => $available_space->x1() + 2 * $bw + length($left_string) + length($text) + length($right_string),
+		y2 => $available_space->y1() + 1 + 2 * $bw,
+	);
 	return $minimum_space;
 }
 
@@ -195,9 +197,10 @@ L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
 
 sub possible_signals {
 	my ($self) = @_;
-	return ( $self->SUPER::possible_signals(),
-			 clicked => 'Curses::Toolkit::Signal::Clicked',
-		   );
+	return (
+		$self->SUPER::possible_signals(),
+		clicked => 'Curses::Toolkit::Signal::Clicked',
+	);
 }
 
 =head1 Theme related properties
@@ -244,16 +247,17 @@ Example :
 
 sub _get_theme_properties_definition {
 	my ($self) = @_;
-	return { %{$self->SUPER::_get_theme_properties_definition() },
-			 left_enclosing => {
-			   optional => 0,
-			   type => SCALAR,
-			 },
-			 right_enclosing => {
-			   optional => 0,
-			   type => SCALAR,
-			 },
-		   }
+	return {
+		%{ $self->SUPER::_get_theme_properties_definition() },
+		left_enclosing => {
+			optional => 0,
+			type     => SCALAR,
+		},
+		right_enclosing => {
+			optional => 0,
+			type     => SCALAR,
+		},
+	};
 }
 
 1;

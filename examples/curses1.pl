@@ -8,28 +8,28 @@ use Curses;
 
 my $curses_handler = Curses->new();
 
-has_colors() or
-  die "color is not supported";
+has_colors()
+	or die "color is not supported";
 
 start_color();
 
-init_pair(1, COLOR_YELLOW, COLOR_BLUE);
+init_pair( 1, COLOR_YELLOW, COLOR_BLUE );
 
 #$curses_handler->attron(COLOR_PAIR(1));
-$curses_handler->addstr(5, 5, '### 1 2 A B Z');
+$curses_handler->addstr( 5, 5, '### 1 2 A B Z' );
 
 $curses_handler->attron(A_UNDERLINE);
-$curses_handler->addstr(6, 5, '### 1 2 A B Z');
+$curses_handler->addstr( 6, 5, '### 1 2 A B Z' );
 
 $curses_handler->attron(A_BOLD);
-$curses_handler->addstr(7, 5, '### 1 2 A B Z');
+$curses_handler->addstr( 7, 5, '### 1 2 A B Z' );
 
 $curses_handler->attron(A_REVERSE);
-$curses_handler->addstr(8, 5, '### 1 2 A B Z');
+$curses_handler->addstr( 8, 5, '### 1 2 A B Z' );
 
 $curses_handler->attrset(0);
-$curses_handler->addstr(9, 5, '### 1 2 A B Z');
-$curses_handler->addstr(10, 5, '### 1 2 A B Z');
+$curses_handler->addstr( 9,  5, '### 1 2 A B Z' );
+$curses_handler->addstr( 10, 5, '### 1 2 A B Z' );
 
 
 $curses_handler->refresh();

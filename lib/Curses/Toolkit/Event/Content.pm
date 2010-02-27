@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Content;
+
 # ABSTRACT: base class for content events
 
 use parent qw(Curses::Toolkit::Event);

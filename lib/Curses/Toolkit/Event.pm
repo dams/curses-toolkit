@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event;
+
 # ABSTRACT: base class for events
 
 use Params::Validate qw(:all);
@@ -36,11 +37,12 @@ parent widget. Only the listener of the widget will be tested.
 =cut
 
 sub new {
-    my $class = shift;
-    $class eq __PACKAGE__ and die "abstract class";
-	return bless { can_propagate => 1,
-				   restricted => 0,
-				 }, $class;
+	my $class = shift;
+	$class eq __PACKAGE__ and die "abstract class";
+	return bless {
+		can_propagate => 1,
+		restricted    => 0,
+	}, $class;
 }
 
 =head1 METHODS

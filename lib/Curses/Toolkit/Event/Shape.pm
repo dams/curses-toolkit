@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Event::Shape;
+
 # ABSTRACT: event that is related to root window shape change
 
 use parent qw(Curses::Toolkit::Event);
@@ -23,25 +24,27 @@ Event that is related to root window shape change
 
 sub new {
 	my $class = shift;
-	my $self = $class->SUPER::new();
-	my %args = validate( @_,
-						 { type => 
-						   { type => SCALAR,
-							 callbacks => { 'must be one of ' . join(', ', $self->get_types()) =>
-											sub { my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] }; },
-										  }
-						   },
-						   params => 0,
-						   root_window => { isa => 'Curses::Toolkit' },
-						 }
-					   );
+	my $self  = $class->SUPER::new();
+	my %args  = validate(
+		@_,
+		{   type => {
+				type      => SCALAR,
+				callbacks => {
+					'must be one of ' . join( ', ', $self->get_types() ) => sub {
+						my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] };
+					},
+				}
+			},
+			params      => 0,
+			root_window => { isa => 'Curses::Toolkit' },
+		}
+	);
 	$args{params} ||= {};
-	my @args = $args{params};
-	my $definition = $self->get_params_definition($args{type});
-	my %params = validate( @args, $definition ),
-	$self->{type}   = $args{type};
-	$self->{root_window}   = $args{root_window};
-	$self->{params} = \%params;
+	my @args       = $args{params};
+	my $definition = $self->get_params_definition( $args{type} );
+	my %params     = validate( @args, $definition ), $self->{type} = $args{type};
+	$self->{root_window} = $args{root_window};
+	$self->{params}      = \%params;
 	return $self;
 }
 
@@ -62,11 +65,13 @@ Returns the types that this Event Class supports
 
 =cut
 
-my %types = ( change => { },
-			  hide => {},
-			  show => {},
-			  destroy => {},
-			);
+my %types = (
+	change  => {},
+	hide    => {},
+	show    => {},
+	destroy => {},
+);
+
 sub get_types {
 	my ($self) = @_;
 	return keys %types;
@@ -82,7 +87,7 @@ Returns the parameter definition for a given type, as specified in Params::Valid
 =cut
 
 sub get_params_definition {
-	my ($self, $type) = @_;
+	my ( $self, $type ) = @_;
 	return $types{$type};
 }
 
