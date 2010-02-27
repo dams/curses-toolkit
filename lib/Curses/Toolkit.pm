@@ -63,6 +63,12 @@ use. In this case you would do something like :
   ...
   $root->render
 
+=head1 TUTORIAL
+
+If you are new with C<Curses::Toolkit>, I suggest you go through the tutorial. You can find it here:
+
+L<Curses::Toolkit::Tutorial> (not yet done!)
+
 =head1 WIDGETS
 
 Curses::Toolkit is based on a widget model, inspired by Gtk. I suggest you read
@@ -84,7 +90,11 @@ To display simple text, with text colors and attributes
 
 =item L<Curses::Toolkit::Widget::Button>
 
-Simple interaction with the user
+Simple text button widget to interact with the user
+
+=item L<Curses::Toolkit::Widget::GenericButton>
+
+A button widget that can contain anything, not just a label
 
 =item L<Curses::Toolkit::Widget::Entry>
 
@@ -118,7 +128,118 @@ Not yet implemented
 
 Not yet implemented
 
+=item L<Curses::Toolkit::Widget::HProgressBar>
+
+An horizontal progress bar widget
+
 =back
+
+For reference, here are the various hierarchy of the objects/concepts of the
+toolkit you might have to use :
+
+=head1 WIDGETS HIERARCHY
+
+This is the inheritance hierarchy of the widgets of the toolkit :
+
+  Curses::Toolkit::Widget
+  |
+  +-- Curses::Toolkit::Widget::Window
+  |   |
+  |   +-- Curses::Toolkit::Widget::Window::Dialog
+  |       |
+  |       + Curses::Toolkit::Widget::Window::Dialog::About
+  |
+  +-- Curses::Toolkit::Widget::Label
+  |
+  +-- Curses::Toolkit::Widget::Entry
+  |
+  +-- Curses::Toolkit::Widget::Scrollbar
+  |   |
+  |   +-- Curses::Toolkit::Widget::HScrollbar
+  |   |
+  |   +-- Curses::Toolkit::Widget::VScrollbar
+  |
+  +-- Curses::Toolkit::Widget::Container
+      |
+      +-- Curses::Toolkit::Widget::HBox
+      |
+      +-- Curses::Toolkit::Widget::VBox
+      |
+      +-- Curses::Toolkit::Widget::Paned
+      |   |
+      |   +-- Curses::Toolkit::Widget::HPaned
+      |   |
+      |   +-- Curses::Toolkit::Widget::VPaned
+      |
+      +-- Curses::Toolkit::Widget::Bin
+          |
+          +-- Curses::Toolkit::Widget::Border
+              |
+              +-- Curses::Toolkit::Widget::Button
+              |
+              +-- Curses::Toolkit::Widget::GenericButton
+              |
+              +-- Curses::Toolkit::Widget::ProgressBar
+                  |
+                  +-- Curses::Toolkit::Widget::HProgressBar
+                  |
+                  +-- Curses::Toolkit::Widget::VProgressBar
+
+=head1 SIGNALS HIERARCHY
+
+This is the inheritance hierarchy of the signals :
+
+  Curses::Toolkit::Signal
+  |
+  +-- Curses::Toolkit::Signal::Clicked
+  |
+  +-- Curses::Toolkit::Signal::Content
+  |   |
+  |   +-- Curses::Toolkit::Signal::Content::Changed
+  |
+  +-- Curses::Toolkit::Signal::Focused
+      |
+      +-- Curses::Toolkit::Signal::Focused::In
+      |
+      +-- Curses::Toolkit::Signal::Focused::Out
+
+=head1 THEMES HIERARCHY
+
+This is the inheritance hierarchy of the themes :
+
+  Curses::Toolkit::Theme
+  |
+  +-- Curses::Toolkit::Theme::Default
+      |
+      +-- Curses::Toolkit::Theme::Default::Color
+      |
+      +-- Curses::Toolkit::Theme::Default::Color::Pink
+      |
+      +-- Curses::Toolkit::Theme::Default::Color::Yellow
+
+=head1 OBJECTS HIERARCHY
+
+This is the list of objects of the toolkit :
+
+  Curses::Toolkit::Object
+  |
+  +-- Curses::Toolkit::Object::Coordinates
+  |
+  +-- Curses::Toolkit::Object::MarkupString
+  |
+  +-- Curses::Toolkit::Object::Shape
+
+=head1 ROLES HIERARCHY
+
+For now there is only one role
+
+  Curses::Toolkit::Role::Focusable
+
+=head1 TYPES HIERARCHY
+
+For now there is only one types class :
+
+  Curses::Toolkit::Types
 
 =head1 CLASS METHODS
 
