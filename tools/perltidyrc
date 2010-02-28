@@ -3,10 +3,10 @@
 --add-semicolons
 --add-whitespace
 --backup-file-extension="bak"
---blanks-before-blocks
+--noblanks-before-blocks
 --blanks-before-comments
 --blanks-before-subs
---block-brace-tightness=1
+--block-brace-tightness=0
 --block-brace-vertical-tightness=0
 --nobrace-left-and-indent
 --brace-tightness=1
@@ -30,7 +30,6 @@
 --delete-old-newlines
 --delete-old-whitespace
 --delete-semicolons
---entab-leading-whitespace=4
 --format="tidy"
 --format-skipping
 --fuzzy-line-length
