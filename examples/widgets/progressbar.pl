@@ -19,11 +19,10 @@ sub main {
 	my $root = POE::Component::Curses->spawn;
 
 	# create the main window
-	my $window = Curses::Toolkit::Widget::Window->new
-		->set_name('window')
-		->set_title("progress bar demo")
+	my $window =
+		Curses::Toolkit::Widget::Window->new->set_name('window')->set_title("progress bar demo")
 		->set_coordinates( x1 => '10%', y1 => '10%', x2 => '90%', y2 => '90%' );
-	$root->add_window( $window );
+	$root->add_window($window);
 
 	# vbox holding the widgets
 	my $vbox = Curses::Toolkit::Widget::HBox->new;

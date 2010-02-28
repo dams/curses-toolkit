@@ -54,19 +54,19 @@ has label_type => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
 
 =cut
 
-sub _build_minimum  { 0; }
-sub _build_maximum  { 100; }
-sub _build_position { 0; }
-sub _build_label_type    { 'percent'; }
+sub _build_minimum    { 0; }
+sub _build_maximum    { 100; }
+sub _build_position   { 0; }
+sub _build_label_type { 'percent'; }
 
 #
 # prevent position attribute to be out of bounds
 around set_position => sub {
-	my ($orig, $self, $pos) = @_;
+	my ( $orig, $self, $pos ) = @_;
 	$pos < $self->get_minimum
-	  and $pos = $self->get_minimum;
+		and $pos = $self->get_minimum;
 	$pos > $self->get_maximum
-	  and $pos = $self->get_maximum;
+		and $pos = $self->get_maximum;
 	$self->$orig($pos);
 };
 
@@ -145,8 +145,8 @@ sub _get_theme_properties_definition {
 	my ($self) = @_;
 	return {
 		%{ $self->SUPER::_get_theme_properties_definition() },
-		char_done     => { optional => 0, type => SCALAR, },
-		char_left     => { optional => 0, type => SCALAR, },
+		char_done => { optional => 0, type => SCALAR, },
+		char_left => { optional => 0, type => SCALAR, },
 	};
 }
 

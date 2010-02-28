@@ -186,7 +186,8 @@ sub main {
 		$root->add_delay( $t->(3), sub { $set->("\n") } );
 		$root->add_delay( $t->(3), sub { $set->("I am not the funny guy which is standing on the scene.\n") } );
 		$root->add_delay( $t->(5), sub { $app->("The funny guy is called BooK, and I'm sure you all know him.") } );
-		$root->add_delay( $t->(5),
+		$root->add_delay(
+			$t->(5),
 			sub { $set->("I couldn't make it to the YAPC::EU this year\nso I asked Book to give this talk for me !") }
 		);
 		$root->add_delay( $t->(7), sub { $set->("") } );
@@ -209,8 +210,10 @@ sub main {
 		$root->add_delay( $t->(2), sub { $set->("Book recently won the White Camel Award !\n") } );
 		$root->add_delay( $t->(2), sub { $app->("So I think he deserves a lot of applause !\n") } );
 		$root->add_delay( $t->(2), sub { $app->(" (Book, at this point, I suggest you bow)!\n") } );
-		$root->add_delay( $t->(10),
-			sub { $set->(" OK ! now back to business (Book, you can put your T-Shirt back on)\n") } );
+		$root->add_delay(
+			$t->(10),
+			sub { $set->(" OK ! now back to business (Book, you can put your T-Shirt back on)\n") }
+		);
 
 		my $audience_label;
 		$root->add_delay( $t->(5), sub { $set->("Let's start with a window\n"); } );
@@ -371,8 +374,10 @@ sub main {
 			}
 		);
 		$root->add_delay( $t->(1), sub { $set->("") } );
-		$root->add_delay( $t->(1),
-			sub { $set->("Please enter something in the entry and hit space on the button\n") } );
+		$root->add_delay(
+			$t->(1),
+			sub { $set->("Please enter something in the entry and hit space on the button\n") }
+		);
 		$root->add_delay( $t->(2),  sub { $app->("You can use <tab> to navigate between widgets\n") } );
 		$root->add_delay( $t->(2),  sub { $app->("Select the entry and hit Enter. Then : \n") } );
 		$root->add_delay( $t->(1),  sub { $app->("You can use <Ctrl-A> and <Ctrl-E> to navigate\n") } );

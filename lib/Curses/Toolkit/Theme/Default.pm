@@ -68,13 +68,13 @@ sub _get_default_properties {
 		'Curses::Toolkit::Widget::HProgressBar' => {
 
 			# inherited from Border
-			border_width  => 0,
+			border_width => 0,
 
 			left_enclosing  => '[',
 			right_enclosing => ']',
-			default_width => 12,
-			char_done     => '|',
-			char_left     => '-',
+			default_width   => 12,
+			char_done       => '|',
+			char_left       => '-',
 		},
 	);
 	return $default{$class_name} || {};

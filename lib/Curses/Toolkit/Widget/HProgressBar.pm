@@ -70,32 +70,32 @@ sub draw {
 	my $bw           = $self->get_theme_property('border_width');
 
 
-	my $value = 100 * ( $pos - $min ) / ( $max - $min );
-	my $text = '';
+	my $value      = 100 * ( $pos - $min ) / ( $max - $min );
+	my $text       = '';
 	my $label_type = $self->get_label_type;
-	if ( $label_type eq 'percent') {
-		$text = sprintf(" %.2d%% ", $value);
-	} elsif ( $label_type eq 'value') {
+	if ( $label_type eq 'percent' ) {
+		$text = sprintf( " %.2d%% ", $value );
+	} elsif ( $label_type eq 'value' ) {
 		$text = "$value";
 	}
 
-    # <------------ w1 ---------------->
-    #  <------------ w2 -------------->
+	# <------------ w1 ---------------->
+	#  <------------ w2 -------------->
 	#  <-$w_done-><-     $w_left     ->
 	# [|||||||||||----34%--------------]
-    # -^  o1
-    # ----- o2 ---^
-    # --------- o3 ---^
-    # ---------------- o4 -------------^
+	# -^  o1
+	# ----- o2 ---^
+	# --------- o3 ---^
+	# ---------------- o4 -------------^
 
-	my $w1 = $c->width() - 2 * $bw;
-	my $w2 = $w1 - $wl - $wr;
+	my $w1     = $c->width() - 2 * $bw;
+	my $w2     = $w1 - $wl - $wr;
 	my $w_done = int( $w2 * ( $pos - $min ) / ( $max - $min ) );
 	my $w_left = $w2 - $w_done;
 
 	my $o1 = $wl;
 	my $o2 = $o1 + $w_done;
-	my $o3 = ($w1 - length $text ) / 2;
+	my $o3 = ( $w1 - length $text ) / 2;
 	my $o4 = $w1 - $wr;
 
 	$theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
