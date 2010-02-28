@@ -7,7 +7,7 @@ package Curses::Toolkit::Types;
 
 use Moose::Util::TypeConstraints;
 
-enum PROGRESS_BAR_LABEL => qw{ none value percent };
+enum PROGRESS_BAR_LABEL => qw( none value percent );
 
 1;
 __END__
