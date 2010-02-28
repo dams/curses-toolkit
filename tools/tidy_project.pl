@@ -3,21 +3,19 @@
 use strict;
 use warnings;
 
-eval("require Perl::Tidy");
-if($@) {
-	die "Please install Perl::Tidy (e.g. cpan Perl::Tidy)";
-}
+eval('require Perl::Tidy');
+$@ and die 'Please install Perl::Tidy (e.g. cpan Perl::Tidy)';
 
 #
-use Cwd                   qw{ cwd };
-use File::Spec::Functions qw{ catfile catdir };
+use Cwd                   qw( cwd );
+use File::Spec::Functions qw( catfile catdir );
 use File::Find::Rule;
-use FindBin qw{ $Bin };
+use FindBin qw( $Bin );
 
 # check if perltidyrc file exists
 my $perltidyrc = catfile( $Bin, 'perltidyrc' );
-die "cannot find perltidy configuration file: $perltidyrc\n"
-	unless -e $perltidyrc;
+-e $perltidyrc
+  or die "cannot find perltidy configuration file: $perltidyrc\n";
 
 # build list of perl files to reformat
 my @pmfiles = @ARGV
@@ -34,6 +32,7 @@ my @files = (@pmfiles, @tfiles, @examples);
 
 # formatting documents
 my $cmd = "perltidy --backup-and-modify-in-place --profile=$perltidyrc @files";
+
 system($cmd) == 0 or die "perltidy exited with return code " . ($? >> 8);
 
 # removing backup files
