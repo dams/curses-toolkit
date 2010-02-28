@@ -125,6 +125,7 @@ sub get_desired_space {
     my ( $self, $available_space ) = @_;
     my $desired_space = $available_space->clone;
     $desired_space->set( y2 => $desired_space->y1 + 1 );
+    $desired_space->grow_to($self->get_minimum_space($available_space));
     return $desired_space;
 }
 
@@ -146,9 +147,12 @@ sub get_minimum_space {
 
     my $minimum_space = $available_space->clone;
     my $default_width = $self->get_theme_property('default_width');
+    my $bw            = $self->get_theme_property('border_width');
+    my $left_string   = $self->get_theme_property('left_enclosing');
+    my $right_string  = $self->get_theme_property('right_enclosing');
     $minimum_space->set(
-        x2 => $available_space->x1() + $default_width,
-        y2 => $available_space->y1() + 1,
+        x2 => $available_space->x1() + 2 * $bw + length($left_string) + $default_width + length($right_string),
+        y2 => $available_space->y1() + 1 + 2 * $bw,
     );
     return $minimum_space;
 }

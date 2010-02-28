@@ -39,10 +39,10 @@ C<percent>.
 
 =cut
 
-has minimum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has maximum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has position => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw } );
-has label_type => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build );
+has minimum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw }, traits => [ 'Chained' ] );
+has maximum  => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw }, traits => [ 'Chained' ]  );
+has position => ( rw, isa => 'Num', lazy_build, trigger => sub { shift->needs_redraw }, traits => [ 'Chained' ]  );
+has label_type => ( rw, isa => 'PROGRESS_BAR_LABEL', lazy_build, traits => [ 'Chained' ]  );
 
 
 # -- builders & initializers
