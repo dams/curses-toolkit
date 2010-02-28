@@ -353,8 +353,8 @@ The Label desires the minimum space that lets it display entirely
 =cut
 
 sub get_desired_space {
-    my $self = shift;
-    return $self->get_minimum_space(@_);
+    my ( $self, $available_space ) = @_;
+    return $self->_get_space($available_space, $self->get_wrap_method);
 }
 
 =head2 get_minimum_space
@@ -368,6 +368,11 @@ needed to properly display itself
 =cut
 
 sub get_minimum_space {
+    my ( $self, $available_space ) = @_;
+    return $self->_get_space($available_space, 'active');
+}
+
+sub _get_space {
     my ( $self, $available_space ) = @_;
 
     my $minimum_space = $available_space->clone();
@@ -410,5 +415,8 @@ sub get_minimum_space {
         return $minimum_space;
     }
     die;
+
 }
+
+
 1;
