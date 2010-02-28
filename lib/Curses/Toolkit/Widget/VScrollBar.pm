@@ -24,10 +24,10 @@ Curses::Toolkit::Widget::ScrollArea
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new();
-	$self->{visibility_mode} = 'auto';
-	return $self;
+    my $class = shift;
+    my $self  = $class->SUPER::new();
+    $self->{visibility_mode} = 'auto';
+    return $self;
 }
 
 =head1 METHODS
@@ -42,10 +42,10 @@ Set the visibility mode of the scrollbar
 =cut
 
 sub set_visibility_mode {
-	my $self = shift;
-	my ($visibility_mode) = validate_pos( @_, { regex => qr/^(?:auto|always)$/ } );
-	$self->{visibility_mode} = $visibility_mode;
-	return $self;
+    my $self = shift;
+    my ($visibility_mode) = validate_pos( @_, { regex => qr/^(?:auto|always)$/ } );
+    $self->{visibility_mode} = $visibility_mode;
+    return $self;
 }
 
 =head2 get_visibility_mode
@@ -58,14 +58,14 @@ Returns the visibility mode of the scrollbar
 =cut
 
 sub get_visibility_mode {
-	my ($self) = @_;
-	return $self->{visibility_mode};
+    my ($self) = @_;
+    return $self->{visibility_mode};
 }
 
 sub draw {
-	my ($self) = @_;
-	my $theme => $self->get_theme();
-	my $c = get_coordinates();
+    my ($self) = @_;
+    my $theme => $self->get_theme();
+    my $c = get_coordinates();
 }
 
 

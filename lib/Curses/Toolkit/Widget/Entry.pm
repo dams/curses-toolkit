@@ -27,128 +27,128 @@ This widget consists of an entry
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new();
-	$self->{text}                = '';
-	$self->{cursor_position}     = 0;
-	$self->{text_display_offset} = 0;
+    my $class = shift;
+    my $self  = $class->SUPER::new();
+    $self->{text}                = '';
+    $self->{cursor_position}     = 0;
+    $self->{text_display_offset} = 0;
 
-	# by default in non edit mode
-	$self->{edit_mode} = 0;
+    # by default in non edit mode
+    $self->{edit_mode} = 0;
 
-	#	# default entry width
-	#	$self->{width} = $self->get_theme_property('default_width');
+    #	# default entry width
+    #	$self->{width} = $self->get_theme_property('default_width');
 
-	# set a key listener, disabled by default
-	$self->{key_listener} = Curses::Toolkit::EventListener->new(
-		accepted_events => {
-			'Curses::Toolkit::Event::Key' => sub {
-				my ($event) = @_;
+    # set a key listener, disabled by default
+    $self->{key_listener} = Curses::Toolkit::EventListener->new(
+        accepted_events => {
+            'Curses::Toolkit::Event::Key' => sub {
+                my ($event) = @_;
 
-				# accept only key strokes
-				$event->{type} eq 'stroke' or return 0;
-				$event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
-				$event->{params}{key} eq '<^D>'            and return 1;
-				$event->{params}{key} eq '<KEY_LEFT>'      and return 1;
-				$event->{params}{key} eq '<KEY_RIGHT>'     and return 1;
-				$event->{params}{key} eq '<KEY_UP>'        and return 1;
-				$event->{params}{key} eq '<KEY_DOWN>'      and return 1;
-				if ( $event->{params}{key} eq '<^?>' ) {
-					$event->{params}{key} = '<KEY_BACKSPACE>';
-					return 1;
-				}
-				if ( $event->{params}{key} eq '<^E>' ) {
-					$event->{params}{key} = '<KEY_DOWN>';
-					return 1;
-				}
-				if ( $event->{params}{key} eq '<^A>' ) {
-					$event->{params}{key} = '<KEY_UP>';
-					return 1;
-				}
+                # accept only key strokes
+                $event->{type} eq 'stroke' or return 0;
+                $event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
+                $event->{params}{key} eq '<^D>'            and return 1;
+                $event->{params}{key} eq '<KEY_LEFT>'      and return 1;
+                $event->{params}{key} eq '<KEY_RIGHT>'     and return 1;
+                $event->{params}{key} eq '<KEY_UP>'        and return 1;
+                $event->{params}{key} eq '<KEY_DOWN>'      and return 1;
+                if ( $event->{params}{key} eq '<^?>' ) {
+                    $event->{params}{key} = '<KEY_BACKSPACE>';
+                    return 1;
+                }
+                if ( $event->{params}{key} eq '<^E>' ) {
+                    $event->{params}{key} = '<KEY_DOWN>';
+                    return 1;
+                }
+                if ( $event->{params}{key} eq '<^A>' ) {
+                    $event->{params}{key} = '<KEY_UP>';
+                    return 1;
+                }
 
-				# accept simple character keys
-				length $event->{params}{key} == 1 and return 1;
+                # accept simple character keys
+                length $event->{params}{key} == 1 and return 1;
 
-				# don't accept other strange keys
-				return 0;
-			},
-		},
-		code => sub {
-			my ( $event, $entry ) = @_;
-			my $k = $event->{params}{key};
-			my $c = $entry->get_cursor_position();
-			my $t = $entry->get_text();
-			if ( $k eq '<KEY_LEFT>' ) {
-				$entry->move_cursor_position(-1);
-			} elsif ( $k eq '<KEY_RIGHT>' ) {
-				$entry->move_cursor_position(1);
-			} elsif ( $k eq '<KEY_UP>' ) {
-				$entry->set_cursor_position(0);
-			} elsif ( $k eq '<KEY_DOWN>' ) {
-				$entry->set_cursor_position( length($t) );
-			} elsif ( $k eq '<KEY_BACKSPACE>' ) {
-				if ( $c > 0 ) {
-					substr( $t, $c - 1, 1 ) = '';
-					$entry->set_text($t);
-					$entry->move_cursor_position(-1);
-				}
-			} elsif ( $k eq '<^D>' ) {
-				if ( $c < length($t) ) {
-					substr( $t, $c, 1 ) = '';
-					$entry->set_text($t);
-				}
-			} else {
-				substr( $t, $c, 0 ) = $k;
-				$entry->set_text($t);
-				$entry->move_cursor_position( length($k) );
-			}
-			$entry->needs_redraw();
+                # don't accept other strange keys
+                return 0;
+            },
+        },
+        code => sub {
+            my ( $event, $entry ) = @_;
+            my $k = $event->{params}{key};
+            my $c = $entry->get_cursor_position();
+            my $t = $entry->get_text();
+            if ( $k eq '<KEY_LEFT>' ) {
+                $entry->move_cursor_position(-1);
+            } elsif ( $k eq '<KEY_RIGHT>' ) {
+                $entry->move_cursor_position(1);
+            } elsif ( $k eq '<KEY_UP>' ) {
+                $entry->set_cursor_position(0);
+            } elsif ( $k eq '<KEY_DOWN>' ) {
+                $entry->set_cursor_position( length($t) );
+            } elsif ( $k eq '<KEY_BACKSPACE>' ) {
+                if ( $c > 0 ) {
+                    substr( $t, $c - 1, 1 ) = '';
+                    $entry->set_text($t);
+                    $entry->move_cursor_position(-1);
+                }
+            } elsif ( $k eq '<^D>' ) {
+                if ( $c < length($t) ) {
+                    substr( $t, $c, 1 ) = '';
+                    $entry->set_text($t);
+                }
+            } else {
+                substr( $t, $c, 0 ) = $k;
+                $entry->set_text($t);
+                $entry->move_cursor_position( length($k) );
+            }
+            $entry->needs_redraw();
 
-			# We consume the event, and don't allow it to propagate to
-			# other widgets
-			$event->disable_propagation();
-		},
-	);
-	$self->{key_listener}->disable();
-	$self->add_event_listener(
-		$self->{key_listener},
-	);
+            # We consume the event, and don't allow it to propagate to
+            # other widgets
+            $event->disable_propagation();
+        },
+    );
+    $self->{key_listener}->disable();
+    $self->add_event_listener(
+        $self->{key_listener},
+    );
 
-	# listen to the Enter key
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
-			accepted_events => {
-				'Curses::Toolkit::Event::Key' => sub {
-					my ($event) = @_;
-					$event->{type} eq 'stroke' or return 0;
-					$event->{params}{key} eq '<^M>' or return 0;
-					return 1;
-				},
-			},
-			code => sub {
-				my ( $event, $entry ) = @_;
-				$entry->set_edit_mode( !$entry->get_edit_mode() );
-			},
-		)
-	);
+    # listen to the Enter key
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Key' => sub {
+                    my ($event) = @_;
+                    $event->{type} eq 'stroke' or return 0;
+                    $event->{params}{key} eq '<^M>' or return 0;
+                    return 1;
+                },
+            },
+            code => sub {
+                my ( $event, $entry ) = @_;
+                $entry->set_edit_mode( !$entry->get_edit_mode() );
+            },
+        )
+    );
 
-	# listen to the Focus Out event
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
-			accepted_events => {
-				'Curses::Toolkit::Event::Focus::Out' => sub {
-					my ($event) = @_;
-					return 1;
-				},
-			},
-			code => sub {
-				my ( $event, $entry ) = @_;
-				$entry->set_edit_mode(0);
-			},
-		)
-	);
+    # listen to the Focus Out event
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Focus::Out' => sub {
+                    my ($event) = @_;
+                    return 1;
+                },
+            },
+            code => sub {
+                my ( $event, $entry ) = @_;
+                $entry->set_edit_mode(0);
+            },
+        )
+    );
 
-	return $self;
+    return $self;
 }
 
 =head2 new_with_text
@@ -161,12 +161,12 @@ This creates an entry with text in it.
 =cut
 
 sub new_with_text {
-	my $class = shift;
-	my ($text) = validate_pos( @_, { type => SCALAR } );
-	my $self = $class->new();
-	$self->set_text($text);
-	$self->set_cursor_position( length($text) );
-	return $self;
+    my $class = shift;
+    my ($text) = validate_pos( @_, { type => SCALAR } );
+    my $self = $class->new();
+    $self->set_text($text);
+    $self->set_cursor_position( length($text) );
+    return $self;
 }
 
 =head1 METHODS
@@ -181,18 +181,18 @@ Set the text of the entry
 =cut
 
 sub set_text {
-	my $self = shift;
+    my $self = shift;
 
-	my ($text) = validate_pos( @_, { type => SCALAR } );
-	$self->{text} = $text;
+    my ($text) = validate_pos( @_, { type => SCALAR } );
+    $self->{text} = $text;
 
-	use Curses::Toolkit::Event::Content::Changed;
-	my $event = Curses::Toolkit::Event::Content::Changed->new->enable_restriction;
+    use Curses::Toolkit::Event::Content::Changed;
+    my $event = Curses::Toolkit::Event::Content::Changed->new->enable_restriction;
 
-	# sends event to be managed by the mainloop and redispatched
-	$self->fire_event( $event, $self );
+    # sends event to be managed by the mainloop and redispatched
+    $self->fire_event( $event, $self );
 
-	return $self;
+    return $self;
 }
 
 =head2 get_text
@@ -205,8 +205,8 @@ Get the text of the Entry
 =cut
 
 sub get_text {
-	my ($self) = @_;
-	return $self->{text};
+    my ($self) = @_;
+    return $self->{text};
 }
 
 # =head2 set_width
@@ -252,23 +252,23 @@ output : the entry widget
 =cut
 
 sub set_edit_mode {
-	my ( $self, $bool ) = @_;
-	my $old_bool = $self->get_edit_mode();
-	if ( $bool && !$old_bool ) {
+    my ( $self, $bool ) = @_;
+    my $old_bool = $self->get_edit_mode();
+    if ( $bool && !$old_bool ) {
 
-		# switched to edit mode
-		$self->{key_listener}->enable();
-		$self->{edit_mode} = 1;
-		$self->needs_redraw();
-	}
-	if ( !$bool && $old_bool ) {
+        # switched to edit mode
+        $self->{key_listener}->enable();
+        $self->{edit_mode} = 1;
+        $self->needs_redraw();
+    }
+    if ( !$bool && $old_bool ) {
 
-		# switched to non-edit mode
-		$self->{key_listener}->disable();
-		$self->{edit_mode} = 0;
-		$self->needs_redraw();
-	}
-	return $self;
+        # switched to non-edit mode
+        $self->{key_listener}->disable();
+        $self->{edit_mode} = 0;
+        $self->needs_redraw();
+    }
+    return $self;
 }
 
 =head2 get_edit_mode
@@ -281,8 +281,8 @@ output : true or false
 =cut
 
 sub get_edit_mode {
-	my ($self) = @_;
-	return $self->{edit_mode};
+    my ($self) = @_;
+    return $self->{edit_mode};
 }
 
 =head2 set_cursor_position
@@ -295,12 +295,12 @@ Set absolute position of the cursor
 =cut
 
 sub set_cursor_position {
-	my $self = shift;
-	my ($position) = validate_pos( @_, { type => SCALAR } );
-	$position < 0                           and $position = 0;
-	$position > length( $self->get_text() ) and $position = length( $self->get_text() );
-	$self->{cursor_position} = $position;
-	return $self;
+    my $self = shift;
+    my ($position) = validate_pos( @_, { type => SCALAR } );
+    $position < 0                           and $position = 0;
+    $position > length( $self->get_text() ) and $position = length( $self->get_text() );
+    $self->{cursor_position} = $position;
+    return $self;
 }
 
 =head2 get_cursor_position
@@ -313,8 +313,8 @@ Returns the absolute position of the cursor
 =cut
 
 sub get_cursor_position {
-	my $self = shift;
-	return $self->{cursor_position};
+    my $self = shift;
+    return $self->{cursor_position};
 }
 
 =head2 move_cursor_position
@@ -327,10 +327,10 @@ Set the position of the cursor, relatively
 =cut
 
 sub move_cursor_position {
-	my $self = shift;
-	my ($rel_position) = validate_pos( @_, { type => SCALAR } );
-	my $position = $self->get_cursor_position() + $rel_position;
-	return $self->set_cursor_position($position);
+    my $self = shift;
+    my ($rel_position) = validate_pos( @_, { type => SCALAR } );
+    my $position = $self->get_cursor_position() + $rel_position;
+    return $self->set_cursor_position($position);
 }
 
 =head2 draw
@@ -344,57 +344,57 @@ sub move_cursor_position {
 # ---- o2 --^
 
 sub draw {
-	my ($self) = @_;
-	my $theme  = $self->get_theme();
-	my $c      = $self->get_coordinates();
-	my $text   = $self->get_text();
+    my ($self) = @_;
+    my $theme  = $self->get_theme();
+    my $c      = $self->get_coordinates();
+    my $text   = $self->get_text();
 
-	my $left_enclosing  = $self->get_theme_property('left_enclosing');
-	my $right_enclosing = $self->get_theme_property('right_enclosing');
+    my $left_enclosing  = $self->get_theme_property('left_enclosing');
+    my $right_enclosing = $self->get_theme_property('right_enclosing');
 
-	my $w1 = $c->width();
-	my $w2 = $w1 - length($left_enclosing) - length($right_enclosing);
-	my $o1 = length $left_enclosing;
-	my $o2 = $w1 - length $right_enclosing;
+    my $w1 = $c->width();
+    my $w2 = $w1 - length($left_enclosing) - length($right_enclosing);
+    my $o1 = length $left_enclosing;
+    my $o2 = $w1 - length $right_enclosing;
 
-	# prepare the background text
-	my $display_text = '_' x $w2;
+    # prepare the background text
+    my $display_text = '_' x $w2;
 
-	# get the text to display
+    # get the text to display
 
-	if ( !$self->get_edit_mode() ) {
-		my $t = substr( $text, 0, $w2 );
+    if ( !$self->get_edit_mode() ) {
+        my $t = substr( $text, 0, $w2 );
 
-		# put the background text below it
-		substr( $display_text, 0, length($t) ) = $t;
+        # put the background text below it
+        substr( $display_text, 0, length($t) ) = $t;
 
-		$theme->draw_string( $c->x1(),       $c->y1(), $left_enclosing );
-		$theme->draw_string( $c->x1() + $o2, $c->y1(), $right_enclosing );
-		$theme->draw_string( $c->x1() + $o1, $c->y1(), $display_text );
+        $theme->draw_string( $c->x1(),       $c->y1(), $left_enclosing );
+        $theme->draw_string( $c->x1() + $o2, $c->y1(), $right_enclosing );
+        $theme->draw_string( $c->x1() + $o1, $c->y1(), $display_text );
 
-	} else {
-		if ( $self->get_cursor_position() >= $self->{text_display_offset} + $w2 - 1 ) {
-			$self->{text_display_offset} = $self->get_cursor_position() - $w2 + 1;
-		}
-		if ( $self->get_cursor_position() < $self->{text_display_offset} ) {
-			$self->{text_display_offset} = $self->get_cursor_position();
-		}
-		my $t = substr( $text, $self->{text_display_offset}, $w2 );
-		substr( $display_text, 0, length($t) ) = $t;
-		my $relative_cursor_position = $self->get_cursor_position() - $self->{text_display_offset};
-		my $t1                       = substr( $display_text, 0, $relative_cursor_position );
-		my $t2                       = substr( $display_text, $relative_cursor_position, 1 );
-		my $t3                       = substr( $display_text, $relative_cursor_position + 1 );
+    } else {
+        if ( $self->get_cursor_position() >= $self->{text_display_offset} + $w2 - 1 ) {
+            $self->{text_display_offset} = $self->get_cursor_position() - $w2 + 1;
+        }
+        if ( $self->get_cursor_position() < $self->{text_display_offset} ) {
+            $self->{text_display_offset} = $self->get_cursor_position();
+        }
+        my $t = substr( $text, $self->{text_display_offset}, $w2 );
+        substr( $display_text, 0, length($t) ) = $t;
+        my $relative_cursor_position = $self->get_cursor_position() - $self->{text_display_offset};
+        my $t1                       = substr( $display_text, 0, $relative_cursor_position );
+        my $t2                       = substr( $display_text, $relative_cursor_position, 1 );
+        my $t3                       = substr( $display_text, $relative_cursor_position + 1 );
 
-		$theme->draw_string( $c->x1(),                         $c->y1(), $left_enclosing,  { reverse => 0 } );
-		$theme->draw_string( $c->x1() + $o2,                   $c->y1(), $right_enclosing, { reverse => 0 } );
-		$theme->draw_string( $c->x1() + $o1,                   $c->y1(), $t1,              { reverse => 0 } );
-		$theme->draw_string( $c->x1() + $o1 + length($t1),     $c->y1(), $t2,              { reverse => 1 } );
-		$theme->draw_string( $c->x1() + $o1 + length($t1) + 1, $c->y1(), $t3,              { reverse => 0 } );
-	}
+        $theme->draw_string( $c->x1(),                         $c->y1(), $left_enclosing,  { reverse => 0 } );
+        $theme->draw_string( $c->x1() + $o2,                   $c->y1(), $right_enclosing, { reverse => 0 } );
+        $theme->draw_string( $c->x1() + $o1,                   $c->y1(), $t1,              { reverse => 0 } );
+        $theme->draw_string( $c->x1() + $o1 + length($t1),     $c->y1(), $t2,              { reverse => 1 } );
+        $theme->draw_string( $c->x1() + $o1 + length($t1) + 1, $c->y1(), $t3,              { reverse => 0 } );
+    }
 
 
-	return;
+    return;
 }
 
 =head2 get_desired_space
@@ -408,16 +408,16 @@ The Entry desires 12x1
 =cut
 
 sub get_desired_space {
-	my ( $self, $available_space ) = @_;
+    my ( $self, $available_space ) = @_;
 
-	my $desired_space = $available_space->clone();
+    my $desired_space = $available_space->clone();
 
-	#	$desired_space->set( x2 => $available_space->x1() + $self->get_width(),
-	$desired_space->set(
-		x2 => $available_space->x2(),
-		y2 => $available_space->y1() + 1,
-	);
-	return $desired_space;
+    #	$desired_space->set( x2 => $available_space->x1() + $self->get_width(),
+    $desired_space->set(
+        x2 => $available_space->x2(),
+        y2 => $available_space->y1() + 1,
+    );
+    return $desired_space;
 
 }
 
@@ -433,15 +433,15 @@ The Entry requires 3x1 minimum
 =cut
 
 sub get_minimum_space {
-	my ( $self, $available_space ) = @_;
+    my ( $self, $available_space ) = @_;
 
-	my $minimum_space = $available_space->clone();
-	my $default_width = $self->get_theme_property('default_width');
-	$minimum_space->set(
-		x2 => $available_space->x1() + $default_width,
-		y2 => $available_space->y1() + 1,
-	);
-	return $minimum_space;
+    my $minimum_space = $available_space->clone();
+    my $default_width = $self->get_theme_property('default_width');
+    $minimum_space->set(
+        x2 => $available_space->x1() + $default_width,
+        y2 => $available_space->y1() + 1,
+    );
+    return $minimum_space;
 }
 
 =head2 possible_signals
@@ -457,11 +457,11 @@ L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
 =cut
 
 sub possible_signals {
-	my ($self) = @_;
-	return (
-		$self->SUPER::possible_signals(),
-		content_changed => 'Curses::Toolkit::Signal::Content::Changed',
-	);
+    my ($self) = @_;
+    return (
+        $self->SUPER::possible_signals(),
+        content_changed => 'Curses::Toolkit::Signal::Content::Changed',
+    );
 }
 
 =head1 Theme related properties
@@ -504,25 +504,25 @@ Example :
 
 
 sub _get_theme_properties_definition {
-	my ($self) = @_;
-	return {
-		%{ $self->SUPER::_get_theme_properties_definition() },
-		default_width => {
-			optional  => 0,
-			type      => SCALAR,
-			callbacks => {
-				"positive integer" => sub { $_[0] >= 0 }
-			},
-		},
-		left_enclosing => {
-			optional => 0,
-			type     => SCALAR,
-		},
-		right_enclosing => {
-			optional => 0,
-			type     => SCALAR,
-		},
-	};
+    my ($self) = @_;
+    return {
+        %{ $self->SUPER::_get_theme_properties_definition() },
+        default_width => {
+            optional  => 0,
+            type      => SCALAR,
+            callbacks => {
+                "positive integer" => sub { $_[0] >= 0 }
+            },
+        },
+        left_enclosing => {
+            optional => 0,
+            type     => SCALAR,
+        },
+        right_enclosing => {
+            optional => 0,
+            type     => SCALAR,
+        },
+    };
 }
 
 1;

@@ -24,6 +24,6 @@ Event that is related to out-focus
 
 # this event has to be dispatched on a specific widget, so get_matching_widget
 # returns void
-sub get_matching_widget {return}
+sub get_matching_widget { return }
 
 1;

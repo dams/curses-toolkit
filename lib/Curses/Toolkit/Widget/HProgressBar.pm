@@ -52,61 +52,61 @@ Redraw the progress bar.
 =cut
 
 sub draw {
-	my ($self) = @_;
-	$self->SUPER::draw(); # draw the border if any
+    my ($self) = @_;
+    $self->SUPER::draw(); # draw the border if any
 
-	my $theme = $self->get_theme();
-	my $c     = $self->get_coordinates();
-	my $min   = $self->get_minimum;
-	my $max   = $self->get_maximum;
-	my $pos   = $self->get_position;
+    my $theme = $self->get_theme();
+    my $c     = $self->get_coordinates();
+    my $min   = $self->get_minimum;
+    my $max   = $self->get_maximum;
+    my $pos   = $self->get_position;
 
-	my $char_done    = $self->get_theme_property('char_done');
-	my $char_left    = $self->get_theme_property('char_left');
-	my $left_string  = $self->get_theme_property('left_enclosing');
-	my $right_string = $self->get_theme_property('right_enclosing');
-	my $wl           = length $left_string;
-	my $wr           = length $right_string;
-	my $bw           = $self->get_theme_property('border_width');
+    my $char_done    = $self->get_theme_property('char_done');
+    my $char_left    = $self->get_theme_property('char_left');
+    my $left_string  = $self->get_theme_property('left_enclosing');
+    my $right_string = $self->get_theme_property('right_enclosing');
+    my $wl           = length $left_string;
+    my $wr           = length $right_string;
+    my $bw           = $self->get_theme_property('border_width');
 
 
-	my $value      = 100 * ( $pos - $min ) / ( $max - $min );
-	my $text       = '';
-	my $label_type = $self->get_label_type;
-	if ( $label_type eq 'percent' ) {
-		$text = sprintf( " %.2d%% ", $value );
-	} elsif ( $label_type eq 'value' ) {
-		$text = "$value";
-	}
+    my $value      = 100 * ( $pos - $min ) / ( $max - $min );
+    my $text       = '';
+    my $label_type = $self->get_label_type;
+    if ( $label_type eq 'percent' ) {
+        $text = sprintf( " %.2d%% ", $value );
+    } elsif ( $label_type eq 'value' ) {
+        $text = "$value";
+    }
 
-	# <------------ w1 ---------------->
-	#  <------------ w2 -------------->
-	#  <-$w_done-><-     $w_left     ->
-	# [|||||||||||----34%--------------]
-	# -^  o1
-	# ----- o2 ---^
-	# --------- o3 ---^
-	# ---------------- o4 -------------^
+    # <------------ w1 ---------------->
+    #  <------------ w2 -------------->
+    #  <-$w_done-><-     $w_left     ->
+    # [|||||||||||----34%--------------]
+    # -^  o1
+    # ----- o2 ---^
+    # --------- o3 ---^
+    # ---------------- o4 -------------^
 
-	my $w1     = $c->width() - 2 * $bw;
-	my $w2     = $w1 - $wl - $wr;
-	my $w_done = int( $w2 * ( $pos - $min ) / ( $max - $min ) );
-	my $w_left = $w2 - $w_done;
+    my $w1     = $c->width() - 2 * $bw;
+    my $w2     = $w1 - $wl - $wr;
+    my $w_done = int( $w2 * ( $pos - $min ) / ( $max - $min ) );
+    my $w_left = $w2 - $w_done;
 
-	my $o1 = $wl;
-	my $o2 = $o1 + $w_done;
-	my $o3 = ( $w1 - length $text ) / 2;
-	my $o4 = $w1 - $wr;
+    my $o1 = $wl;
+    my $o2 = $o1 + $w_done;
+    my $o3 = ( $w1 - length $text ) / 2;
+    my $o4 = $w1 - $wr;
 
-	$theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
-	$theme->draw_string( $c->x1() + $bw + $o4, $c->y1() + $bw, $right_string );
+    $theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
+    $theme->draw_string( $c->x1() + $bw + $o4, $c->y1() + $bw, $right_string );
 
-	$theme->draw_string( $c->x1() + $bw + $o1, $c->y1() + $bw, $char_done x $w_done );
-	$theme->draw_string( $c->x1() + $bw + $o2, $c->y1() + $bw, $char_left x $w_left );
+    $theme->draw_string( $c->x1() + $bw + $o1, $c->y1() + $bw, $char_done x $w_done );
+    $theme->draw_string( $c->x1() + $bw + $o2, $c->y1() + $bw, $char_left x $w_left );
 
-	$theme->draw_string( $c->x1() + $bw + $o3, $c->y1() + $bw, $text );
+    $theme->draw_string( $c->x1() + $bw + $o3, $c->y1() + $bw, $text );
 
-	return;
+    return;
 }
 
 =method get_desired_space
@@ -122,10 +122,10 @@ The desired space is as much horizontal space as possible, with a height of 1.
 =cut
 
 sub get_desired_space {
-	my ( $self, $available_space ) = @_;
-	my $desired_space = $available_space->clone;
-	$desired_space->set( y2 => $desired_space->y1 + 1 );
-	return $desired_space;
+    my ( $self, $available_space ) = @_;
+    my $desired_space = $available_space->clone;
+    $desired_space->set( y2 => $desired_space->y1 + 1 );
+    return $desired_space;
 }
 
 =method get_minimum_space
@@ -142,15 +142,15 @@ The ProgressBar requires 12x1 minimum.
 =cut
 
 sub get_minimum_space {
-	my ( $self, $available_space ) = @_;
+    my ( $self, $available_space ) = @_;
 
-	my $minimum_space = $available_space->clone;
-	my $default_width = $self->get_theme_property('default_width');
-	$minimum_space->set(
-		x2 => $available_space->x1() + $default_width,
-		y2 => $available_space->y1() + 1,
-	);
-	return $minimum_space;
+    my $minimum_space = $available_space->clone;
+    my $default_width = $self->get_theme_property('default_width');
+    $minimum_space->set(
+        x2 => $available_space->x1() + $default_width,
+        y2 => $available_space->y1() + 1,
+    );
+    return $minimum_space;
 }
 
 
@@ -237,14 +237,14 @@ Example :
 =cut
 
 sub _get_theme_properties_definition {
-	my ($self) = @_;
-	return {
-		%{ $self->SUPER::_get_theme_properties_definition() },
-		default_width   => { optional => 0, type => SCALAR, },
-		left_enclosing  => { optional => 0, type => SCALAR, },
-		right_enclosing => { optional => 0, type => SCALAR, },
+    my ($self) = @_;
+    return {
+        %{ $self->SUPER::_get_theme_properties_definition() },
+        default_width   => { optional => 0, type => SCALAR, },
+        left_enclosing  => { optional => 0, type => SCALAR, },
+        right_enclosing => { optional => 0, type => SCALAR, },
 
-	};
+    };
 }
 
 1;

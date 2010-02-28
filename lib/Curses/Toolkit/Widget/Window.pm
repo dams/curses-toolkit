@@ -71,159 +71,159 @@ contained in one or more window.
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new(@_);
+    my $class = shift;
+    my $self  = $class->SUPER::new(@_);
 
-	# set window stack by default
-	$self->set_property( window => stack     => -1 );
-	$self->set_property( window => resizable => 1 );
+    # set window stack by default
+    $self->set_property( window => stack     => -1 );
+    $self->set_property( window => resizable => 1 );
 
-	# set_default title
-	$self->set_title('');
-	$self->set_type('normal');
-	$self->{_title_offset}              = 0;
-	$self->{_title_animation_direction} = '';
+    # set_default title
+    $self->set_title('');
+    $self->set_type('normal');
+    $self->{_title_offset}              = 0;
+    $self->{_title_animation_direction} = '';
 
-	#	$self->set_focused_widget($self);
+    #	$self->set_focused_widget($self);
 
-	# listen to the Mouse Click for focus switch
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
-			accepted_events => {
-				'Curses::Toolkit::Event::Mouse::Click' => sub {
-					my ($event) = @_;
-					$event->{type}   eq 'clicked' or return 0;
-					$event->{button} eq 'button1' or return 0;
-					return 1;
-				},
-			},
-			code => sub {
-				my ( $event, $window ) = @_;
+    # listen to the Mouse Click for focus switch
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Mouse::Click' => sub {
+                    my ($event) = @_;
+                    $event->{type}   eq 'clicked' or return 0;
+                    $event->{button} eq 'button1' or return 0;
+                    return 1;
+                },
+            },
+            code => sub {
+                my ( $event, $window ) = @_;
 
-				# get the root window
-				my $root_window = $window->get_root_window();
-				defined $root_window or return;
+                # get the root window
+                my $root_window = $window->get_root_window();
+                defined $root_window or return;
 
-				# get the currently focused widget, unfocus it
-				my $current_focused_widget = $root_window->get_focused_widget();
-				if ( defined $current_focused_widget && $current_focused_widget->can('set_focus') ) {
-					$current_focused_widget->set_focus(0);
-				}
+                # get the currently focused widget, unfocus it
+                my $current_focused_widget = $root_window->get_focused_widget();
+                if ( defined $current_focused_widget && $current_focused_widget->can('set_focus') ) {
+                    $current_focused_widget->set_focus(0);
+                }
 
-				# bring the window to the front
-				$window->bring_to_front();
+                # bring the window to the front
+                $window->bring_to_front();
 
-				# focus the window or one of its component
-				my $next_focused_widget =
-					$window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
-				defined $next_focused_widget
-					and $next_focused_widget->set_focus(1);
-				return;
-			},
-		)
-	);
+                # focus the window or one of its component
+                my $next_focused_widget =
+                    $window->get_next_focused_widget(1); # 1 means "consider if $window is focusable"
+                defined $next_focused_widget
+                    and $next_focused_widget->set_focus(1);
+                return;
+            },
+        )
+    );
 
-	# listen to the Mouse for moving the window
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
-			accepted_events => {
-				'Curses::Toolkit::Event::Mouse::Click' => sub {
-					my ($event) = @_;
-					$event->{button} eq 'button1' or return 0;
-					$self->{_move_pressed} && $event->{type} eq 'released'
-						and return 1;
-					my $c  = $event->{coordinates};
-					my $wc = $self->get_coordinates();
-					!$self->{_move_pressed} && $event->{type} eq 'pressed' && $c->y1() == $wc->y1()
-						and return 1;
-					return 0;
-				},
-			},
-			code => sub {
-				my ( $event, $window ) = @_;
+    # listen to the Mouse for moving the window
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Mouse::Click' => sub {
+                    my ($event) = @_;
+                    $event->{button} eq 'button1' or return 0;
+                    $self->{_move_pressed} && $event->{type} eq 'released'
+                        and return 1;
+                    my $c  = $event->{coordinates};
+                    my $wc = $self->get_coordinates();
+                    !$self->{_move_pressed} && $event->{type} eq 'pressed' && $c->y1() == $wc->y1()
+                        and return 1;
+                    return 0;
+                },
+            },
+            code => sub {
+                my ( $event, $window ) = @_;
 
-				if ( $self->{_move_pressed} ) {
+                if ( $self->{_move_pressed} ) {
 
-					# means we released it
-					$window->unset_modal();
-					my $c  = $event->{coordinates};                 # event coord
-					my $oc = $self->{_move_coord};                  # click-origin coord
-					my $wc = $window->get_coordinates();            # window coord
-					my $rc = $self->get_root_window()->get_shape(); # root coord
-					$wc += {
-						x1 => $c->x1() - $oc->x1(), x2 => $c->x1() - $oc->x1(),
-						y1 => $c->y1() - $oc->y1(), y2 => $c->y1() - $oc->y1(),
-					};
-					$wc->y1() < 0
-						and $wc->translate_down( $wc->y1() );
-					$wc->y1() > $rc->height() - 1
-						and $wc->translate_up( $wc->y1() - $rc->height() + 1 );
-					$wc->x1() < -$wc->width() + 1
-						and $wc->translate_right( -$wc->width() + 1 - $wc->x1() );
-					$wc->x1() > $rc->width() - 1
-						and $wc->translate_left( -$wc->x1() - $rc->width() + 1 );
+                    # means we released it
+                    $window->unset_modal();
+                    my $c  = $event->{coordinates};                 # event coord
+                    my $oc = $self->{_move_coord};                  # click-origin coord
+                    my $wc = $window->get_coordinates();            # window coord
+                    my $rc = $self->get_root_window()->get_shape(); # root coord
+                    $wc += {
+                        x1 => $c->x1() - $oc->x1(), x2 => $c->x1() - $oc->x1(),
+                        y1 => $c->y1() - $oc->y1(), y2 => $c->y1() - $oc->y1(),
+                    };
+                    $wc->y1() < 0
+                        and $wc->translate_down( $wc->y1() );
+                    $wc->y1() > $rc->height() - 1
+                        and $wc->translate_up( $wc->y1() - $rc->height() + 1 );
+                    $wc->x1() < -$wc->width() + 1
+                        and $wc->translate_right( -$wc->width() + 1 - $wc->x1() );
+                    $wc->x1() > $rc->width() - 1
+                        and $wc->translate_left( -$wc->x1() - $rc->width() + 1 );
 
-					$window->set_coordinates($wc);
-					$window->needs_redraw();
-					$self->{_move_pressed} = 0;
-					$self->{_move_coord}   = undef;
-				} else {
+                    $window->set_coordinates($wc);
+                    $window->needs_redraw();
+                    $self->{_move_pressed} = 0;
+                    $self->{_move_coord}   = undef;
+                } else {
 
-					# means we pressed it
-					$window->set_modal();
-					$self->{_move_pressed} = 1;
-					$self->needs_redraw();
-					$self->{_move_coord} = $event->{coordinates};
-				}
-				return;
-			},
-		)
-	);
+                    # means we pressed it
+                    $window->set_modal();
+                    $self->{_move_pressed} = 1;
+                    $self->needs_redraw();
+                    $self->{_move_coord} = $event->{coordinates};
+                }
+                return;
+            },
+        )
+    );
 
-	# listen to the Mouse for resizing
-	$self->add_event_listener(
-		Curses::Toolkit::EventListener->new(
-			accepted_events => {
-				'Curses::Toolkit::Event::Mouse::Click' => sub {
-					my ($event) = @_;
-					$event->{button} eq 'button1' or return 0;
-					$self->{_resize_pressed} && $event->{type} eq 'released'
-						and return 1;
-					my $c  = $event->{coordinates};
-					my $wc = $self->get_coordinates();
-					      !$self->{_resize_pressed}
-						&& $event->{type} eq 'pressed'
-						&& $c->x2() == $wc->x2() - 1
-						&& $c->y2() == $wc->y2() - 1
-						and return 1;
-					return 0;
-				},
-			},
-			code => sub {
-				my ( $event, $window ) = @_;
+    # listen to the Mouse for resizing
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Mouse::Click' => sub {
+                    my ($event) = @_;
+                    $event->{button} eq 'button1' or return 0;
+                    $self->{_resize_pressed} && $event->{type} eq 'released'
+                        and return 1;
+                    my $c  = $event->{coordinates};
+                    my $wc = $self->get_coordinates();
+                          !$self->{_resize_pressed}
+                        && $event->{type} eq 'pressed'
+                        && $c->x2() == $wc->x2() - 1
+                        && $c->y2() == $wc->y2() - 1
+                        and return 1;
+                    return 0;
+                },
+            },
+            code => sub {
+                my ( $event, $window ) = @_;
 
-				if ( $self->{_resize_pressed} ) {
+                if ( $self->{_resize_pressed} ) {
 
-					# means we released it
-					$window->unset_modal();
-					my $c  = $event->{coordinates};
-					my $wc = $window->get_coordinates();
-					$wc->set( x2 => $c->x2() + 1, y2 => $c->y2() + 1 );
-					$window->set_coordinates($wc);
-					$window->needs_redraw();
-					$self->{_resize_pressed} = 0;
-				} else {
+                    # means we released it
+                    $window->unset_modal();
+                    my $c  = $event->{coordinates};
+                    my $wc = $window->get_coordinates();
+                    $wc->set( x2 => $c->x2() + 1, y2 => $c->y2() + 1 );
+                    $window->set_coordinates($wc);
+                    $window->needs_redraw();
+                    $self->{_resize_pressed} = 0;
+                } else {
 
-					# means we pressed it
-					$window->set_modal();
-					$self->needs_redraw();
-					$self->{_resize_pressed} = 1;
-				}
-				return;
-			},
-		)
-	);
-	return $self;
+                    # means we pressed it
+                    $window->set_modal();
+                    $self->needs_redraw();
+                    $self->{_resize_pressed} = 1;
+                }
+                return;
+            },
+        )
+    );
+    return $self;
 }
 
 =head2 set_title
@@ -236,14 +236,14 @@ Set the title of the window
 =cut
 
 sub set_title {
-	my $self = shift;
-	my ($title) = validate_pos(
-		@_,
-		{   type => SCALAR,
-		}
-	);
-	$self->{title} = $title;
-	return $self;
+    my $self = shift;
+    my ($title) = validate_pos(
+        @_,
+        {   type => SCALAR,
+        }
+    );
+    $self->{title} = $title;
+    return $self;
 }
 
 =head2 get_title
@@ -256,8 +256,8 @@ Get the title of the window
 =cut
 
 sub get_title {
-	my ($self) = @_;
-	return $self->{title};
+    my ($self) = @_;
+    return $self->{title};
 }
 
 =head2 set_coordinates
@@ -286,58 +286,58 @@ You can also set coordinates in percent of the root window width / height :
 =cut
 
 sub set_coordinates {
-	my $self = shift;
-	use Curses::Toolkit::Object::Coordinates;
-	use Data::Dumper;
-	if ( !ref( $_[0] ) ) {
-		my %params = @_;
-		foreach my $x (qw(x1 x2)) {
-			if ( $params{$x} =~ /^(.+)%$/ ) {
-				my $percent = $1;
-				$params{$x} = sub {
-					return $self->get_root_window()
-						? sprintf( "%.0f", $self->get_root_window()->get_shape()->width() * $percent / 100 )
-						: 0;
-				};
-			}
-		}
-		foreach my $y (qw(y1 y2)) {
-			if ( $params{$y} =~ /^(.+)%$/ ) {
-				my $percent = $1;
-				$params{$y} = sub {
-					return $self->get_root_window()
-						? sprintf( "%.0f", $self->get_root_window()->get_shape()->height() * $percent / 100 )
-						: 0;
-				};
-			}
-		}
-		if ( defined $params{width} && $params{width} =~ /^(.+)%$/ ) {
-			my $percent = $1;
-			$params{x2} = sub {
-				my ($coord) = @_;
-				$coord->x1()
-					+ ( $self->get_root_window() and $self->get_root_window()->get_shape()->width() * $percent / 100 );
-			};
-			delete $params{width};
-		}
-		if ( defined $params{height} && $params{height} =~ /^(.+)%$/ ) {
-			my $percent = $1;
-			$params{y2} = sub {
-				my ($coord) = @_;
-				$coord->y1()
-					+ ( $self->get_root_window() and $self->get_root_window()->get_shape()->height() * $percent / 100 );
-			};
-			delete $params{height};
-		}
-		$self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(%params);
-	} else {
-		$self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
-	}
-	$self->_set_relatives_coordinates( $self->{coordinates} );
+    my $self = shift;
+    use Curses::Toolkit::Object::Coordinates;
+    use Data::Dumper;
+    if ( !ref( $_[0] ) ) {
+        my %params = @_;
+        foreach my $x (qw(x1 x2)) {
+            if ( $params{$x} =~ /^(.+)%$/ ) {
+                my $percent = $1;
+                $params{$x} = sub {
+                    return $self->get_root_window()
+                        ? sprintf( "%.0f", $self->get_root_window()->get_shape()->width() * $percent / 100 )
+                        : 0;
+                };
+            }
+        }
+        foreach my $y (qw(y1 y2)) {
+            if ( $params{$y} =~ /^(.+)%$/ ) {
+                my $percent = $1;
+                $params{$y} = sub {
+                    return $self->get_root_window()
+                        ? sprintf( "%.0f", $self->get_root_window()->get_shape()->height() * $percent / 100 )
+                        : 0;
+                };
+            }
+        }
+        if ( defined $params{width} && $params{width} =~ /^(.+)%$/ ) {
+            my $percent = $1;
+            $params{x2} = sub {
+                my ($coord) = @_;
+                $coord->x1()
+                    + ( $self->get_root_window() and $self->get_root_window()->get_shape()->width() * $percent / 100 );
+            };
+            delete $params{width};
+        }
+        if ( defined $params{height} && $params{height} =~ /^(.+)%$/ ) {
+            my $percent = $1;
+            $params{y2} = sub {
+                my ($coord) = @_;
+                $coord->y1()
+                    + ( $self->get_root_window() and $self->get_root_window()->get_shape()->height() * $percent / 100 );
+            };
+            delete $params{height};
+        }
+        $self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(%params);
+    } else {
+        $self->{coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
+    }
+    $self->_set_relatives_coordinates( $self->{coordinates} );
 
-	# needs to take care of rebuilding coordinates from top to bottom
-	$self->rebuild_all_coordinates();
-	return $self;
+    # needs to take care of rebuilding coordinates from top to bottom
+    $self->rebuild_all_coordinates();
+    return $self;
 }
 
 =head2 set_root_window
@@ -350,9 +350,9 @@ Sets the root window ( the root toolkit object) to which this window is added
 =cut
 
 sub set_root_window {
-	my ( $self, $root_window ) = @_;
-	$self->{root_window} = $root_window;
-	return $self;
+    my ( $self, $root_window ) = @_;
+    $self->{root_window} = $root_window;
+    return $self;
 }
 
 =head2 get_root_window
@@ -365,8 +365,8 @@ Get the root window
 =cut
 
 sub get_root_window {
-	my ($self) = @_;
-	return $self->{root_window};
+    my ($self) = @_;
+    return $self->{root_window};
 }
 
 =head2 bring_to_front()
@@ -381,11 +381,11 @@ Bring the window to front
 =cut
 
 sub bring_to_front {
-	my ($self) = @_;
-	my $root_window = $self->get_root_window();
-	defined $root_window or return;
-	$root_window->bring_window_to_front($self);
-	return $self;
+    my ($self) = @_;
+    my $root_window = $self->get_root_window();
+    defined $root_window or return;
+    $root_window->bring_window_to_front($self);
+    return $self;
 }
 
 =head2 bring_to_back()
@@ -416,21 +416,21 @@ Set the widget that has focus.
 =cut
 
 sub set_focused_widget {
-	my $self = shift;
-	my ($widget) = validate_pos(
-		@_,
-		{   isa       => 'Curses::Toolkit::Widget',
-			callbacks => {
-				'must be focusable' => sub { $_[0]->isa('Curses::Toolkit::Role::Focusable') }
-			}
-		}
-	);
-	my $current_focused_widget = $self->get_focused_widget();
-	if ( defined $current_focused_widget && $current_focused_widget->can('set_focus') ) {
-		$current_focused_widget->set_focus(0);
-	}
-	$self->{focused_widget} = $widget;
-	return $self;
+    my $self = shift;
+    my ($widget) = validate_pos(
+        @_,
+        {   isa       => 'Curses::Toolkit::Widget',
+            callbacks => {
+                'must be focusable' => sub { $_[0]->isa('Curses::Toolkit::Role::Focusable') }
+            }
+        }
+    );
+    my $current_focused_widget = $self->get_focused_widget();
+    if ( defined $current_focused_widget && $current_focused_widget->can('set_focus') ) {
+        $current_focused_widget->set_focus(0);
+    }
+    $self->{focused_widget} = $widget;
+    return $self;
 }
 
 =head2 get_focused_widget
@@ -445,12 +445,12 @@ Gets the focused widget.
 =cut
 
 sub get_focused_widget {
-	my ($self) = @_;
-	my $focused_widget = $self->{focused_widget};
-	if ( defined $focused_widget && $focused_widget->can('is_focused') && $focused_widget->is_focused() ) {
-		return $focused_widget;
-	}
-	return;
+    my ($self) = @_;
+    my $focused_widget = $self->{focused_widget};
+    if ( defined $focused_widget && $focused_widget->can('is_focused') && $focused_widget->is_focused() ) {
+        return $focused_widget;
+    }
+    return;
 }
 
 
@@ -484,55 +484,55 @@ Curses::Toolkit
 =cut
 
 sub draw {
-	my ($self) = @_;
-	$self->SUPER::draw();
+    my ($self) = @_;
+    $self->SUPER::draw();
 
-	$self->get_theme_property('border_width') > 0 or return;
+    $self->get_theme_property('border_width') > 0 or return;
 
-	my ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 ) = $self->_compute_draw_informations();
+    my ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 ) = $self->_compute_draw_informations();
 
-	my $title                     = $self->get_title();
-	my @title_brackets_characters = @{ $self->get_theme_property('title_brackets_characters') };
-	my $title_position            = $self->get_theme_property('title_position');
-
-
-	if ( $w4 < length $title && $self->{_title_animation_direction} eq '' ) {
-
-		# no animation were in place, we put one
-		$self->{_title_animation_direction} = 'right';
-		$self->{_title_offset}              = 0;
-		$self->_start_animation();
-	}
-
-	my $o2 = $self->{_title_offset};
-
-	my $title_to_display = '';
-	$o2 < length $title
-		and $title_to_display = substr( $title, $o2, $w4 );
+    my $title                     = $self->get_title();
+    my @title_brackets_characters = @{ $self->get_theme_property('title_brackets_characters') };
+    my $title_position            = $self->get_theme_property('title_position');
 
 
-	my $o1 = 0;
-	if ( $title_position eq 'center' ) {
-		$o1 = ( $w1 - $w3 ) / 2;
-	} elsif ( $title_position eq 'left' ) {
-		$o1 = 1 + $o3;                  # TODO : needs to change that with variable border width
-		$o1 = min( $o1, $w1 - $w3 - 1 ) # TODO : needs to change that with variable border width
-	} else {                            # right
-		$o1 = $w1 - $w3 - 1 - $o4;      # TODO : needs to change that with variable border width
-		$o1 = max( $o1, 1 );            # TODO : needs to change that with variable border width
-	}
+    if ( $w4 < length $title && $self->{_title_animation_direction} eq '' ) {
 
-	my $theme = $self->get_theme();
-	if ( length $title_to_display ) {
-		$theme->draw_title(
-			$c->x1() + $o1, $c->y1(),
-			join( $title_to_display, @title_brackets_characters ),
-			{ clicked => $self->{_move_pressed} }
-		);
-	}
+        # no animation were in place, we put one
+        $self->{_title_animation_direction} = 'right';
+        $self->{_title_offset}              = 0;
+        $self->_start_animation();
+    }
 
-	#	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
-	$theme->draw_resize( $c->x2() - 1, $c->y2() - 1, { clicked => $self->{_resize_pressed} } );
+    my $o2 = $self->{_title_offset};
+
+    my $title_to_display = '';
+    $o2 < length $title
+        and $title_to_display = substr( $title, $o2, $w4 );
+
+
+    my $o1 = 0;
+    if ( $title_position eq 'center' ) {
+        $o1 = ( $w1 - $w3 ) / 2;
+    } elsif ( $title_position eq 'left' ) {
+        $o1 = 1 + $o3;                  # TODO : needs to change that with variable border width
+        $o1 = min( $o1, $w1 - $w3 - 1 ) # TODO : needs to change that with variable border width
+    } else {                            # right
+        $o1 = $w1 - $w3 - 1 - $o4;      # TODO : needs to change that with variable border width
+        $o1 = max( $o1, 1 );            # TODO : needs to change that with variable border width
+    }
+
+    my $theme = $self->get_theme();
+    if ( length $title_to_display ) {
+        $theme->draw_title(
+            $c->x1() + $o1, $c->y1(),
+            join( $title_to_display, @title_brackets_characters ),
+            { clicked => $self->{_move_pressed} }
+        );
+    }
+
+    #	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
+    $theme->draw_resize( $c->x2() - 1, $c->y2() - 1, { clicked => $self->{_resize_pressed} } );
 }
 
 =head2 get_visible_shape
@@ -545,88 +545,88 @@ Gets the Coordinates of the part of the window which is visible
 =cut
 
 sub get_visible_shape {
-	my ($self)      = @_;
-	my $shape       = $self->get_coordinates->clone;
-	my $root_window = $self->get_root_window
-		or return $shape;
-	my $root_shape = $root_window->get_shape;
-	$shape->restrict_to($root_shape);
-	return $shape;
+    my ($self)      = @_;
+    my $shape       = $self->get_coordinates->clone;
+    my $root_window = $self->get_root_window
+        or return $shape;
+    my $root_shape = $root_window->get_shape;
+    $shape->restrict_to($root_shape);
+    return $shape;
 }
 
 sub _compute_draw_informations {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	my $title_width               = $self->get_theme_property('title_width');
-	my $c                         = $self->get_coordinates();
-	my $title                     = $self->get_title();
-	my @title_brackets_characters = @{ $self->get_theme_property('title_brackets_characters') };
+    my $title_width               = $self->get_theme_property('title_width');
+    my $c                         = $self->get_coordinates();
+    my $title                     = $self->get_title();
+    my @title_brackets_characters = @{ $self->get_theme_property('title_brackets_characters') };
 
-	my $o3 = $self->get_theme_property('title_left_offset');
-	my $o4 = $self->get_theme_property('title_right_offset');
+    my $o3 = $self->get_theme_property('title_left_offset');
+    my $o4 = $self->get_theme_property('title_right_offset');
 
-	my $w1 = $c->width();
-	my $w2 = $w1 - 2;    # TODO : needs to change that with variable border width
-	my ( $w5, $w6 ) = map {length} @title_brackets_characters;
-	my $w7 = $w5 + $w6;
-	my $w3 = min( length($title) + $w7, $w2 * $title_width / 100 );
-	my $w4 = $w3 - $w7;
+    my $w1 = $c->width();
+    my $w2 = $w1 - 2;    # TODO : needs to change that with variable border width
+    my ( $w5, $w6 ) = map { length } @title_brackets_characters;
+    my $w7 = $w5 + $w6;
+    my $w3 = min( length($title) + $w7, $w2 * $title_width / 100 );
+    my $w4 = $w3 - $w7;
 
-	return ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 );
+    return ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 );
 }
 
 sub _start_animation {
-	my ($self) = @_;
-	my $root_window = $self->get_root_window();
+    my ($self) = @_;
+    my $root_window = $self->get_root_window();
 
-	my $delay_sub;
-	$delay_sub = sub {
-		my ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 ) = $self->_compute_draw_informations();
-		my $title = $self->get_title();
+    my $delay_sub;
+    $delay_sub = sub {
+        my ( $c, $w1, $w2, $w3, $w4, $w5, $w6, $w7, $o3, $o4 ) = $self->_compute_draw_informations();
+        my $title = $self->get_title();
 
-		if ( $w4 >= length $title ) {
+        if ( $w4 >= length $title ) {
 
-			# stop the animation
-			$self->{_title_offset}              = 0;
-			$self->{_title_animation_direction} = '';
-			return;
-		}
+            # stop the animation
+            $self->{_title_offset}              = 0;
+            $self->{_title_animation_direction} = '';
+            return;
+        }
 
-		# continue the animation
-		my $total_second = $self->get_theme_property('title_loop_duration') / 2; # TODO : reimplement
-		my $nb_step      = length($title) - $w4 + 1;
-		my $delay        = $total_second / $nb_step;
-		if ( $self->{_title_animation_direction} eq 'right' ) {
+        # continue the animation
+        my $total_second = $self->get_theme_property('title_loop_duration') / 2; # TODO : reimplement
+        my $nb_step      = length($title) - $w4 + 1;
+        my $delay        = $total_second / $nb_step;
+        if ( $self->{_title_animation_direction} eq 'right' ) {
 
-			# animation goes to the right
-			$self->{_title_offset}++;
-		} else {
+            # animation goes to the right
+            $self->{_title_offset}++;
+        } else {
 
-			# animation goes to the left
-			$self->{_title_offset}--;
-		}
+            # animation goes to the left
+            $self->{_title_offset}--;
+        }
 
-		# 		# now check the boundaries
-		if ( $self->{_title_offset} < 0 ) {
-			$self->{_title_animation_direction} = 'right';
-			$self->{_title_offset}              = 0;
-			$delay                              = $self->get_theme_property('title_loop_pause');
-		}
-		if ( $self->{_title_offset} > length($title) - $w4 + 1 ) {
-			$self->{_title_offset}              = length($title) - $w4 + 1;
-			$self->{_title_animation_direction} = 'left';
-			$delay                              = $self->get_theme_property('title_loop_pause');
-		}
-		$self->needs_redraw();
-		my $root_window = $self->get_root_window();
+        # 		# now check the boundaries
+        if ( $self->{_title_offset} < 0 ) {
+            $self->{_title_animation_direction} = 'right';
+            $self->{_title_offset}              = 0;
+            $delay                              = $self->get_theme_property('title_loop_pause');
+        }
+        if ( $self->{_title_offset} > length($title) - $w4 + 1 ) {
+            $self->{_title_offset}              = length($title) - $w4 + 1;
+            $self->{_title_animation_direction} = 'left';
+            $delay                              = $self->get_theme_property('title_loop_pause');
+        }
+        $self->needs_redraw();
+        my $root_window = $self->get_root_window();
 
-		#		$delay = 1/4;
-		$root_window->add_delay( $delay, $delay_sub );
-	};
+        #		$delay = 1/4;
+        $root_window->add_delay( $delay, $delay_sub );
+    };
 
-	# launch the animation in 1 second
-	$root_window->add_delay( 1, $delay_sub );
-	return;
+    # launch the animation in 1 second
+    $root_window->add_delay( 1, $delay_sub );
+    return;
 }
 
 =head2 set_type
@@ -642,21 +642,21 @@ Can be :
 my @possible_types = qw( normal menu );
 
 sub set_type {
-	my $self = shift;
-	my ($type) = validate_pos(
-		@_,
-		{   type      => SCALAR,
-			callbacks => {
-				"one of @possible_types" => sub {
-					my ($arg) = @_;
-					any { $arg eq $_ } @possible_types;
-					}
-			}
-		}
-	);
+    my $self = shift;
+    my ($type) = validate_pos(
+        @_,
+        {   type      => SCALAR,
+            callbacks => {
+                "one of @possible_types" => sub {
+                    my ($arg) = @_;
+                    any { $arg eq $_ } @possible_types;
+                    }
+            }
+        }
+    );
 
-	$self->{type} = $type;
-	return $self;
+    $self->{type} = $type;
+    return $self;
 }
 
 =head2 get_type
@@ -669,8 +669,8 @@ Get the type of the window
 =cut
 
 sub get_type {
-	my ($self) = @_;
-	return $self->{type};
+    my ($self) = @_;
+    return $self->{type};
 }
 
 =head1 Theme related properties
@@ -755,90 +755,90 @@ my @title_bar_positions = qw(top bottom left right);
 my @title_positions     = qw(left center right);
 
 sub _get_theme_properties_definition {
-	my ($self) = @_;
-	return {
-		%{ $self->SUPER::_get_theme_properties_definition() },
-		title_width => {
-			optional  => 1,
-			callbacks => {
-				"should be between 0 and 100 (percent)" => sub {
-					$_[0] <= 100 && $_[0] >= 0;
-					}
-			}
-		},
-		title_bar_position => {
-			optional  => 1,
-			callbacks => {
-				"should be one of @title_bar_positions" => sub {
-					my ($arg) = @_;
-					any { $arg eq $_ } @title_bar_positions;
-					}
-			}
-		},
-		title_position => {
-			optional  => 1,
-			callbacks => {
-				"should be one of @title_positions" => sub {
-					my ($arg) = @_;
-					any { $arg eq $_ } @title_positions;
-					}
-			}
-		},
-		title_brackets_characters => {
-			optional  => 1,
-			type      => ARRAYREF,
-			callbacks => {
-				"should contain 2 strings" => sub {
-					@{ $_[0] } == 2 && none {ref} @{ $_[0] };
-					}
-			}
-		},
-		title_left_offset => {
-			optional  => 1,
-			type      => SCALAR,
-			callbacks => {
-				"positive integer" => sub {
-					$_[0] >= 0;
-					}
-			}
-		},
-		title_right_offset => {
-			optional  => 1,
-			type      => SCALAR,
-			callbacks => {
-				"positive integer" => sub {
-					$_[0] >= 0;
-					}
-			}
-		},
-		title_animation => {
-			optional  => 1,
-			type      => BOOLEAN,
-			callbacks => {
-				"1 or 0" => sub {
-					$_[0] =~ /^1|0$/;
-					}
-			},
-		},
-		title_loop_duration => {
-			optional  => 1,
-			type      => SCALAR,
-			callbacks => {
-				"strictly positive float (seconds)" => sub {
-					$_[0] > 0;
-					}
-			}
-		},
-		title_loop_pause => {
-			optional  => 1,
-			type      => SCALAR,
-			callbacks => {
-				"positive float (seconds)" => sub {
-					$_[0] >= 0;
-					}
-			}
-		},
-	};
+    my ($self) = @_;
+    return {
+        %{ $self->SUPER::_get_theme_properties_definition() },
+        title_width => {
+            optional  => 1,
+            callbacks => {
+                "should be between 0 and 100 (percent)" => sub {
+                    $_[0] <= 100 && $_[0] >= 0;
+                    }
+            }
+        },
+        title_bar_position => {
+            optional  => 1,
+            callbacks => {
+                "should be one of @title_bar_positions" => sub {
+                    my ($arg) = @_;
+                    any { $arg eq $_ } @title_bar_positions;
+                    }
+            }
+        },
+        title_position => {
+            optional  => 1,
+            callbacks => {
+                "should be one of @title_positions" => sub {
+                    my ($arg) = @_;
+                    any { $arg eq $_ } @title_positions;
+                    }
+            }
+        },
+        title_brackets_characters => {
+            optional  => 1,
+            type      => ARRAYREF,
+            callbacks => {
+                "should contain 2 strings" => sub {
+                    @{ $_[0] } == 2 && none { ref } @{ $_[0] };
+                    }
+            }
+        },
+        title_left_offset => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "positive integer" => sub {
+                    $_[0] >= 0;
+                    }
+            }
+        },
+        title_right_offset => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "positive integer" => sub {
+                    $_[0] >= 0;
+                    }
+            }
+        },
+        title_animation => {
+            optional  => 1,
+            type      => BOOLEAN,
+            callbacks => {
+                "1 or 0" => sub {
+                    $_[0] =~ /^1|0$/;
+                    }
+            },
+        },
+        title_loop_duration => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "strictly positive float (seconds)" => sub {
+                    $_[0] > 0;
+                    }
+            }
+        },
+        title_loop_pause => {
+            optional  => 1,
+            type      => SCALAR,
+            callbacks => {
+                "positive float (seconds)" => sub {
+                    $_[0] >= 0;
+                    }
+            }
+        },
+    };
 }
 
 1;

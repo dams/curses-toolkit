@@ -55,118 +55,118 @@ put between child and the reference edge of box
 =cut
 
 sub pack_start {
-	my $self = shift;
-	my ( $child_widget, $options ) = validate_pos(
-		@_,
-		{ isa  => 'Curses::Toolkit::Widget' },
-		{ type => HASHREF, default => {} },
-	);
-	my @array   = ($options);
-	my %options = validate(
-		@array,
-		{   expand  => { type => BOOLEAN, default => 0 },
-			fill    => { type => BOOLEAN, default => 0 },
-			padding => { type => SCALAR,  default => 0, regex => qr/^\d+$/ },
-		}
-	);
-	$self->_add_child_at_beginning($child_widget);
+    my $self = shift;
+    my ( $child_widget, $options ) = validate_pos(
+        @_,
+        { isa  => 'Curses::Toolkit::Widget' },
+        { type => HASHREF, default => {} },
+    );
+    my @array   = ($options);
+    my %options = validate(
+        @array,
+        {   expand  => { type => BOOLEAN, default => 0 },
+            fill    => { type => BOOLEAN, default => 0 },
+            padding => { type => SCALAR,  default => 0, regex => qr/^\d+$/ },
+        }
+    );
+    $self->_add_child_at_beginning($child_widget);
 
-	#	unshift @{$self->{children}}, $child_widget;
-	$child_widget->_set_parent($self);
-	$child_widget->set_property( packing => \%options );
-	$self->rebuild_all_coordinates();
-	return $self;
+    #	unshift @{$self->{children}}, $child_widget;
+    $child_widget->_set_parent($self);
+    $child_widget->set_property( packing => \%options );
+    $self->rebuild_all_coordinates();
+    return $self;
 }
 
 sub pack_end {
-	my $self = shift;
-	my ( $child_widget, $options ) = validate_pos(
-		@_,
-		{ isa  => 'Curses::Toolkit::Widget' },
-		{ type => HASHREF, default => {} },
-	);
-	my @array   = ($options);
-	my %options = validate(
-		@array,
-		{   expand  => { type => BOOLEAN, default => 0 },
-			fill    => { type => BOOLEAN, default => 0 },
-			padding => { type => SCALAR,  default => 0, regex => qr/^\d+$/ },
-		}
-	);
-	$self->_add_child_at_end($child_widget);
+    my $self = shift;
+    my ( $child_widget, $options ) = validate_pos(
+        @_,
+        { isa  => 'Curses::Toolkit::Widget' },
+        { type => HASHREF, default => {} },
+    );
+    my @array   = ($options);
+    my %options = validate(
+        @array,
+        {   expand  => { type => BOOLEAN, default => 0 },
+            fill    => { type => BOOLEAN, default => 0 },
+            padding => { type => SCALAR,  default => 0, regex => qr/^\d+$/ },
+        }
+    );
+    $self->_add_child_at_end($child_widget);
 
-	#	push @{$self->{children}}, $child_widget;
-	$child_widget->_set_parent($self);
-	$child_widget->set_property( packing => \%options );
-	$self->rebuild_all_coordinates();
-	return $self;
+    #	push @{$self->{children}}, $child_widget;
+    $child_widget->_set_parent($self);
+    $child_widget->set_property( packing => \%options );
+    $self->rebuild_all_coordinates();
+    return $self;
 }
 
 sub _rebuild_children_coordinates {
-	my ($self) = @_;
-	my $available_space = $self->_get_available_space();
+    my ($self) = @_;
+    my $available_space = $self->_get_available_space();
 
-	my @children_widths;
+    my @children_widths;
 
-	my $desired_space   = $available_space->clone();
-	my $remaining_space = $available_space->clone();
+    my $desired_space   = $available_space->clone();
+    my $remaining_space = $available_space->clone();
 
-	# first, compute how large all the non expanding children are
-	my @children = $self->get_children();
+    # first, compute how large all the non expanding children are
+    my @children = $self->get_children();
 
-	my $width = 0;
-	my $idx   = 0;
-	foreach my $child (@children) {
-		if ( $child->get_property( 'packing', 'expand' ) ) {
-			$idx++;
-		} else {
-			my $space = $child->get_minimum_space($remaining_space);
-			my $w     = $space->width();
-			$width += $w;
-			$remaining_space->substract( { x2 => $w } );
-			$children_widths[$idx] = $w;
-			$idx++;
-		}
-	}
+    my $width = 0;
+    my $idx   = 0;
+    foreach my $child (@children) {
+        if ( $child->get_property( 'packing', 'expand' ) ) {
+            $idx++;
+        } else {
+            my $space = $child->get_minimum_space($remaining_space);
+            my $w     = $space->width();
+            $width += $w;
+            $remaining_space->substract( { x2 => $w } );
+            $children_widths[$idx] = $w;
+            $idx++;
+        }
+    }
 
-	# add to it the width of the expanding children, restricted
-	my $count = scalar( grep { $_->get_property( 'packing', 'expand' ) } @children );
+    # add to it the width of the expanding children, restricted
+    my $count = scalar( grep { $_->get_property( 'packing', 'expand' ) } @children );
 
-	$idx = 0;
-	foreach my $child (@children) {
-		if ( !$child->get_property( 'packing', 'expand' ) ) {
-			$idx++;
-		} else {
-			my $avg_width = int( $remaining_space->width() / $count );
-			my $avg_space = $remaining_space->clone();
-			$avg_space->set( x2 => $avg_space->x1() + $avg_width );
-			my $space = $child->get_desired_space($avg_space);
-			my $w     = $space->width();
-			$remaining_space->substract( { x2 => $w } );
-			$width += $w;
-			$children_widths[$idx] = $w;
-			$count--;
-			$idx++;
-		}
-	}
+    $idx = 0;
+    foreach my $child (@children) {
+        if ( !$child->get_property( 'packing', 'expand' ) ) {
+            $idx++;
+        } else {
+            my $avg_width = int( $remaining_space->width() / $count );
+            my $avg_space = $remaining_space->clone();
+            $avg_space->set( x2 => $avg_space->x1() + $avg_width );
+            my $space = $child->get_desired_space($avg_space);
+            my $w     = $space->width();
+            $remaining_space->substract( { x2 => $w } );
+            $width += $w;
+            $children_widths[$idx] = $w;
+            $count--;
+            $idx++;
+        }
+    }
 
-	$idx = 0;
-	my $x1 = 0;
-	my $x2 = 0;
-	foreach my $child (@children) {
-		my $child_space = $available_space->clone();
-		$x2 = $x1 + $children_widths[$idx];
-		$child_space->set( x1 => $x1, x2 => $x2 );
-		$child_space->restrict_to($available_space);
-		$child->_set_relatives_coordinates($child_space);
-		$child->can('_rebuild_children_coordinates')
-			and $child->_rebuild_children_coordinates();
+    $idx = 0;
+    my $x1 = 0;
+    my $x2 = 0;
+    foreach my $child (@children) {
+        my $child_space = $available_space->clone();
+        $x2 = $x1 + $children_widths[$idx];
+        $child_space->set( x1 => $x1, x2 => $x2 );
+        $child_space->restrict_to($available_space);
+        $child->_set_relatives_coordinates($child_space);
+        $child->can('_rebuild_children_coordinates')
+            and $child->_rebuild_children_coordinates();
 
-		$x1 = $x2;
-		$idx++;
-	}
+        $x1 = $x2;
+        $idx++;
+    }
 
-	return $self;
+    return $self;
 }
 
 =head2 get_desired_space
@@ -179,39 +179,39 @@ Given a coordinate representing the available space, returns the space desired
 =cut
 
 sub get_desired_space {
-	my ( $self, $available_space ) = @_;
+    my ( $self, $available_space ) = @_;
 
-	my $desired_space   = $available_space->clone();
-	my $remaining_space = $available_space->clone();
+    my $desired_space   = $available_space->clone();
+    my $remaining_space = $available_space->clone();
 
-	# first, compute how large all the non expanding children are
-	my @children = $self->get_children();
-	my $width    = 0;
-	foreach my $child ( grep { !$_->get_property( 'packing', 'expand' ) } @children ) {
-		my $space = $child->get_minimum_space($remaining_space);
-		my $w     = $space->width();
-		$width += $w;
-		$remaining_space->substract( { x2 => $w } );
-	}
+    # first, compute how large all the non expanding children are
+    my @children = $self->get_children();
+    my $width    = 0;
+    foreach my $child ( grep { !$_->get_property( 'packing', 'expand' ) } @children ) {
+        my $space = $child->get_minimum_space($remaining_space);
+        my $w     = $space->width();
+        $width += $w;
+        $remaining_space->substract( { x2 => $w } );
+    }
 
-	# add to it the width of the expanding children, restricted
-	my @expanding_children = grep { $_->get_property( 'packing', 'expand' ) } @children;
+    # add to it the width of the expanding children, restricted
+    my @expanding_children = grep { $_->get_property( 'packing', 'expand' ) } @children;
 
-	my $count = @expanding_children;
-	foreach my $child (@expanding_children) {
-		my $avg_width = int( $remaining_space->width() / $count );
-		my $avg_space = $remaining_space->clone();
-		$avg_space->set( x2 => $avg_space->x1() + $avg_width );
-		my $space = $child->get_desired_space($avg_space);
-		my $w     = $space->width();
-		$remaining_space->substract( { x2 => $w } );
-		$width += $w;
-		$count--;
-	}
+    my $count = @expanding_children;
+    foreach my $child (@expanding_children) {
+        my $avg_width = int( $remaining_space->width() / $count );
+        my $avg_space = $remaining_space->clone();
+        $avg_space->set( x2 => $avg_space->x1() + $avg_width );
+        my $space = $child->get_desired_space($avg_space);
+        my $w     = $space->width();
+        $remaining_space->substract( { x2 => $w } );
+        $width += $w;
+        $count--;
+    }
 
-	$desired_space->set( x2 => $desired_space->x1() + $width );
+    $desired_space->set( x2 => $desired_space->x1() + $width );
 
-	return $desired_space;
+    return $desired_space;
 
 }
 
@@ -226,27 +226,27 @@ needed to properly display itself
 =cut
 
 sub get_minimum_space {
-	my ( $self, $available_space ) = @_;
+    my ( $self, $available_space ) = @_;
 
-	my $minimum_space   = $available_space->clone();
-	my $remaining_space = $available_space->clone();
+    my $minimum_space   = $available_space->clone();
+    my $remaining_space = $available_space->clone();
 
-	# compute how high all the children are
-	my @children = $self->get_children();
-	my $width    = 0;
-	my $height   = 0;
-	foreach my $child (@children) {
-		my $space = $child->get_minimum_space($remaining_space);
-		my $w     = $space->width();
-		$width += $w;
-		use List::Util qw(max);
-		$height = max $height, $space->height();
-		$remaining_space->substract( { x2 => $w } );
-	}
+    # compute how high all the children are
+    my @children = $self->get_children();
+    my $width    = 0;
+    my $height   = 0;
+    foreach my $child (@children) {
+        my $space = $child->get_minimum_space($remaining_space);
+        my $w     = $space->width();
+        $width += $w;
+        use List::Util qw(max);
+        $height = max $height, $space->height();
+        $remaining_space->substract( { x2 => $w } );
+    }
 
-	$minimum_space->set( x2 => $minimum_space->x1() + $width, y2 => $minimum_space->y1() + $height );
+    $minimum_space->set( x2 => $minimum_space->x1() + $width, y2 => $minimum_space->y1() + $height );
 
-	return $minimum_space;
+    return $minimum_space;
 
 }
 

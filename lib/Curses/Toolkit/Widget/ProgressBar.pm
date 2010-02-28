@@ -62,12 +62,12 @@ sub _build_label_type { 'percent'; }
 #
 # prevent position attribute to be out of bounds
 around set_position => sub {
-	my ( $orig, $self, $pos ) = @_;
-	$pos < $self->get_minimum
-		and $pos = $self->get_minimum;
-	$pos > $self->get_maximum
-		and $pos = $self->get_maximum;
-	$self->$orig($pos);
+    my ( $orig, $self, $pos ) = @_;
+    $pos < $self->get_minimum
+        and $pos = $self->get_minimum;
+    $pos > $self->get_maximum
+        and $pos = $self->get_maximum;
+    $self->$orig($pos);
 };
 
 =method possible_signals
@@ -85,8 +85,8 @@ The progress bar accepts no signal.
 =cut
 
 sub possible_signals {
-	my ($self) = @_;
-	return $self->SUPER::possible_signals();
+    my ($self) = @_;
+    return $self->SUPER::possible_signals();
 }
 
 
@@ -142,12 +142,12 @@ Example :
 =cut
 
 sub _get_theme_properties_definition {
-	my ($self) = @_;
-	return {
-		%{ $self->SUPER::_get_theme_properties_definition() },
-		char_done => { optional => 0, type => SCALAR, },
-		char_left => { optional => 0, type => SCALAR, },
-	};
+    my ($self) = @_;
+    return {
+        %{ $self->SUPER::_get_theme_properties_definition() },
+        char_done => { optional => 0, type => SCALAR, },
+        char_left => { optional => 0, type => SCALAR, },
+    };
 }
 
 1;

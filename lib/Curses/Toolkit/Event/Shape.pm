@@ -23,29 +23,29 @@ Event that is related to root window shape change
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = $class->SUPER::new();
-	my %args  = validate(
-		@_,
-		{   type => {
-				type      => SCALAR,
-				callbacks => {
-					'must be one of ' . join( ', ', $self->get_types() ) => sub {
-						my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] };
-					},
-				}
-			},
-			params      => 0,
-			root_window => { isa => 'Curses::Toolkit' },
-		}
-	);
-	$args{params} ||= {};
-	my @args       = $args{params};
-	my $definition = $self->get_params_definition( $args{type} );
-	my %params     = validate( @args, $definition ), $self->{type} = $args{type};
-	$self->{root_window} = $args{root_window};
-	$self->{params}      = \%params;
-	return $self;
+    my $class = shift;
+    my $self  = $class->SUPER::new();
+    my %args  = validate(
+        @_,
+        {   type => {
+                type      => SCALAR,
+                callbacks => {
+                    'must be one of ' . join( ', ', $self->get_types() ) => sub {
+                        my %h = map { $_ => 1 } $self->get_types(); $h{ $_[0] };
+                    },
+                }
+            },
+            params      => 0,
+            root_window => { isa => 'Curses::Toolkit' },
+        }
+    );
+    $args{params} ||= {};
+    my @args       = $args{params};
+    my $definition = $self->get_params_definition( $args{type} );
+    my %params     = validate( @args, $definition ), $self->{type} = $args{type};
+    $self->{root_window} = $args{root_window};
+    $self->{params}      = \%params;
+    return $self;
 }
 
 =head1 METHODS
@@ -66,15 +66,15 @@ Returns the types that this Event Class supports
 =cut
 
 my %types = (
-	change  => {},
-	hide    => {},
-	show    => {},
-	destroy => {},
+    change  => {},
+    hide    => {},
+    show    => {},
+    destroy => {},
 );
 
 sub get_types {
-	my ($self) = @_;
-	return keys %types;
+    my ($self) = @_;
+    return keys %types;
 }
 
 =head2 get_params_definition
@@ -87,8 +87,8 @@ Returns the parameter definition for a given type, as specified in Params::Valid
 =cut
 
 sub get_params_definition {
-	my ( $self, $type ) = @_;
-	return $types{$type};
+    my ( $self, $type ) = @_;
+    return $types{$type};
 }
 
 =head2 get_matching_widget
@@ -102,8 +102,8 @@ window, because Shape event is only related to the root window
 =cut
 
 sub get_matching_widget {
-	my ($self) = @_;
-	return $self->{root_window};
+    my ($self) = @_;
+    return $self->{root_window};
 }
 
 1;

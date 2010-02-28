@@ -26,29 +26,29 @@ You want to use this theme if you are a stereotyped girl, or a child, or Book. O
 
 
 sub new {
-	my $class = shift;
-	has_colors()
-		or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
-	return $class->SUPER::new(@_);
+    my $class = shift;
+    has_colors()
+        or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
+    return $class->SUPER::new(@_);
 }
 
-sub default_fgcolor {'white'}
-sub default_bgcolor {'magenta'}
+sub default_fgcolor { 'white' }
+sub default_bgcolor { 'magenta' }
 
 
 # the values of this theme
 sub _get_default_properties {
-	my ( $self, $class_name ) = @_;
-	my %properties = (
-		'Curses::Toolkit::Widget::Button' => {
+    my ( $self, $class_name ) = @_;
+    my %properties = (
+        'Curses::Toolkit::Widget::Button' => {
 
-			# inherited from Border
-			border_width    => 1,
-			left_enclosing  => '',
-			right_enclosing => '',
-		},
-	);
-	return $properties{$class_name} || $self->SUPER::_get_default_properties($class_name);
+            # inherited from Border
+            border_width    => 1,
+            left_enclosing  => '',
+            right_enclosing => '',
+        },
+    );
+    return $properties{$class_name} || $self->SUPER::_get_default_properties($class_name);
 }
 
 sub HLINE_NORMAL  { shift->_set_colors( 'blue', 'magenta' ) }

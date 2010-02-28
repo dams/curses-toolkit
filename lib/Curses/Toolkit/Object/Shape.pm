@@ -32,14 +32,14 @@ sub substract   { _die() }
 sub restrict_to { _die() }
 
 sub _die {
-	die " You should not be calling '" . ( caller(1) )[3] . "' on a '" . __PACKAGE__ . "' object, as it's read only.";
+    die " You should not be calling '" . ( caller(1) )[3] . "' on a '" . __PACKAGE__ . "' object, as it's read only.";
 }
 
 # private methods
 
 sub _set {
-	my $self = shift;
-	$self->SUPER::set(@_);
+    my $self = shift;
+    $self->SUPER::set(@_);
 }
 
 

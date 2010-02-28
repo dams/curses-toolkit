@@ -37,12 +37,12 @@ parent widget. Only the listener of the widget will be tested.
 =cut
 
 sub new {
-	my $class = shift;
-	$class eq __PACKAGE__ and die "abstract class";
-	return bless {
-		can_propagate => 1,
-		restricted    => 0,
-	}, $class;
+    my $class = shift;
+    $class eq __PACKAGE__ and die "abstract class";
+    return bless {
+        can_propagate => 1,
+        restricted    => 0,
+    }, $class;
 }
 
 =head1 METHODS
@@ -54,8 +54,8 @@ Returns the type of the event
 =cut
 
 sub get_type {
-	my ($self) = @_;
-	return $self->{type};
+    my ($self) = @_;
+    return $self->{type};
 }
 
 =head2 enable_propagation
@@ -65,9 +65,9 @@ Enable propagation of the event to other matching listeners
 =cut
 
 sub enable_propagation {
-	my ($self) = @_;
-	$self->{can_propagate} = 1;
-	return $self;
+    my ($self) = @_;
+    $self->{can_propagate} = 1;
+    return $self;
 }
 
 =head2 disable_propagation
@@ -77,9 +77,9 @@ Disable propagation of the event to other matching listeners
 =cut
 
 sub disable_propagation {
-	my ($self) = @_;
-	$self->{can_propagate} = 0;
-	return $self;
+    my ($self) = @_;
+    $self->{can_propagate} = 0;
+    return $self;
 }
 
 =head2 can_propagate
@@ -89,7 +89,7 @@ Returns wether the event can propagate
 =cut
 
 sub can_propagate {
-	return shift->{can_propagate};
+    return shift->{can_propagate};
 }
 
 =head2 enable_restriction
@@ -100,9 +100,9 @@ passed to parent widgets
 =cut
 
 sub enable_restriction {
-	my ($self) = @_;
-	$self->{restricted} = 1;
-	return $self;
+    my ($self) = @_;
+    $self->{restricted} = 1;
+    return $self;
 }
 
 =head2 disable_restriction
@@ -113,9 +113,9 @@ passed to parent widgets
 =cut
 
 sub disable_restriction {
-	my ($self) = @_;
-	$self->{restricted} = 0;
-	return $self;
+    my ($self) = @_;
+    $self->{restricted} = 0;
+    return $self;
 }
 
 =head2 restricted_to_widget
@@ -125,7 +125,7 @@ Returns wether the event is restricted to the widget
 =cut
 
 sub restricted_to_widget {
-	return shift->{restricted};
+    return shift->{restricted};
 }
 
 1;

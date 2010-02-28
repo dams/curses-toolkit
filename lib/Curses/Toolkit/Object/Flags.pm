@@ -26,13 +26,13 @@ The list of flags is :
 =cut
 
 sub new {
-	my $class = shift;
-	my $self  = bless {
-		focused  => 0,
-		selected => 0,
-		clicked  => 0,
-	}, $class;
-	return $self;
+    my $class = shift;
+    my $self  = bless {
+        focused  => 0,
+        selected => 0,
+        clicked  => 0,
+    }, $class;
+    return $self;
 }
 
 1;

@@ -25,14 +25,14 @@ This theme is used by default when rendering widgets, if color is available.
 
 
 sub new {
-	my $class = shift;
-	has_colors()
-		or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
-	return $class->SUPER::new(@_);
+    my $class = shift;
+    has_colors()
+        or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
+    return $class->SUPER::new(@_);
 }
 
-sub default_fgcolor {'yellow'}
-sub default_bgcolor {'black'}
+sub default_fgcolor { 'yellow' }
+sub default_bgcolor { 'black' }
 
 sub HLINE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
 sub HLINE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }

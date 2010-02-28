@@ -44,19 +44,19 @@ This creates a button with a Curses::Toolkit::Widget::Label for you.
 =cut
 
 sub new_with_label {
-	my $class = shift;
-	my ($label_text) = validate_pos( @_, { type => SCALAR } );
-	my $self = $class->new();
-	$self->add_widget( Curses::Toolkit::Widget::Label->new()->set_text($label_text) );
-	return $self;
+    my $class = shift;
+    my ($label_text) = validate_pos( @_, { type => SCALAR } );
+    my $self = $class->new();
+    $self->add_widget( Curses::Toolkit::Widget::Label->new()->set_text($label_text) );
+    return $self;
 }
 
 # The difference with Border is that we don't want to expand when not
 # necessary. Meaning, when asked for desired_space, we return the minimum space
 
 sub get_desired_space {
-	my $self = shift;
-	return $self->get_minimum_space(@_);
+    my $self = shift;
+    return $self->get_minimum_space(@_);
 }
 
 1;

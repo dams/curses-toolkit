@@ -20,15 +20,15 @@ None, this is an abstract class
 =cut
 
 sub new {
-	my $class = shift;
-	$class eq __PACKAGE__ and die "abstract class";
-	return bless {}, $class;
+    my $class = shift;
+    $class eq __PACKAGE__ and die "abstract class";
+    return bless {}, $class;
 }
 
 # returns the type of the signal
 sub get_type {
-	my ($self) = @_;
-	return $self->{type};
+    my ($self) = @_;
+    return $self->{type};
 }
 
 1;
