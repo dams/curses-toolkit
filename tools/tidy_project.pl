@@ -6,34 +6,27 @@ use warnings;
 eval('require Perl::Tidy');
 $@ and die 'Please install Perl::Tidy (e.g. cpan Perl::Tidy)';
 
-#
 use Cwd                   qw( cwd );
 use File::Spec::Functions qw( catfile catdir );
 use File::Find::Rule;
 use FindBin qw( $Bin );
+use Path::Class qw( dir );
 
 # check if perltidyrc file exists
 my $perltidyrc = catfile( $Bin, 'perltidyrc' );
 -e $perltidyrc
   or die "cannot find perltidy configuration file: $perltidyrc\n";
 
-# build list of perl files to reformat
-my @pmfiles = @ARGV
-	? @ARGV
-	: grep {/^lib/}	File::Find::Rule->file->name("*.pm")->relative->in(cwd);
-my @tfiles = @ARGV
-	? @ARGV
-	: grep {/^t/}	File::Find::Rule->file->name("*.t")->relative->in(cwd);
-my @examples  = @ARGV
-	? @ARGV
-	: grep {/^examples/} File::Find::Rule->file->name("*.pl")->relative->in(cwd);
+my $root_dir = dir($Bin)->parent;
 
-my @files = (@pmfiles, @tfiles, @examples);
+my $lib_dir = $root_dir->subdir('lib');
+my @files = @ARGV || File::Find::Rule->file->name("*.pm")->in("$lib_dir");
 
 # formatting documents
 my $cmd = "perltidy --backup-and-modify-in-place --profile=$perltidyrc @files";
 
-system($cmd) == 0 or die "perltidy exited with return code " . ($? >> 8);
+system($cmd)
+  and die "perltidy exited with return code " . ($? >> 8);
 
 # removing backup files
-unlink map {"$_.bak"} @files;
+unlink map { $_ . '.bak'} @files;
