@@ -370,6 +370,7 @@ Force the coordinate to be inside the passed coordinate.
 sub restrict_to {
     my $self = shift;
     my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+
     $self->x1() < $c->x1() and $self->{x1} = $c->{x1};
     $self->x1() > $c->x2() and $self->{x1} = $c->{x2};
 
@@ -381,6 +382,28 @@ sub restrict_to {
 
     $self->y2() > $c->y2() and $self->{y2} = $c->{y2};
     $self->y2() < $c->y1() and $self->{y2} = $c->{y1};
+
+    return $self;
+}
+
+=head2 grow_to
+
+Force the coordinate to be at least as big as the passed coordinate.
+
+  input  : a Curses::Toolkit::Object::Coordinates object
+  output : the object
+
+=cut
+
+sub grow_to {
+    my $self = shift;
+    my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
+
+    $self->x1() > $c->x1() and $self->{x1} = $c->{x1};
+    $self->x2() < $c->x2() and $self->{x2} = $c->{x2};
+
+    $self->y1() > $c->y1() and $self->{y1} = $c->{y1};
+    $self->y2() < $c->y2() and $self->{y2} = $c->{y2};
 
     return $self;
 }
