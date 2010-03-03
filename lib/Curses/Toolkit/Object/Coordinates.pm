@@ -17,16 +17,16 @@ use overload
 
 sub _stringify {
     my ($self) = @_;
-    return $self->width . 'x' . $self->height . '+' . $self->x1 . 'x' . $self->y1;
+    return $self->width . 'x' . $self->height . '+' . $self->get_x1 . 'x' . $self->get_y1;
 }
 
 sub _equals {
     my ( $c1, $c2 ) = @_;
     return
-           $c1->x1() == $c2->x1()
-        && $c1->y1() == $c2->y1()
-        && $c1->x2() == $c2->x2()
-        && $c1->y2() == $c2->y2();
+           $c1->get_x1() == $c2->get_x1()
+        && $c1->get_y1() == $c2->get_y1()
+        && $c1->get_x2() == $c2->get_x2()
+        && $c1->get_y2() == $c2->get_y2();
 }
 
 =head1 DESCRIPTION
@@ -165,8 +165,8 @@ sub set {
 sub _normalize {
     my ($self) = @_;
 
-    $self->x1() <= $self->x2() or ( $self->{x1}, $self->{x2} ) = ( $self->{x2}, $self->{x1} );
-    $self->y1() <= $self->y2() or ( $self->{y1}, $self->{y2} ) = ( $self->{y2}, $self->{y1} );
+    $self->get_x1() <= $self->get_x2() or ( $self->{x1}, $self->{x2} ) = ( $self->{x2}, $self->{x1} );
+    $self->get_y1() <= $self->get_y2() or ( $self->{y1}, $self->{y2} ) = ( $self->{y2}, $self->{y1} );
     return;
 }
 
@@ -178,7 +178,7 @@ returns the width represented by the coordinates
 
 sub width {
     my ($self) = @_;
-    return $self->x2() - $self->x1();
+    return $self->get_x2() - $self->get_x1();
 }
 
 =head2 height
@@ -189,7 +189,7 @@ returns the height represented by the coordinates
 
 sub height {
     my ($self) = @_;
-    return $self->y2() - $self->y1();
+    return $self->get_y2() - $self->get_y1();
 }
 
 =head2 x1, x2, y1, y2
@@ -198,10 +198,11 @@ These are helpers to retrieve the coordinates values
 
 =cut
 
-sub x1 { my ($self) = @_; my $x1 = $self->{x1}; ref $x1 eq 'CODE' ? $x1->($self) : $x1 }
-sub y1 { my ($self) = @_; my $y1 = $self->{y1}; ref $y1 eq 'CODE' ? $y1->($self) : $y1 }
-sub x2 { my ($self) = @_; my $x2 = $self->{x2}; ref $x2 eq 'CODE' ? $x2->($self) : $x2 }
-sub y2 { my ($self) = @_; my $y2 = $self->{y2}; ref $y2 eq 'CODE' ? $y2->($self) : $y2 }
+sub get_x1 { my ($self) = @_; my $x1 = $self->{x1}; ref $x1 eq 'CODE' ? $x1->($self) : $x1 }
+sub get_y1 { my ($self) = @_; my $y1 = $self->{y1}; ref $y1 eq 'CODE' ? $y1->($self) : $y1 }
+sub get_x2 { my ($self) = @_; my $x2 = $self->{x2}; ref $x2 eq 'CODE' ? $x2->($self) : $x2 }
+sub get_y2 { my ($self) = @_; my $y2 = $self->{y2}; ref $y2 eq 'CODE' ? $y2->($self) : $y2 }
+
 
 =head2 add
 
@@ -229,21 +230,22 @@ sub add {
 
         # argument is a constant
         @{$self}{qw(x1 y1 x2 y2)} = (
-            $self->x1() + $c, $self->y1() + $c,
-            $self->x2() + $c, $self->y2() + $c,
+            $self->get_x1() + $c, $self->get_y1() + $c,
+            $self->get_x2() + $c, $self->get_y2() + $c,
         );
     } elsif ( ref $c eq __PACKAGE__ ) {
 
         # argument is a coordinate object
         @{$self}{qw(x1 x2 y1 y2)} = (
-            $self->x1() + $c->x1(), $self->y1() + $c->y1(),
-            $self->x2() + $c->x2(), $self->y2() + $c->y2(),
+            $self->get_x1() + $c->get_x1(), $self->get_y1() + $c->get_y1(),
+            $self->get_x2() + $c->get_x2(), $self->get_y2() + $c->get_y2(),
         );
     } elsif ( ref $c eq 'HASH' ) {
 
         # argument is a hash
         while ( my ( $k, $v ) = each %$c ) {
-            $self->{$k} = $self->$k() + $v;
+            my $meth = "get_$k";
+            $self->{$k} = $self->$meth + $v;
         }
     } else {
         die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
@@ -263,19 +265,19 @@ sub _clone_add {
 # 	my ($self, $c) = @_;
 # 	# argument is a constant
 # 	ref $c or
-# 	  return $self->set( x1 => $self->x1() + $c, y1 => $self->y1() + $c,
-# 							   x2 => $self->x2() + $c, y2 => $self->y2() + $c,
+# 	  return $self->set( x1 => $self->get_x1() + $c, y1 => $self->get_y1() + $c,
+# 							   x2 => $self->get_x2() + $c, y2 => $self->get_y2() + $c,
 # 							 );
 
 # 	# argument is a coordinate object
 # 	ref $c eq $self and
-# 	  return $self->set( x1 => $self->x1() + $c->x1(), y1 => $self->y1() + $c->y1(),
-# 							   x2 => $self->x2() + $c->x2(), y2 => $self->y2() + $c->y2(),
+# 	  return $self->set( x1 => $self->get_x1() + $c->get_x1(), y1 => $self->get_y1() + $c->get_y1(),
+# 							   x2 => $self->get_x2() + $c->get_x2(), y2 => $self->get_y2() + $c->get_y2(),
 # 							 );
 # 	# argument is a hash
 # 	ref $c eq 'HASH' and
-# 	  return $self->set( x1 => $self->x1() + $c->{x1}, y1 => $self->y1() + $c->{y1},
-# 							   x2 => $self->x2() + $c->{x2}, y2 => $self->y2() + $c->{y2},
+# 	  return $self->set( x1 => $self->get_x1() + $c->{x1}, y1 => $self->get_y1() + $c->{y1},
+# 							   x2 => $self->get_x2() + $c->{x2}, y2 => $self->get_y2() + $c->{y2},
 # 							 );
 
 # 	die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
@@ -307,21 +309,22 @@ sub substract {
 
         # argument is a constant
         @{$self}{qw(x1 y1 x2 y2)} = (
-            $self->x1() - $c, $self->y1() - $c,
-            $self->x2() - $c, $self->y2() - $c,
+            $self->get_x1() - $c, $self->get_y1() - $c,
+            $self->get_x2() - $c, $self->get_y2() - $c,
         );
     } elsif ( ref $c eq __PACKAGE__ ) {
 
         # argument is a coordinate object
         @{$self}{qw(x1 x2 y1 y2)} = (
-            $self->x1() - $c->x1(), $self->y1() - $c->y1(),
-            $self->x2() - $c->x2(), $self->y2() - $c->y2(),
+            $self->get_x1() - $c->get_x1(), $self->get_y1() - $c->get_y1(),
+            $self->get_x2() - $c->get_x2(), $self->get_y2() - $c->get_y2(),
         );
     } elsif ( ref $c eq 'HASH' ) {
 
         # argument is a hash
         while ( my ( $k, $v ) = each %$c ) {
-            $self->{$k} = $self->$k() - $v;
+            my $meth = "get_$k";
+            $self->{$k} = $self->$meth - $v;
         }
     } else {
         die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
@@ -341,19 +344,19 @@ sub _clone_substract {
 # 	my ($self, $c) = @_;
 # 	# argument is a constant
 # 	ref $c or
-# 	  return $self->set( x1 => $self->x1() - $c, y1 => $self->y1() - $c,
-# 							   x2 => $self->x2() - $c, y2 => $self->y2() - $c,
+# 	  return $self->set( x1 => $self->get_x1() - $c, y1 => $self->get_y1() - $c,
+# 							   x2 => $self->get_x2() - $c, y2 => $self->get_y2() - $c,
 # 							 );
 # 	# argument is a Coordinates object
 # 	if ($c->isa($self)) {
-# 		return $self->set( x1 => $self->x1() - $c->x1(), y1 => $self->y1() - $c->y1(),
-# 								 x2 => $self->x2() - $c->x2(), y2 => $self->y2() - $c->y2(),
+# 		return $self->set( x1 => $self->get_x1() - $c->get_x1(), y1 => $self->get_y1() - $c->get_y1(),
+# 								 x2 => $self->get_x2() - $c->get_x2(), y2 => $self->get_y2() - $c->get_y2(),
 # 							   );
 # 	}
 # 	# argument is a hash
 # 	ref $c eq 'HASH' and
-# 	  return $self->set( x1 => $self->x1() - $c->{x1}, y1 => $self->y1() - $c->{y1},
-# 							   x2 => $self->x2() - $c->{x2}, y2 => $self->y2() - $c->{y2},
+# 	  return $self->set( x1 => $self->get_x1() - $c->{x1}, y1 => $self->get_y1() - $c->{y1},
+# 							   x2 => $self->get_x2() - $c->{x2}, y2 => $self->get_y2() - $c->{y2},
 # 							 );
 # 	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
 # }
@@ -371,17 +374,17 @@ sub restrict_to {
     my $self = shift;
     my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
 
-    $self->x1() < $c->x1() and $self->{x1} = $c->{x1};
-    $self->x1() > $c->x2() and $self->{x1} = $c->{x2};
+    $self->get_x1() < $c->get_x1() and $self->{x1} = $c->{x1};
+    $self->get_x1() > $c->get_x2() and $self->{x1} = $c->{x2};
 
-    $self->x2() > $c->x2() and $self->{x2} = $c->{x2};
-    $self->x2() < $c->x1() and $self->{x2} = $c->{x1};
+    $self->get_x2() > $c->get_x2() and $self->{x2} = $c->{x2};
+    $self->get_x2() < $c->get_x1() and $self->{x2} = $c->{x1};
 
-    $self->y1() < $c->y1() and $self->{y1} = $c->{y1};
-    $self->y1() > $c->y2() and $self->{y1} = $c->{y2};
+    $self->get_y1() < $c->get_y1() and $self->{y1} = $c->{y1};
+    $self->get_y1() > $c->get_y2() and $self->{y1} = $c->{y2};
 
-    $self->y2() > $c->y2() and $self->{y2} = $c->{y2};
-    $self->y2() < $c->y1() and $self->{y2} = $c->{y1};
+    $self->get_y2() > $c->get_y2() and $self->{y2} = $c->{y2};
+    $self->get_y2() < $c->get_y1() and $self->{y2} = $c->{y1};
 
     return $self;
 }
@@ -399,11 +402,11 @@ sub grow_to {
     my $self = shift;
     my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
 
-    $self->x1() > $c->x1() and $self->{x1} = $c->{x1};
-    $self->x2() < $c->x2() and $self->{x2} = $c->{x2};
+    $self->get_x1() > $c->get_x1() and $self->{x1} = $c->{x1};
+    $self->get_x2() < $c->get_x2() and $self->{x2} = $c->{x2};
 
-    $self->y1() > $c->y1() and $self->{y1} = $c->{y1};
-    $self->y2() < $c->y2() and $self->{y2} = $c->{y2};
+    $self->get_y1() > $c->get_y1() and $self->{y1} = $c->{y1};
+    $self->get_y2() < $c->get_y2() and $self->{y2} = $c->{y2};
 
     return $self;
 }
@@ -512,10 +515,10 @@ sub contains {
     my $self = shift;
     my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
     return
-           $self->x1() <= $c->x1()
-        && $self->y1() <= $c->y1()
-        && $self->x2() >= $c->x2()
-        && $self->y2() >= $c->y2();
+           $self->get_x1() <= $c->get_x1()
+        && $self->get_y1() <= $c->get_y1()
+        && $self->get_x2() >= $c->get_x2()
+        && $self->get_y2() >= $c->get_y2();
 }
 
 =head2 is_inside
@@ -548,10 +551,10 @@ sub is_in_widget {
     my ( $self, $widget ) = @_;
     my $w_coord = $widget->get_coordinates();
     return
-           $w_coord->x1() <= $self->x1()
-        && $w_coord->x2() >= $self->x2()
-        && $w_coord->y1() <= $self->y1()
-        && $w_coord->y2() >= $self->y2();
+           $w_coord->get_x1() <= $self->get_x1()
+        && $w_coord->get_x2() >= $self->get_x2()
+        && $w_coord->get_y1() <= $self->get_y1()
+        && $w_coord->get_y2() >= $self->get_y2();
 }
 
 

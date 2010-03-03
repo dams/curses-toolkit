@@ -62,8 +62,8 @@ sub blank {
     my $theme  = $self->get_theme();
     my $c      = $self->get_coordinates();
     my $bc     = $self->_get_available_space() + {
-        x1 => $c->x1(), y1 => $c->y1(),
-        x2 => $c->x1(), y2 => $c->y1(),
+        x1 => $c->get_x1(), y1 => $c->get_y1(),
+        x2 => $c->get_x1(), y2 => $c->get_y1(),
     };
     $theme->draw_blank($bc);
     return $self;

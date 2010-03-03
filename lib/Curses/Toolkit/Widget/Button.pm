@@ -139,9 +139,9 @@ sub draw {
     my $t1 = ' ' x ( ( $w2 - length $text ) / 2 );
     my $t2 = ' ' x ( $w2 - length($text) - length($t1) );
 
-    $theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
-    $theme->draw_string( $c->x1() + $bw + $o2, $c->y1() + $bw, $right_string );
-    $theme->draw_string( $c->x1() + $bw + $o1, $c->y1() + $bw, $t1 . $text . $t2 );
+    $theme->draw_string( $c->get_x1() + $bw,       $c->get_y1() + $bw, $left_string );
+    $theme->draw_string( $c->get_x1() + $bw + $o2, $c->get_y1() + $bw, $right_string );
+    $theme->draw_string( $c->get_x1() + $bw + $o1, $c->get_y1() + $bw, $t1 . $text . $t2 );
 
     return;
 }
@@ -177,8 +177,8 @@ sub get_minimum_space {
     my $left_string   = $self->get_theme_property('left_enclosing');
     my $right_string  = $self->get_theme_property('right_enclosing');
     $minimum_space->set(
-        x2 => $available_space->x1() + 2 * $bw + length($left_string) + length($text) + length($right_string),
-        y2 => $available_space->y1() + 1 + 2 * $bw,
+        x2 => $available_space->get_x1() + 2 * $bw + length($left_string) + length($text) + length($right_string),
+        y2 => $available_space->get_y1() + 1 + 2 * $bw,
     );
     return $minimum_space;
 }

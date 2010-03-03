@@ -84,7 +84,7 @@ sub _rebuild_children_coordinates {
     $child_space->restrict_to($available_space);
 
     # 		# Force the child space to be as large as the available space
-    # 		$child_space->set(x2 => $available_space->x2() );
+    # 		$child_space->set(x2 => $available_space->get_x2() );
     # At the end, we grant it this space
     $child_widget->_set_relatives_coordinates($child_space);
     $child_widget->can('_rebuild_children_coordinates')

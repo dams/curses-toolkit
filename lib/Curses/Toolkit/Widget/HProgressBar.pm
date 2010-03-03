@@ -98,13 +98,13 @@ sub draw {
     my $o3 = ( $w1 - length $text ) / 2;
     my $o4 = $w1 - $wr;
 
-    $theme->draw_string( $c->x1() + $bw,       $c->y1() + $bw, $left_string );
-    $theme->draw_string( $c->x1() + $bw + $o4, $c->y1() + $bw, $right_string );
+    $theme->draw_string( $c->get_x1() + $bw,       $c->get_y1() + $bw, $left_string );
+    $theme->draw_string( $c->get_x1() + $bw + $o4, $c->get_y1() + $bw, $right_string );
 
-    $theme->draw_string( $c->x1() + $bw + $o1, $c->y1() + $bw, $char_done x $w_done );
-    $theme->draw_string( $c->x1() + $bw + $o2, $c->y1() + $bw, $char_left x $w_left );
+    $theme->draw_string( $c->get_x1() + $bw + $o1, $c->get_y1() + $bw, $char_done x $w_done );
+    $theme->draw_string( $c->get_x1() + $bw + $o2, $c->get_y1() + $bw, $char_left x $w_left );
 
-    $theme->draw_string( $c->x1() + $bw + $o3, $c->y1() + $bw, $text );
+    $theme->draw_string( $c->get_x1() + $bw + $o3, $c->get_y1() + $bw, $text );
 
     return;
 }
@@ -124,7 +124,7 @@ The desired space is as much horizontal space as possible, with a height of 1.
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
     my $desired_space = $available_space->clone;
-    $desired_space->set( y2 => $desired_space->y1 + 1 );
+    $desired_space->set( y2 => $desired_space->get_y1 + 1 );
     $desired_space->grow_to($self->get_minimum_space($available_space));
     return $desired_space;
 }
@@ -151,8 +151,8 @@ sub get_minimum_space {
     my $left_string   = $self->get_theme_property('left_enclosing');
     my $right_string  = $self->get_theme_property('right_enclosing');
     $minimum_space->set(
-        x2 => $available_space->x1() + 2 * $bw + length($left_string) + $default_width + length($right_string),
-        y2 => $available_space->y1() + 1 + 2 * $bw,
+        x2 => $available_space->get_x1() + 2 * $bw + length($left_string) + $default_width + length($right_string),
+        y2 => $available_space->get_y1() + 1 + 2 * $bw,
     );
     return $minimum_space;
 }

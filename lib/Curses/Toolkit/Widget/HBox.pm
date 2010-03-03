@@ -139,7 +139,7 @@ sub _rebuild_children_coordinates {
         } else {
             my $avg_width = int( $remaining_space->width() / $count );
             my $avg_space = $remaining_space->clone();
-            $avg_space->set( x2 => $avg_space->x1() + $avg_width );
+            $avg_space->set( x2 => $avg_space->get_x1() + $avg_width );
             my $space = $child->get_desired_space($avg_space);
             my $w     = $space->width();
             $remaining_space->substract( { x2 => $w } );
@@ -201,7 +201,7 @@ sub get_desired_space {
     foreach my $child (@expanding_children) {
         my $avg_width = int( $remaining_space->width() / $count );
         my $avg_space = $remaining_space->clone();
-        $avg_space->set( x2 => $avg_space->x1() + $avg_width );
+        $avg_space->set( x2 => $avg_space->get_x1() + $avg_width );
         my $space = $child->get_desired_space($avg_space);
         my $w     = $space->width();
         $remaining_space->substract( { x2 => $w } );
@@ -209,7 +209,7 @@ sub get_desired_space {
         $count--;
     }
 
-    $desired_space->set( x2 => $desired_space->x1() + $width );
+    $desired_space->set( x2 => $desired_space->get_x1() + $width );
 
     return $desired_space;
 
@@ -244,7 +244,7 @@ sub get_minimum_space {
         $remaining_space->substract( { x2 => $w } );
     }
 
-    $minimum_space->set( x2 => $minimum_space->x1() + $width, y2 => $minimum_space->y1() + $height );
+    $minimum_space->set( x2 => $minimum_space->get_x1() + $width, y2 => $minimum_space->get_y1() + $height );
 
     return $minimum_space;
 

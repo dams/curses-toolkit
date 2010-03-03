@@ -264,19 +264,19 @@ sub draw {
         $t->search_replace( '^\s+', '' );
         $t->search_replace( '\s+$', '' );
         if ( $justify eq 'left' ) {
-            $theme->draw_string( $c->x1(), $c->y1() + $y, $t );
+            $theme->draw_string( $c->get_x1(), $c->get_y1() + $y, $t );
         }
         if ( $justify eq 'center' ) {
             $theme->draw_string(
-                $c->x1() + ( $c->width() - length $t ) / 2,
-                $c->y1() + $y,
+                $c->get_x1() + ( $c->width() - length $t ) / 2,
+                $c->get_y1() + $y,
                 $t
             );
         }
         if ( $justify eq 'right' ) {
             $theme->draw_string(
-                $c->x1() + $c->width() - length $t,
-                $c->y1() + $y,
+                $c->get_x1() + $c->width() - length $t,
+                $c->get_y1() + $y,
                 $t
             );
         }
@@ -382,8 +382,8 @@ sub _get_space {
         $text =~ s/\n(\s)/$1/g;
         $text =~ s/\n/ /g;
         $minimum_space->set(
-            x2 => $available_space->x1() + length $text,
-            y2 => $available_space->y1() + 1,
+            x2 => $available_space->get_x1() + length $text,
+            y2 => $available_space->get_y1() + 1,
         );
         return $minimum_space;
     } elsif ( $wrap_mode eq 'active' ) {
@@ -392,8 +392,8 @@ sub _get_space {
             my @text = _textwrap( $self->{_markup_string}, $width );
             if ( $width >= $self->{_markup_string}->stripped_length() ) {
                 $minimum_space->set(
-                    x2 => $minimum_space->x1() + $self->{_markup_string}->stripped_length() + 1,
-                    y2 => $minimum_space->y1() + 1
+                    x2 => $minimum_space->get_x1() + $self->{_markup_string}->stripped_length() + 1,
+                    y2 => $minimum_space->get_y1() + 1
                 );
                 last;
             }
@@ -402,16 +402,16 @@ sub _get_space {
                 next;
             }
             $minimum_space->set(
-                x2 => $minimum_space->x1() + max( map { $_->stripped_length() } @text ) + 1,
-                y2 => $minimum_space->y1() + scalar(@text)
+                x2 => $minimum_space->get_x1() + max( map { $_->stripped_length() } @text ) + 1,
+                y2 => $minimum_space->get_y1() + scalar(@text)
             );
             last;
         }
         return $minimum_space;
     } elsif ( $wrap_mode eq 'lazy' ) {
         my @text = _textwrap( $self->{_markup_string}, max( $available_space->width(), 1 ) );
-        $minimum_space->set( y2 => $minimum_space->y1() + scalar(@text) );
-        $minimum_space->set( x2 => $minimum_space->x1() + max( map { $_->stripped_length() } @text ) );
+        $minimum_space->set( y2 => $minimum_space->get_y1() + scalar(@text) );
+        $minimum_space->set( x2 => $minimum_space->get_x1() + max( map { $_->stripped_length() } @text ) );
         return $minimum_space;
     }
     die;

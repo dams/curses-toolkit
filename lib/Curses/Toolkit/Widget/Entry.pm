@@ -368,9 +368,9 @@ sub draw {
         # put the background text below it
         substr( $display_text, 0, length($t) ) = $t;
 
-        $theme->draw_string( $c->x1(),       $c->y1(), $left_enclosing );
-        $theme->draw_string( $c->x1() + $o2, $c->y1(), $right_enclosing );
-        $theme->draw_string( $c->x1() + $o1, $c->y1(), $display_text );
+        $theme->draw_string( $c->get_x1(),       $c->get_y1(), $left_enclosing );
+        $theme->draw_string( $c->get_x1() + $o2, $c->get_y1(), $right_enclosing );
+        $theme->draw_string( $c->get_x1() + $o1, $c->get_y1(), $display_text );
 
     } else {
         if ( $self->get_cursor_position() >= $self->{text_display_offset} + $w2 - 1 ) {
@@ -386,11 +386,11 @@ sub draw {
         my $t2                       = substr( $display_text, $relative_cursor_position, 1 );
         my $t3                       = substr( $display_text, $relative_cursor_position + 1 );
 
-        $theme->draw_string( $c->x1(),                         $c->y1(), $left_enclosing,  { reverse => 0 } );
-        $theme->draw_string( $c->x1() + $o2,                   $c->y1(), $right_enclosing, { reverse => 0 } );
-        $theme->draw_string( $c->x1() + $o1,                   $c->y1(), $t1,              { reverse => 0 } );
-        $theme->draw_string( $c->x1() + $o1 + length($t1),     $c->y1(), $t2,              { reverse => 1 } );
-        $theme->draw_string( $c->x1() + $o1 + length($t1) + 1, $c->y1(), $t3,              { reverse => 0 } );
+        $theme->draw_string( $c->get_x1(),                         $c->get_y1(), $left_enclosing,  { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o2,                   $c->get_y1(), $right_enclosing, { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o1,                   $c->get_y1(), $t1,              { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o1 + length($t1),     $c->get_y1(), $t2,              { reverse => 1 } );
+        $theme->draw_string( $c->get_x1() + $o1 + length($t1) + 1, $c->get_y1(), $t3,              { reverse => 0 } );
     }
 
 
@@ -412,10 +412,10 @@ sub get_desired_space {
 
     my $desired_space = $available_space->clone();
 
-    #	$desired_space->set( x2 => $available_space->x1() + $self->get_width(),
+    #	$desired_space->set( x2 => $available_space->get_x1() + $self->get_width(),
     $desired_space->set(
-        x2 => $available_space->x2(),
-        y2 => $available_space->y1() + 1,
+        x2 => $available_space->get_x2(),
+        y2 => $available_space->get_y1() + 1,
     );
     return $desired_space;
 
@@ -438,8 +438,8 @@ sub get_minimum_space {
     my $minimum_space = $available_space->clone();
     my $default_width = $self->get_theme_property('default_width');
     $minimum_space->set(
-        x2 => $available_space->x1() + $default_width,
-        y2 => $available_space->y1() + 1,
+        x2 => $available_space->get_x1() + $default_width,
+        y2 => $available_space->get_y1() + 1,
     );
     return $minimum_space;
 }

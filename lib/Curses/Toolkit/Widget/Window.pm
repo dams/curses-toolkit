@@ -134,7 +134,7 @@ sub new {
                         and return 1;
                     my $c  = $event->{coordinates};
                     my $wc = $self->get_coordinates();
-                    !$self->{_move_pressed} && $event->{type} eq 'pressed' && $c->y1() == $wc->y1()
+                    !$self->{_move_pressed} && $event->{type} eq 'pressed' && $c->get_y1() == $wc->get_y1()
                         and return 1;
                     return 0;
                 },
@@ -151,17 +151,17 @@ sub new {
                     my $wc = $window->get_coordinates();            # window coord
                     my $rc = $self->get_root_window()->get_shape(); # root coord
                     $wc += {
-                        x1 => $c->x1() - $oc->x1(), x2 => $c->x1() - $oc->x1(),
-                        y1 => $c->y1() - $oc->y1(), y2 => $c->y1() - $oc->y1(),
+                        x1 => $c->get_x1() - $oc->get_x1(), x2 => $c->get_x1() - $oc->get_x1(),
+                        y1 => $c->get_y1() - $oc->get_y1(), y2 => $c->get_y1() - $oc->get_y1(),
                     };
-                    $wc->y1() < 0
-                        and $wc->translate_down( $wc->y1() );
-                    $wc->y1() > $rc->height() - 1
-                        and $wc->translate_up( $wc->y1() - $rc->height() + 1 );
-                    $wc->x1() < -$wc->width() + 1
-                        and $wc->translate_right( -$wc->width() + 1 - $wc->x1() );
-                    $wc->x1() > $rc->width() - 1
-                        and $wc->translate_left( -$wc->x1() - $rc->width() + 1 );
+                    $wc->get_y1() < 0
+                        and $wc->translate_down( $wc->get_y1() );
+                    $wc->get_y1() > $rc->height() - 1
+                        and $wc->translate_up( $wc->get_y1() - $rc->height() + 1 );
+                    $wc->get_x1() < -$wc->width() + 1
+                        and $wc->translate_right( -$wc->width() + 1 - $wc->get_x1() );
+                    $wc->get_x1() > $rc->width() - 1
+                        and $wc->translate_left( -$wc->get_x1() - $rc->width() + 1 );
 
                     $window->set_coordinates($wc);
                     $window->needs_redraw();
@@ -193,8 +193,8 @@ sub new {
                     my $wc = $self->get_coordinates();
                           !$self->{_resize_pressed}
                         && $event->{type} eq 'pressed'
-                        && $c->x2() == $wc->x2() - 1
-                        && $c->y2() == $wc->y2() - 1
+                        && $c->get_x2() == $wc->get_x2() - 1
+                        && $c->get_y2() == $wc->get_y2() - 1
                         and return 1;
                     return 0;
                 },
@@ -208,7 +208,7 @@ sub new {
                     $window->unset_modal();
                     my $c  = $event->{coordinates};
                     my $wc = $window->get_coordinates();
-                    $wc->set( x2 => $c->x2() + 1, y2 => $c->y2() + 1 );
+                    $wc->set( x2 => $c->get_x2() + 1, y2 => $c->get_y2() + 1 );
                     $window->set_coordinates($wc);
                     $window->needs_redraw();
                     $self->{_resize_pressed} = 0;
@@ -315,7 +315,7 @@ sub set_coordinates {
             my $percent = $1;
             $params{x2} = sub {
                 my ($coord) = @_;
-                $coord->x1()
+                $coord->get_x1()
                     + ( $self->get_root_window() and $self->get_root_window()->get_shape()->width() * $percent / 100 );
             };
             delete $params{width};
@@ -324,7 +324,7 @@ sub set_coordinates {
             my $percent = $1;
             $params{y2} = sub {
                 my ($coord) = @_;
-                $coord->y1()
+                $coord->get_y1()
                     + ( $self->get_root_window() and $self->get_root_window()->get_shape()->height() * $percent / 100 );
             };
             delete $params{height};
@@ -525,14 +525,14 @@ sub draw {
     my $theme = $self->get_theme();
     if ( length $title_to_display ) {
         $theme->draw_title(
-            $c->x1() + $o1, $c->y1(),
+            $c->get_x1() + $o1, $c->get_y1(),
             join( $title_to_display, @title_brackets_characters ),
             { clicked => $self->{_move_pressed} }
         );
     }
 
-    #	$theme->draw_corner_lr($c->x2() - 1, $c->y2() - 1);
-    $theme->draw_resize( $c->x2() - 1, $c->y2() - 1, { clicked => $self->{_resize_pressed} } );
+    #	$theme->draw_corner_lr($c->get_x2() - 1, $c->get_y2() - 1);
+    $theme->draw_resize( $c->get_x2() - 1, $c->get_y2() - 1, { clicked => $self->{_resize_pressed} } );
 }
 
 =head2 get_visible_shape

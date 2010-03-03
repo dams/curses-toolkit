@@ -36,12 +36,12 @@ This widget contain 2 widgets. The children are packed horizontally.
 
 sub _p1 {
     my ( $self, $c ) = @_;
-    return $c->y1();
+    return $c->get_y1();
 }
 
 sub _p2 {
     my ( $self, $c ) = @_;
-    return $c->x2();
+    return $c->get_x2();
 }
 
 sub _p3 {
@@ -51,12 +51,12 @@ sub _p3 {
 
 sub _p4 {
     my ( $self, $c, $gp ) = @_;
-    return ( y2 => $c->y1() + $gp );
+    return ( y2 => $c->get_y1() + $gp );
 }
 
 sub _p5 {
     my ( $self, $c, $gp, $gw ) = @_;
-    return ( y1 => $c->y1() + $gp + $gw );
+    return ( y1 => $c->get_y1() + $gp + $gw );
 }
 
 sub _p6 {
@@ -66,39 +66,39 @@ sub _p6 {
 
 sub _p7 {
     my ( $self, $theme, $c, $i, $gp, $attr ) = @_;
-    $theme->draw_hline( $c->x1(), $c->y1() + $gp + $i, $c->width(), $attr );
+    $theme->draw_hline( $c->get_x1(), $c->get_y1() + $gp + $i, $c->width(), $attr );
     return;
 }
 
 sub _p8 {
     my ( $self, $c, $gp, $gw ) = @_;
-    return ( y2 => $c->y1() + $gp + $gw );
+    return ( y2 => $c->get_y1() + $gp + $gw );
 }
 
 sub _p9 {
     my ( $self, $c ) = @_;
-    return ( x2 => $c->x2() );
+    return ( x2 => $c->get_x2() );
 }
 
 sub _p10 {
     my ( $self, $c ) = @_;
-    return ( y1 => $c->y1() );
+    return ( y1 => $c->get_y1() );
 }
 
 sub _p11 {
     my ( $self, $c1, $c2 ) = @_;
-    return ( y2 => $c1->y1() + $c1->height() + $c2->height() );
+    return ( y2 => $c1->get_y1() + $c1->height() + $c2->height() );
 }
 
 sub _p12 {
     my ( $self, $c ) = @_;
-    return ( x2 => $c->x1() + 1 );
+    return ( x2 => $c->get_x1() + 1 );
 }
 
 sub _p13 {
     my ( $self, $c1, $c2 ) = @_;
     use List::Util qw(max);
-    return ( x2 => max( $c1->x2(), $c2->x2() ) );
+    return ( x2 => max( $c1->get_x2(), $c2->get_x2() ) );
 }
 
 =head1 METHODS

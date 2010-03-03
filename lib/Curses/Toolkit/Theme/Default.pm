@@ -123,7 +123,7 @@ sub draw_hline {
     $y1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1 )
         or return;
-    $self->curses($attr)->hline( $c->y1(), $c->x1(), HLINE(), $c->width() );
+    $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), HLINE(), $c->width() );
     return $self;
 }
 
@@ -133,7 +133,7 @@ sub draw_vline {
     $x1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $height )
         or return;
-    $self->curses($attr)->vline( $c->y1(), $c->x1(), VLINE(), $c->height() );
+    $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), VLINE(), $c->height() );
     return $self;
 }
 
@@ -179,12 +179,12 @@ sub draw_string {
 
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1 ) or return;
 
-    my $start = $c->x1() - $x1;
-    my $end   = $c->x1() - $x1 + $c->width();
+    my $start = $c->get_x1() - $x1;
+    my $end   = $c->get_x1() - $x1 + $c->width();
     my $width = $end - $start;
     $text = $text->substring( $start, $width );
     $text->stripped_length() or return;
-    $self->_addstr_with_tags( $attr, $c->x1(), $c->y1(), $text );
+    $self->_addstr_with_tags( $attr, $c->get_x1(), $c->get_y1(), $text );
     return $self;
 }
 
@@ -193,11 +193,11 @@ sub draw_title {
     $self->get_widget->is_visible() or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => length($text), height => 1 ) or return;
 
-    $c->x1() - $x1 < length $text
+    $c->get_x1() - $x1 < length $text
         or return;
-    $text = substr( $text, $c->x1() - $x1, $c->width() );
+    $text = substr( $text, $c->get_x1() - $x1, $c->width() );
     defined $text && length $text or return;
-    $self->curses($attr)->addstr( $c->y1(), $c->x1(), $text );
+    $self->curses($attr)->addstr( $c->get_y1(), $c->get_x1(), $text );
     return $self;
 }
 
@@ -215,11 +215,11 @@ sub draw_blank {
     my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
     $c = $self->restrict_to_shape($c)
         or return;
-    my $l = $c->x2() - $c->x1();
+    my $l = $c->get_x2() - $c->get_x1();
     $l > 0 or return $self;
     my $str = ' ' x $l;
-    foreach my $y ( $c->y1() .. $c->y2() - 1 ) {
-        $self->curses->addstr( $y, $c->x1(), $str );
+    foreach my $y ( $c->get_y1() .. $c->get_y2() - 1 ) {
+        $self->curses->addstr( $y, $c->get_x1(), $str );
     }
     return $self;
 }

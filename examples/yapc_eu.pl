@@ -80,24 +80,24 @@ sub main {
 						my $c  = $time_label->get_coordinates();
 						my $wc = $time_window->get_coordinates();
 						my $nr = 0;
-						int $c->x1() < $screen_w - 4 and $wc->set(
-							x1 => $wc->x1() + 1,
-							x2 => $wc->x2() + 1
+						int $c->get_x1() < $screen_w - 4 and $wc->set(
+							x1 => $wc->get_x1() + 1,
+							x2 => $wc->get_x() + 1
 							),
 							$nr = 1;
-						int $c->x1() > $screen_w - 4 and $wc->set(
-							x1 => $wc->x1() - 1,
-							x2 => $wc->x2() - 1
+						int $c->get_x1() > $screen_w - 4 and $wc->set(
+							x1 => $wc->get_x1() - 1,
+							x2 => $wc->get_x() - 1
 							),
 							$nr = 1;
-						int $c->y1() < 0 and $wc->set(
-							y1 => $wc->y1() + 1,
-							y2 => $wc->x2() + 1
+						int $c->get_y1() < 0 and $wc->set(
+							y1 => $wc->get_y1() + 1,
+							y2 => $wc->get_x() + 1
 							),
 							$nr = 1;
-						int $c->y1() > 0 and $wc->set(
-							y1 => $wc->y1() - 1,
-							y2 => $wc->x2() - 1
+						int $c->get_y1() > 0 and $wc->set(
+							y1 => $wc->get_y1() - 1,
+							y2 => $wc->get_x() - 1
 							),
 							$nr = 1;
 						$nr == 1 and $time_window->set_coordinates($wc);
@@ -249,16 +249,16 @@ sub main {
 		$move_audience_window_sub = sub {
 			my $wc = $audience_window->get_coordinates();
 			$audience_window->set_coordinates(
-				x1 => $wc->x1() + 1, x2 => $wc->x2(),
-				y1 => $wc->y1(),     y2 => $wc->y2()
+				x1 => $wc->get_x1() + 1, x2 => $wc->get_x(),
+				y1 => $wc->get_y1(),     y2 => $wc->get_y2()
 			);
 			$loop1-- and $root->add_delay( 1 / 3, $move_audience_window_sub );
 		};
 		$move_audience_window_sub2 = sub {
 			my $wc = $audience_window->get_coordinates();
 			$audience_window->set_coordinates(
-				x1 => $wc->x1() - 1, x2 => $wc->x2() + 1,
-				y1 => $wc->y1(),     y2 => $wc->y2()
+				x1 => $wc->get_x1() - 1, x2 => $wc->get_x() + 1,
+				y1 => $wc->get_y1(),     y2 => $wc->get_y2()
 			);
 			$loop2-- and $root->add_delay( 1 / 3, $move_audience_window_sub2 );
 		};

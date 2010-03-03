@@ -511,8 +511,8 @@ sub get_coordinates {
         my $rc = $self->get_relatives_coordinates();
         use Curses::Toolkit::Object::Coordinates;
         my $c = Curses::Toolkit::Object::Coordinates->new(
-            x1 => $pc->x1() + $rc->x1(), y1 => $pc->y1() + $rc->y1(),
-            x2 => $pc->x1() + $rc->x2(), y2 => $pc->y1() + $rc->y2(),
+            x1 => $pc->get_x1() + $rc->get_x1(), y1 => $pc->get_y1() + $rc->get_y1(),
+            x2 => $pc->get_x1() + $rc->get_x2(), y2 => $pc->get_y1() + $rc->get_y2(),
         );
         return $c;
     }
