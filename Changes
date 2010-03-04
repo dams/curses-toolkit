@@ -1,5 +1,7 @@
 {{$NEXT}}
-
+	progress bar widget (by jquelin)
+	more signals
+	more documentation, some cleanup
 0.100320
 	more signals
 	additional examples

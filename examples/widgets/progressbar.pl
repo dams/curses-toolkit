@@ -20,82 +20,64 @@ sub main {
 
     my $root = POE::Component::Curses->spawn;
 
-        my ($bar, $b1, $b2);
+    my $bar;
     {
-        # window 1
-
         my $window1 =
           Curses::Toolkit::Widget::Window->new->set_name('window')->set_title("manual progress bar")
-              ->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => 6 );
+              ->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => 7 );
         $root->add_window($window1);
 
         $window1->add_widget(
-          Curses::Toolkit::Widget::HBox->new
+          Curses::Toolkit::Widget::VBox->new
           ->pack_end(
-            Curses::Toolkit::Widget::Border->new
-            ->add_widget(
-              Curses::Toolkit::Widget::VBox->new
-              ->pack_end(
-                Curses::Toolkit::Widget::Label->new->set_text('Click to decrease'),
-                { expand => 0 },
-              )
-              ->pack_end(
-                $b1 = Curses::Toolkit::Widget::Button->new_with_label('-'),
-                { expand => 0 },
-              )
+            Curses::Toolkit::Widget::HBox->new
+            ->pack_end(
+              Curses::Toolkit::Widget::Border->new
+              ->add_widget(
+                Curses::Toolkit::Widget::VBox->new
+                ->pack_end(
+                  Curses::Toolkit::Widget::Label->new->set_text('Click to decrease'),
+                  { expand => 0 },
+                )
+                ->pack_end(
+                  Curses::Toolkit::Widget::Button->new_with_label('-')->signal_connect( clicked => 
+                      sub {
+                          $bar->set_position( $bar->get_position - 1 );
+                      }),
+                  { expand => 0 },
+                )
+              ),
+              { expand => 0 },
+            )
+            ->pack_end(
+              $bar  = Curses::Toolkit::Widget::HProgressBar->new,
+              { expand => 1 },
+            )
+            ->pack_end(
+              Curses::Toolkit::Widget::Border->new
+              ->add_widget(
+                Curses::Toolkit::Widget::VBox->new
+                ->pack_end(
+                  Curses::Toolkit::Widget::Label->new->set_text('Click to increase'),
+                  { expand => 0 },
+                )
+                ->pack_end(
+                  Curses::Toolkit::Widget::Button->new_with_label('+')->signal_connect( clicked =>
+                      sub {
+                          $bar->set_position( $bar->get_position + 1 );
+                      }),
+                  { expand => 0 },
+                )
+              ),
+              { expand => 0 },
             ),
-            { expand => 0 },
-          )
-          ->pack_end(
-            $bar  = Curses::Toolkit::Widget::HProgressBar->new,
             { expand => 1 },
           )
           ->pack_end(
-            Curses::Toolkit::Widget::Border->new
-            ->add_widget(
-              Curses::Toolkit::Widget::VBox->new
-              ->pack_end(
-                Curses::Toolkit::Widget::Label->new->set_text('Click to increase'),
-                { expand => 0 },
-              )
-              ->pack_end(
-                $b2 = Curses::Toolkit::Widget::Button->new_with_label('+'),
-                { expand => 0 },
-              )
-            ),
-            { expand => 0 },
+			Curses::Toolkit::Widget::Button->new_with_label('Exit')->signal_connect( clicked => sub {exit} ),
+			{ expand => 0 }
           )
         );
-
-        $b1->add_event_listener(
-            Curses::Toolkit::EventListener->new(
-                accepted_events => {
-                    'Curses::Toolkit::Event::Key' => sub {
-                        my ($event) = @_;
-                        $event->{type} eq 'stroke' or return 0;
-                        $event->{params}{key} eq ' ' or return 0;
-                        }
-                },
-                code => sub {
-                    $bar->set_position( $bar->get_position - 1 );
-                },
-            )
-        );
-        $b2->add_event_listener(
-            Curses::Toolkit::EventListener->new(
-                accepted_events => {
-                    'Curses::Toolkit::Event::Key' => sub {
-                        my ($event) = @_;
-                        $event->{type} eq 'stroke' or return 0;
-                        $event->{params}{key} eq ' ' or return 0;
-                        }
-                },
-                code => sub {
-                    $bar->set_position( $bar->get_position + 1 );
-                },
-            )
-        );
-
     }
     POE::Kernel->run();
 }
