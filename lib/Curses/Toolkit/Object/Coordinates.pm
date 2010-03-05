@@ -237,8 +237,8 @@ sub add {
 
         # argument is a coordinate object
         @{$self}{qw(x1 x2 y1 y2)} = (
-            $self->get_x1() + $c->get_x1(), $self->get_y1() + $c->get_y1(),
-            $self->get_x2() + $c->get_x2(), $self->get_y2() + $c->get_y2(),
+            $self->get_x1() + $c->get_x1(), $self->get_x2() + $c->get_x2(),
+            $self->get_y1() + $c->get_y1(), $self->get_y2() + $c->get_y2(),
         );
     } elsif ( ref $c eq 'HASH' ) {
 
