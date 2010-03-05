@@ -12,6 +12,7 @@ use Params::Validate qw(:all);
 use List::MoreUtils qw(any none);
 use List::Util qw(min sum max);
 
+use Curses::Toolkit::EventListener;
 
 =head1 Appearence
 
