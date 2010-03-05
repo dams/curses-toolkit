@@ -248,7 +248,7 @@ sub add {
             $self->{$k} = $self->$meth + $v;
         }
     } else {
-        die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
+        die "Argument type ('" . ref($c) . "') is not supported in Coordinate addition";
     }
     $self->_normalize();
     return $self;
