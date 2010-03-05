@@ -105,17 +105,17 @@ is( "$c3", '3x7+5x2', 'new coord returned' );
 
 # -- add()
 $c1 = Coordinates->new( x1=>4, y1=>3, x2=>5, y2=>4 );
-$c1->substract( 3 );
-is( "$c1", '1x1+1x0', 'substract(const) works' );
+$c1->subtract( 3 );
+is( "$c1", '1x1+1x0', 'subtract(const) works' );
 $c1 = Coordinates->new( x1=>3, y1=>1, x2=>5, y2=>4 );
 $c2 = Coordinates->new( x1=>2, y1=>1, x2=>3, y2=>2 );
-$c1->substract( $c2 );
-is( "$c1", '1x2+1x0', 'substract(coords)' );
+$c1->subtract( $c2 );
+is( "$c1", '1x2+1x0', 'subtract(coords)' );
 $c1 = Coordinates->new( x1=>3, y1=>1, x2=>5, y2=>4 );
 my %rm = ( x1=>2, y1=>1, x2=>3, y2=>2 );
-$c1->substract( \%rm );
-is( "$c1", '1x2+1x0', 'substract(hashref)' );
-throws_ok { $c1->substract([]) } qr/not supported/, 'cannot remove whatever';
+$c1->subtract( \%rm );
+is( "$c1", '1x2+1x0', 'subtract(hashref)' );
+throws_ok { $c1->subtract([]) } qr/not supported/, 'cannot remove whatever';
 
 
 # -- overloaded subtraction

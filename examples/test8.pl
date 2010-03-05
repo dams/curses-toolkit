@@ -2,7 +2,7 @@
 
 use HTML::Parser;
 
-# substract of pango  :
+# subtract of pango  :
 # weight : One of 'normal', 'bold'
 # fgcolor :
 # bgcolor :

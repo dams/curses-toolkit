@@ -11,7 +11,7 @@ use Params::Validate qw(:all);
 
 use overload
     '+'  => '_clone_add',
-    '-'  => '_clone_substract',
+    '-'  => '_clone_subtract',
     '""' => '_stringify',
     '==' => '_equals';
 
@@ -283,14 +283,14 @@ sub _clone_add {
 # 	die "Argument type ('" . ref $c . "') is not supported in Coordinate addition";
 # }
 
-=head2 substract
+=head2 subtract
 
 Substract from the coordinate (also overloads '-').
 
-If the argument is a constant, it's substracted from all the components of the
+If the argument is a constant, it's subtracted from all the components of the
 coordinate.
-If it's a Curses::Toolkit::Object::Coordinates, it's substracted side by side
-If it's a hashref, it's substracted side by side
+If it's a Curses::Toolkit::Object::Coordinates, it's subtracted side by side
+If it's a hashref, it's subtracted side by side
 
   input  : a CONSTANT
 OR
@@ -302,7 +302,7 @@ output : the Curses::Toolkit::Object::Coordinates object
 
 =cut
 
-sub substract {
+sub subtract {
     my ( $self, $c ) = @_;
 
     if ( !ref $c ) {
@@ -333,14 +333,14 @@ sub substract {
     return $self;
 }
 
-sub _clone_substract {
+sub _clone_subtract {
     my $self  = shift;
     my $clone = $self->clone();
-    $clone->substract(@_);
+    $clone->subtract(@_);
     return $clone;
 }
 
-# sub substract {
+# sub subtract {
 # 	my ($self, $c) = @_;
 # 	# argument is a constant
 # 	ref $c or
@@ -358,7 +358,7 @@ sub _clone_substract {
 # 	  return $self->set( x1 => $self->get_x1() - $c->{x1}, y1 => $self->get_y1() - $c->{y1},
 # 							   x2 => $self->get_x2() - $c->{x2}, y2 => $self->get_y2() - $c->{y2},
 # 							 );
-# 	die "Argument type ('" . ref $c . "') is not supported in Coordinate substraction";
+# 	die "Argument type ('" . ref $c . "') is not supported in Coordinate subtraction";
 # }
 
 =head2 restrict_to

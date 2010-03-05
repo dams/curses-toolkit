@@ -123,7 +123,7 @@ sub _rebuild_children_coordinates {
             my $space = $child->get_minimum_space($remaining_space);
             my $w     = $space->width();
             $width += $w;
-            $remaining_space->substract( { x2 => $w } );
+            $remaining_space->subtract( { x2 => $w } );
             $children_widths[$idx] = $w;
             $idx++;
         }
@@ -142,7 +142,7 @@ sub _rebuild_children_coordinates {
             $avg_space->set( x2 => $avg_space->get_x1() + $avg_width );
             my $space = $child->get_desired_space($avg_space);
             my $w     = $space->width();
-            $remaining_space->substract( { x2 => $w } );
+            $remaining_space->subtract( { x2 => $w } );
             $width += $w;
             $children_widths[$idx] = $w;
             $count--;
@@ -191,7 +191,7 @@ sub get_desired_space {
         my $space = $child->get_minimum_space($remaining_space);
         my $w     = $space->width();
         $width += $w;
-        $remaining_space->substract( { x2 => $w } );
+        $remaining_space->subtract( { x2 => $w } );
     }
 
     # add to it the width of the expanding children, restricted
@@ -204,7 +204,7 @@ sub get_desired_space {
         $avg_space->set( x2 => $avg_space->get_x1() + $avg_width );
         my $space = $child->get_desired_space($avg_space);
         my $w     = $space->width();
-        $remaining_space->substract( { x2 => $w } );
+        $remaining_space->subtract( { x2 => $w } );
         $width += $w;
         $count--;
     }
@@ -241,7 +241,7 @@ sub get_minimum_space {
         $width += $w;
         use List::Util qw(max);
         $height = max $height, $space->height();
-        $remaining_space->substract( { x2 => $w } );
+        $remaining_space->subtract( { x2 => $w } );
     }
 
     $minimum_space->set( x2 => $minimum_space->get_x1() + $width, y2 => $minimum_space->get_y1() + $height );

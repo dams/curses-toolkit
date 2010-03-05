@@ -28,7 +28,7 @@ Nothing more than L<Curses::Toolkit::Object::Coordinates> for now
 
 sub set         { _die() }
 sub add         { _die() }
-sub substract   { _die() }
+sub subtract   { _die() }
 sub restrict_to { _die() }
 
 sub _die {
