@@ -2,24 +2,19 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object;
-
 # ABSTRACT: base class for objects
 
-=head1 DESCRIPTION
+use Moose;
 
-Base class for objects
-
-=head1 CONSTRUCTOR
-
-None, this is an abstract class
-
-=cut
-
-sub new {
+sub BUILDARGS {
     my ($class) = shift;
-
     # TODO : use Exception;
     $class eq __PACKAGE__ and die "abstract class";
 }
 
 1;
+__END__
+
+=head1 DESCRIPTION
+
+Base class for objects. This class cannot be instanciated.
