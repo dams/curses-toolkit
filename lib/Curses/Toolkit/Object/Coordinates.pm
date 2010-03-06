@@ -2,18 +2,31 @@ use warnings;
 use strict;
 
 package Curses::Toolkit::Object::Coordinates;
-
 # ABSTRACT: simple coordinates class
 
-use parent qw(Curses::Toolkit::Object);
+use Moose;
+use MooseX::FollowPBP;
+use MooseX::Has::Sugar;
 
 use Params::Validate qw(:all);
+
+extends qw(Curses::Toolkit::Object);
 
 use overload
     '+'  => '_clone_add',
     '-'  => '_clone_subtract',
     '""' => '_stringify',
     '==' => '_equals';
+
+
+# -- attributes
+
+has x1 => ( rw, isa=>'Int|CodeRef', required );
+has y1 => ( rw, isa=>'Int|CodeRef', required );
+has x2 => ( rw, isa=>'Int|CodeRef', required );
+has y2 => ( rw, isa=>'Int|CodeRef', required );
+has normalize => ( ro, isa=>'Bool', default=>1 );
+
 
 sub _stringify {
     my ($self) = @_;
@@ -29,11 +42,6 @@ sub _equals {
         && $c1->get_y2() == $c2->get_y2();
 }
 
-=head1 DESCRIPTION
-
-Trivial class to hold 2 points
-
-+ and - are properly overloaded
 
 =head1 CONSTRUCTOR
 
@@ -68,41 +76,40 @@ they are all integers, swapping or rounding them if necessary.
 
 =cut
 
-sub new {
-    my $class = shift;
+sub BUILDARGS {
+    my $class  = shift;
 
-    if ( ref( $_[0] ) eq __PACKAGE__ ) {
+    # case: Coordinates->new( $clone );
+    if ( ref($_[0]) eq __PACKAGE__ ) {
         my $c    = $_[0];
-        my $self = {
+        my %params = (
             x1 => $c->{x1}, y1 => $c->{y1},
             x2 => $c->{x2}, y2 => $c->{y2},
-        };
-        return bless $self, $class;
+        );
+        return \%params;
     }
+
+    # regular case
     my %params = @_;
-    if ( exists $params{width} || exists $params{height} ) {
-        validate(
-            @_,
-            {   x1        => { type     => SCALAR }, y1     => { type => SCALAR },
-                width     => { type     => SCALAR }, height => { type => SCALAR },
-                normalize => { optional => 1,        type   => BOOLEAN },
-            }
-        );
-        $params{x2} = $params{x1} + $params{width};
-        $params{y2} = $params{y1} + $params{height};
-        defined $params{normalize} or $params{normalize} = 1;
-    } else {
-        validate(
-            @_,
-            {   x1        => { type     => SCALAR | CODEREF }, y1   => { type => SCALAR | CODEREF },
-                x2        => { type     => SCALAR | CODEREF }, y2   => { type => SCALAR | CODEREF },
-                normalize => { optional => 1,                  type => BOOLEAN },
-            }
-        );
-    }
-    my $self = bless \%params, $class;
-    $params{normalize} and $self->_normalize();
-    return $self;
+    return \%params unless exists $params{width} || exists $params{height};
+
+    # case: width and height arguments
+    validate( @_,
+        {   x1        => { type     => SCALAR }, y1     => { type => SCALAR },
+            width     => { type     => SCALAR }, height => { type => SCALAR },
+            normalize => { optional => 1,        type   => BOOLEAN },
+        }
+    );
+    $params{x2} = $params{x1} + $params{width};
+    $params{y2} = $params{y1} + $params{height};
+    defined $params{normalize} or $params{normalize} = 1;
+
+    return \%params;
+}
+
+sub BUILD {
+    my $self = shift;
+    $self->get_normalize and $self->_normalize;
 }
 
 =head2 new_zero
@@ -198,10 +205,22 @@ These are helpers to retrieve the coordinates values
 
 =cut
 
-sub get_x1 { my ($self) = @_; my $x1 = $self->{x1}; ref $x1 eq 'CODE' ? $x1->($self) : $x1 }
-sub get_y1 { my ($self) = @_; my $y1 = $self->{y1}; ref $y1 eq 'CODE' ? $y1->($self) : $y1 }
-sub get_x2 { my ($self) = @_; my $x2 = $self->{x2}; ref $x2 eq 'CODE' ? $x2->($self) : $x2 }
-sub get_y2 { my ($self) = @_; my $y2 = $self->{y2}; ref $y2 eq 'CODE' ? $y2->($self) : $y2 }
+around get_x1 => \&_coderef2value;
+around get_y1 => \&_coderef2value;
+around get_x2 => \&_coderef2value;
+around get_y2 => \&_coderef2value;
+
+sub _coderef2value {
+    my $orig = shift;
+    my $self = shift;
+    my $val = $self->$orig;
+    return ref($val) eq 'CODE' ? $val->($self) : $val;
+}
+
+#sub get_x1 { my ($self) = @_; my $x1 = $self->{x1}; ref $x1 eq 'CODE' ? $x1->($self) : $x1 }
+#sub get_y1 { my ($self) = @_; my $y1 = $self->{y1}; ref $y1 eq 'CODE' ? $y1->($self) : $y1 }
+#sub get_x2 { my ($self) = @_; my $x2 = $self->{x2}; ref $x2 eq 'CODE' ? $x2->($self) : $x2 }
+#sub get_y2 { my ($self) = @_; my $y2 = $self->{y2}; ref $y2 eq 'CODE' ? $y2->($self) : $y2 }
 
 
 =head2 add
@@ -559,3 +578,10 @@ sub is_in_widget {
 
 
 1;
+__END__
+
+=head1 DESCRIPTION
+
+Trivial class to hold 2 points.
+
++ and - are properly overloaded.
