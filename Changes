@@ -1,4 +1,6 @@
 {{$NEXT}}
+	add Moose::Meta::Attribute::Custom::Trait::Chained requirement
+0.100630
 	progress bar widget (by jquelin)
 	more signals
 	more documentation, some cleanup
