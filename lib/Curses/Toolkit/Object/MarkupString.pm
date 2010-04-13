@@ -125,10 +125,10 @@ sub _recompute {
                     push @current_attrs, \%struct;
                 } elsif ( $tagname eq 'b' ) {
                     push @stack, $tagname;
-                    push @current_attrs, { weight => A_BOLD };
+                    push @current_attrs, { weight => 'bold' };
                 } elsif ( $tagname eq 'u' ) {
                     push @stack, $tagname;
-                    push @current_attrs, { weight => A_UNDERLINE };
+                    push @current_attrs, { weight => 'underline' };
                 } else {
                     push @struct, map { [ $_, _deep_copy(@current_attrs) ] } split( //, $text );
                 }
