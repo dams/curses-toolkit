@@ -50,6 +50,10 @@ sub STRING_NORMAL  { shift->_set_colors( 'white', 'black' ) }
 sub STRING_FOCUSED { shift->_set_colors( 'white', 'black' )->_attron(A_REVERSE) }
 sub STRING_CLICKED { shift->_set_colors( 'white', 'black' )->_attron(A_BOLD) }
 
+sub VSTRING_NORMAL  { shift->_set_colors( 'white', 'black' ) }
+sub VSTRING_FOCUSED { shift->_set_colors( 'white', 'black' )->_attron(A_REVERSE) }
+sub VSTRING_CLICKED { shift->_set_colors( 'white', 'black' )->_attron(A_BOLD) }
+
 sub TITLE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
 sub TITLE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
 sub TITLE_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }

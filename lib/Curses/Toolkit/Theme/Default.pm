@@ -70,11 +70,22 @@ sub _get_default_properties {
             # inherited from Border
             border_width => 0,
 
-            left_enclosing  => '[',
-            right_enclosing => ']',
-            default_width   => 12,
+            start_enclosing  => '[',
+            end_enclosing => ']',
+            default_length   => 12,
             char_done       => '|',
             char_left       => '-',
+        },
+        'Curses::Toolkit::Widget::VProgressBar' => {
+
+            # inherited from Border
+            border_width => 0,
+
+            start_enclosing => '.',
+            end_enclosing   => '>',
+            default_length  => 12,
+            char_done       => '#',
+            char_left       => '|',
         },
     );
     return $default{$class_name} || {};
@@ -92,6 +103,10 @@ sub VLINE    { ACS_VLINE; }
 sub STRING_NORMAL  { }
 sub STRING_FOCUSED { shift->_attron(A_REVERSE) }
 sub STRING_CLICKED { shift->_attron(A_BOLD) }
+
+sub VSTRING_NORMAL  { }
+sub VSTRING_FOCUSED { shift->_attron(A_REVERSE) }
+sub VSTRING_CLICKED { shift->_attron(A_BOLD) }
 
 sub TITLE_NORMAL  { }
 sub TITLE_FOCUSED { shift->_attron(A_REVERSE) }
@@ -185,6 +200,28 @@ sub draw_string {
     $text = $text->substring( $start, $width );
     $text->stripped_length() or return;
     $self->_addstr_with_tags( $attr, $c->get_x1(), $c->get_y1(), $text );
+    return $self;
+}
+
+sub draw_vstring {
+    my ( $self, $x1, $y1, $text, $attr ) = @_;
+    $self->get_widget->is_visible() or return;
+
+    use Curses::Toolkit::Object::MarkupString;
+    ref $text
+        or $text = Curses::Toolkit::Object::MarkupString->new($text);
+
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $text->stripped_length() ) or return;
+
+    my $start  = $c->get_y1() - $y1;
+    my $end    = $c->get_y1() - $y1 + $c->height();
+    my $height = $end - $start;
+    $text = $text->substring( $start, $height );
+    $text->stripped_length() or return;
+    foreach my $y (0..$height-1) {
+        my $char = $text->substring( $y, 1 );
+        $self->_addstr_with_tags( $attr, $c->get_x1(), $c->get_y1() + $y, $char );
+    }
     return $self;
 }
 
