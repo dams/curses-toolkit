@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-package Curses::Toolkit::Widget::HProgressBar;
+package Curses::Toolkit::Widget::VProgressBar;
 
-# ABSTRACT: a horizontal progress bar widget
+# ABSTRACT: a vertical progress bar widget
 
 use Moose;
 use MooseX::Has::Sugar;
@@ -41,7 +41,7 @@ C<percent>.
 =method new
 
   input:  none
-  output: a Curses::Toolkit::Widget::HProgressBar
+  output: a Curses::Toolkit::Widget::VProgressBar
 
 =cut
 
@@ -63,10 +63,10 @@ sub draw {
 
     my $char_done    = $self->get_theme_property('char_done');
     my $char_left    = $self->get_theme_property('char_left');
-    my $left_string  = $self->get_theme_property('start_enclosing');
-    my $right_string = $self->get_theme_property('end_enclosing');
-    my $wl           = length $left_string;
-    my $wr           = length $right_string;
+    my $upper_string  = $self->get_theme_property('start_enclosing');
+    my $bottom_string = $self->get_theme_property('end_enclosing');
+    my $hu           = length $upper_string;
+    my $hb           = length $bottom_string;
     my $bw           = $self->get_theme_property('border_width');
 
 
@@ -79,32 +79,37 @@ sub draw {
         $text = "$value";
     }
 
-    # <------------ w1 ---------------->
-    #  <------------ w2 -------------->
-    #  <-$w_done-><-     $w_left     ->
-    # [|||||||||||----34%--------------]
-    # -^  o1
-    # ----- o2 ---^
-    # --------- o3 ---^
-    # ---------------- o4 -------------^
 
-    my $w1     = $c->width() - 2 * $bw;
-    my $w2     = $w1 - $wl - $wr;
-    my $w_done = int( $w2 * ( $pos - $min ) / ( $max - $min ) );
-    my $w_left = $w2 - $w_done;
+    # 
+    #    ^               _ 
+    #    |     ^      ^  # < o1
+    #    |     |   hd |  #
+    #    |     |      \/ #
+    #  h1|   h2|      ^  | < o2
+    #    |     |      |  |
+    #    |     |   hl |  |
+    #    |     |      |  |
+    #    |     \/     \/ |
+    #    \/              - < o4
+    #
 
-    my $o1 = $wl;
-    my $o2 = $o1 + $w_done;
-    my $o3 = ( $w1 - length $text ) / 2;
-    my $o4 = $w1 - $wr;
+    my $h1     = $c->height() - 2 * $bw;
+    my $h2     = $h1 - $hu - $hb;
+    my $h_done = int( $h2 * ( $pos - $min ) / ( $max - $min ) );
+    my $h_left = $h2 - $h_done;
 
-    $theme->draw_string( $c->get_x1() + $bw,       $c->get_y1() + $bw, $left_string );
-    $theme->draw_string( $c->get_x1() + $bw + $o4, $c->get_y1() + $bw, $right_string );
+    my $o1 = $hu;
+    my $o2 = $o1 + $h_done;
+ #   my $o3 = ( $h1 - length $text ) / 2;
+    my $o4 = $h1 - $hb;
 
-    $theme->draw_string( $c->get_x1() + $bw + $o1, $c->get_y1() + $bw, $char_done x $w_done );
-    $theme->draw_string( $c->get_x1() + $bw + $o2, $c->get_y1() + $bw, $char_left x $w_left );
+    $theme->draw_vstring( $c->get_x1() + $bw, $c->get_y1() + $bw, $upper_string );
+    $theme->draw_vstring( $c->get_x1() + $bw, $c->get_y1() + $bw + $o4, $bottom_string );
 
-    $theme->draw_string( $c->get_x1() + $bw + $o3, $c->get_y1() + $bw, $text );
+    $theme->draw_vstring( $c->get_x1() + $bw, $c->get_y1() + $bw + $o1, $char_done x $h_done );
+    $theme->draw_vstring( $c->get_x1() + $bw, $c->get_y1() + $bw + $o2, $char_left x $h_left );
+
+#    $theme->draw_vstring( $c->get_x1() + $bw, $c->get_y1() + $bw + $o3, $text );
 
     return;
 }
@@ -146,13 +151,13 @@ sub get_minimum_space {
     my ( $self, $available_space ) = @_;
 
     my $minimum_space = $available_space->clone;
-    my $default_width = $self->get_theme_property('default_length');
+    my $default_height = $self->get_theme_property('default_length');
     my $bw            = $self->get_theme_property('border_width');
-    my $left_string   = $self->get_theme_property('start_enclosing');
-    my $right_string  = $self->get_theme_property('end_enclosing');
+    my $upper_string  = $self->get_theme_property('start_enclosing');
+    my $bottom_string = $self->get_theme_property('end_enclosing');
     $minimum_space->set(
-        x2 => $available_space->get_x1() + 2 * $bw + length($left_string) + $default_width + length($right_string),
-        y2 => $available_space->get_y1() + 1 + 2 * $bw,
+        x2 => $available_space->get_y1() + 1 + 2 * $bw,
+        y2 => $available_space->get_x1() + 2 * $bw + length($upper_string) + $default_height + length($bottom_string),
     );
     return $minimum_space;
 }
@@ -160,7 +165,7 @@ sub get_minimum_space {
 
 =method possible_signals
 
-  my @signals = keys $progressbar->possible_signals();
+  my @signals = keys $vprogressbar->possible_signals();
 
 Returns the possible signals that can be used on this widget. See
 L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
@@ -176,8 +181,8 @@ The progress bar accepts no signal.
 
 To set/get a theme properties, you should do :
 
-  $hprogressbar->set_theme_property(property_name => $property_value);
-  $value = $hprogressbar->get_theme_property('property_name');
+  $vprogressbar->set_theme_property(property_name => $property_value);
+  $value = $vprogressbar->get_theme_property('property_name');
 
 Here is the list of properties related to the progressbar, that can be
 changed in the associated theme. See the L<Curses::Toolkit::Theme> class
@@ -194,7 +199,7 @@ The width of the border of the progressbar.
 
 Example:
   # set the progressbar to have a border of 1
-  $hprogressbar->set_theme_property(border_width => 1 );
+  $vprogressbar->set_theme_property(border_width => 1 );
 
 
 =head2 default_length
@@ -203,7 +208,7 @@ Sets the value of the default length of the progress bar.
 
 Example :
   # set default_length
-  $hprogressbar->set_theme_property(default_length => 10 );
+  $vprogressbar->set_theme_property(default_length => 10 );
 
 =head2 char_done
 
@@ -212,7 +217,7 @@ progress bar.
 
 Example :
   # set char_done
-  $hprogressbar->set_theme_property(char_done => '=' );
+  $vprogressbar->set_theme_property(char_done => '=' );
 
 
 =head2 char_left
@@ -222,25 +227,25 @@ progress bar.
 
 Example :
   # set char_left
-  $hprogressbar->set_theme_property(char_left => ' ' );
+  $vprogressbar->set_theme_property(char_left => ' ' );
 
 =head2 start_enclosing
 
-The string to be displayed at the left of the progress bar. Usually some enclosing characters.
+The string to be displayed at the top of the progress bar. Usually some enclosing characters.
 
 Example :
-  # set left enclosing
-  $hprogressbar->set_theme_property(start_enclosing => '< ' );
-  $hprogressbar->set_theme_property(start_enclosing => '[ ' );
+  # set top enclosing
+  $vprogressbar->set_theme_property(start_enclosing => '< ' );
+  $vprogressbar->set_theme_property(start_enclosing => '[ ' );
 
 =head2 end_enclosing
 
-The string to be displayed at the right of the progress bar. Usually some enclosing characters.
+The string to be displayed at the bottom of the progress bar. Usually some enclosing characters.
 
 Example :
-  # set right enclosing
-  $hprogressbar->set_theme_property(end_enclosing => ' >' );
-  $hprogressbar->set_theme_property(end_enclosing => ' ]' );
+  # set bottom enclosing
+  $vprogressbar->set_theme_property(end_enclosing => ' >' );
+  $vprogressbar->set_theme_property(end_enclosing => ' ]' );
 
 =cut
 
@@ -264,8 +269,9 @@ With a border:
 
 =head1 DESCRIPTION
 
-The C<Curses::Toolkit::Widget::HProgressBar> widget is a classical
+The C<Curses::Toolkit::Widget::VProgressBar> widget is a classical
 progress bar widget, used to provide some sort of progress information
 to your program user.
 
-This progress bar is horizontal.
+This Progress bar is vertical.
+

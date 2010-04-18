@@ -72,7 +72,7 @@ around set_position => sub {
 
 =method possible_signals
 
-  my @signals = keys $button->possible_signals();
+  my @signals = keys $progressbar->possible_signals();
 
 Returns the possible signals that can be used on this widget. See
 L<Curses::Toolkit::Widget::signal_connect> to bind signals to actions
@@ -94,10 +94,10 @@ sub possible_signals {
 
 To set/get a theme properties, you should do :
 
-  $button->set_theme_property(property_name => $property_value);
-  $value = $button->get_theme_property('property_name');
+  $progressbar->set_theme_property(property_name => $property_value);
+  $value = $progressbar->get_theme_property('property_name');
 
-Here is the list of properties related to the window, that can be
+Here is the list of properties related to the progressbar, that can be
 changed in the associated theme. See the L<Curses::Toolkit::Theme> class
 used for the default (default class to look at is
 L<Curses::Toolkit::Theme::Default>)
@@ -108,17 +108,20 @@ inherited from!
 
 =head2 border_width (inherited)
 
-The width of the border of the button.
+The width of the border of the progressbar.
 
 Example:
-  # set buttons to have a border of 1
-  $button->set_theme_property(border_width => 1 );
+  # set the progressbar to have a border of 1
+  $progressbar->set_theme_property(border_width => 1 );
 
 
-=head2 default_width
+=head2 default_length
 
-Sets the value of the default width of the progress bar.
+Sets the value of the default length of the progress bar.
 
+Example :
+  # set default_length
+  $progressbar->set_theme_property(default_length => 10 );
 
 =head2 char_done
 
@@ -127,7 +130,7 @@ progress bar.
 
 Example :
   # set char_done
-  $entry->set_theme_property(char_done => '=' );
+  $progressbar->set_theme_property(char_done => '=' );
 
 
 =head2 char_left
@@ -137,7 +140,25 @@ progress bar.
 
 Example :
   # set char_left
-  $entry->set_theme_property(char_left => '=' );
+  $progressbar->set_theme_property(char_left => ' ' );
+
+=head2 start_enclosing
+
+The string to be displayed at the left/top of the progress bar. Usually some enclosing characters.
+
+Example :
+  # set left/top enclosing
+  $progressbar->set_theme_property(start_enclosing => '< ' );
+  $progressbar->set_theme_property(start_enclosing => '[ ' );
+
+=head2 end_enclosing
+
+The string to be displayed at the right/bottom of the progress bar. Usually some enclosing characters.
+
+Example :
+  # set right/bottom enclosing
+  $progressbar->set_theme_property(end_enclosing => ' >' );
+  $progressbar->set_theme_property(end_enclosing => ' ]' );
 
 =cut
 
@@ -145,6 +166,9 @@ sub _get_theme_properties_definition {
     my ($self) = @_;
     return {
         %{ $self->SUPER::_get_theme_properties_definition() },
+        start_enclosing => { optional => 0, type => SCALAR, },
+        end_enclosing => { optional => 0, type => SCALAR, },
+        default_length => { optional => 0, type => SCALAR, },
         char_done => { optional => 0, type => SCALAR, },
         char_left => { optional => 0, type => SCALAR, },
     };
