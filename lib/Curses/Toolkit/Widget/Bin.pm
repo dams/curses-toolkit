@@ -11,7 +11,7 @@ use Params::Validate qw(:all);
 
 =head1 DESCRIPTION
 
-This widget can contain 0 or 1 other widgets.
+This widget can contain 0 or 1 other widget.
 
 =cut
 

@@ -14,7 +14,7 @@ use Curses::Toolkit::Object::MarkupString;
 =head1 DESCRIPTION
 
 This widget consists of a text label. This widget is more powerful than it
-seems : it supports line wrapping, and color, bold, underline, etc.
+looks : it supports line wrapping, and color, bold, underline, etc.
 
 =head1 MARKUPS SUPPORT
 

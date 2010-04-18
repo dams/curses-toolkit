@@ -73,7 +73,7 @@ sub _get_available_space {
 =head2 get_desired_space
 
 Given a coordinate representing the available space, returns the space desired
-The Border desires all the space available, so it returns the available space
+The Border desires as much as its children desires, plus its width
 
   input : a Curses::Toolkit::Object::Coordinates object
   output : a Curses::Toolkit::Object::Coordinates object
