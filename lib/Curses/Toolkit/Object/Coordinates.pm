@@ -48,10 +48,10 @@ true (default). If set to false, the coordinates will be untouched.
 
 =cut
 
-has x1 => ( rw, isa=>'Int|CodeRef', required );
-has y1 => ( rw, isa=>'Int|CodeRef', required );
-has x2 => ( rw, isa=>'Int|CodeRef', required );
-has y2 => ( rw, isa=>'Int|CodeRef', required );
+has x1 => ( rw, isa=>'Num|Int|CodeRef', required );
+has y1 => ( rw, isa=>'Num|Int|CodeRef', required );
+has x2 => ( rw, isa=>'Num|Int|CodeRef', required );
+has y2 => ( rw, isa=>'Num|Int|CodeRef', required );
 has normalize => ( ro, isa=>'Bool', default=>1 );
 
 # if coords are coderef, derefence the callback at query time
@@ -130,6 +130,16 @@ sub BUILDARGS {
 # called when object has been built
 sub BUILD {
     my $self = shift;
+
+    # force all numbers to be integers
+    my $meta = __PACKAGE__->meta;
+    foreach my $att_name (qw(x1 y1 x2 y2)) {
+        my $att_class = $meta->get_attribute($att_name);
+        my $old_value = $att_class->get_value($self);
+        ref $old_value
+          or $att_class->set_value($self, int($old_value) );
+    }
+
     $self->get_normalize and $self->_normalize;
 }
 
