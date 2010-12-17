@@ -82,22 +82,22 @@ sub main {
 						my $nr = 0;
 						int $c->get_x1() < $screen_w - 4 and $wc->set(
 							x1 => $wc->get_x1() + 1,
-							x2 => $wc->get_x() + 1
+							x2 => $wc->get_x2() + 1
 							),
 							$nr = 1;
 						int $c->get_x1() > $screen_w - 4 and $wc->set(
 							x1 => $wc->get_x1() - 1,
-							x2 => $wc->get_x() - 1
+							x2 => $wc->get_x2() - 1
 							),
 							$nr = 1;
 						int $c->get_y1() < 0 and $wc->set(
 							y1 => $wc->get_y1() + 1,
-							y2 => $wc->get_x() + 1
+							y2 => $wc->get_y2() + 1
 							),
 							$nr = 1;
 						int $c->get_y1() > 0 and $wc->set(
 							y1 => $wc->get_y1() - 1,
-							y2 => $wc->get_x() - 1
+							y2 => $wc->get_y2() - 1
 							),
 							$nr = 1;
 						$nr == 1 and $time_window->set_coordinates($wc);
@@ -122,12 +122,12 @@ sub main {
 					Curses::Toolkit::Widget::Button->new_with_label('Hit space when you are ready to start!')
 					->add_event_listener(
 					Curses::Toolkit::EventListener->new(
-						accepted_event_class => 'Curses::Toolkit::Event::Key',
-						conditional_code     => sub {
-							my ($event) = @_;
-							$event->{type} eq 'stroke' or return 0;
-							$event->{params}{key} eq ' ' or return 0;
-						},
+						accepted_events => { 'Curses::Toolkit::Event::Key' => sub {
+                                                 my ($event) = @_;
+                                                 $event->{type} eq 'stroke' or return 0;
+                                                 $event->{params}{key} eq ' ' or return 0;
+                                             },
+                                           },
 						code => sub {
 							my ( $event, $button ) = @_;
 							$move_label = 1;
@@ -185,7 +185,9 @@ sub main {
 		$root->add_delay( $t->(3), sub { $app->("I'm also known as 'dams'\n") } );
 		$root->add_delay( $t->(3), sub { $set->("\n") } );
 		$root->add_delay( $t->(3), sub { $set->("I am not the funny guy which is standing on the scene.\n") } );
-		$root->add_delay( $t->(5), sub { $app->("The funny guy is called BooK, and I'm sure you all know him.") } );
+		$root->add_delay( $t->(5), sub {
+ $app->("The funny guy is called BooK, and I'm sure you all know him.")
+ } );
 		$root->add_delay(
 			$t->(5),
 			sub { $set->("I couldn't make it to the YAPC::EU this year\nso I asked Book to give this talk for me !") }
@@ -249,7 +251,7 @@ sub main {
 		$move_audience_window_sub = sub {
 			my $wc = $audience_window->get_coordinates();
 			$audience_window->set_coordinates(
-				x1 => $wc->get_x1() + 1, x2 => $wc->get_x(),
+				x1 => $wc->get_x1() + 1, x2 => $wc->get_x2(),
 				y1 => $wc->get_y1(),     y2 => $wc->get_y2()
 			);
 			$loop1-- and $root->add_delay( 1 / 3, $move_audience_window_sub );
@@ -257,7 +259,7 @@ sub main {
 		$move_audience_window_sub2 = sub {
 			my $wc = $audience_window->get_coordinates();
 			$audience_window->set_coordinates(
-				x1 => $wc->get_x1() - 1, x2 => $wc->get_x() + 1,
+				x1 => $wc->get_x1() - 1, x2 => $wc->get_x2() + 1,
 				y1 => $wc->get_y1(),     y2 => $wc->get_y2()
 			);
 			$loop2-- and $root->add_delay( 1 / 3, $move_audience_window_sub2 );
@@ -351,12 +353,12 @@ sub main {
 					);
 				$audience_button->add_event_listener(
 					Curses::Toolkit::EventListener->new(
-						accepted_event_class => 'Curses::Toolkit::Event::Key',
-						conditional_code     => sub {
-							my ($event) = @_;
-							$event->{type} eq 'stroke' or return 0;
-							$event->{params}{key} eq ' ' or return 0;
-						},
+						accepted_events => { 'Curses::Toolkit::Event::Key' => sub {
+                                                 my ($event) = @_;
+                                                 $event->{type} eq 'stroke' or return 0;
+                                                 $event->{params}{key} eq ' ' or return 0;
+                                             },
+                                           },
 						code => sub {
 							my ( $event, $button ) = @_;
 							$step3->();
