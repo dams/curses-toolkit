@@ -4,13 +4,11 @@ use strict;
 package Curses::Toolkit::Object::Coordinates;
 # ABSTRACT: simple coordinates class
 
-use Moose;
-use MooseX::FollowPBP;
-use MooseX::Has::Sugar;
+# We don't use Moose for speed purpose
 
 use Params::Validate qw(:all);
 
-extends qw(Curses::Toolkit::Object);
+use parent qw(Curses::Toolkit::Object);
 
 use overload
     '+'  => '_clone_add',
@@ -48,19 +46,6 @@ true (default). If set to false, the coordinates will be untouched.
 
 =cut
 
-has x1 => ( rw, isa=>'Num|Int|CodeRef', required );
-has y1 => ( rw, isa=>'Num|Int|CodeRef', required );
-has x2 => ( rw, isa=>'Num|Int|CodeRef', required );
-has y2 => ( rw, isa=>'Num|Int|CodeRef', required );
-has normalize => ( ro, isa=>'Bool', default=>1 );
-
-# if coords are coderef, derefence the callback at query time
-around get_x1 => \&_coderef2value;
-around get_y1 => \&_coderef2value;
-around get_x2 => \&_coderef2value;
-around get_y2 => \&_coderef2value;
-
-
 # -- constructor, builder & initializer
 
 =method new
@@ -96,53 +81,49 @@ Constructor for the class. Acceps various kind of attributes.
 =cut
 
 # called before object is built, to normalize the arguments.
-sub BUILDARGS {
+sub new {
     my $class  = shift;
 
-    # case: Coordinates->new( $clone );
+    my %params;
+
     if ( ref($_[0]) eq __PACKAGE__ ) {
+        # case: Coordinates->new( $clone );
         my $c    = $_[0];
-        my %params = (
+        %params = (
             x1 => $c->{x1}, y1 => $c->{y1},
             x2 => $c->{x2}, y2 => $c->{y2},
+            normalize => $c->{normalize},
         );
-        return \%params;
-    }
-
-    # regular case
-    my %params = @_;
-    return \%params unless exists $params{width} || exists $params{height};
-
-    # case: width and height arguments
-    validate( @_,
-        {   x1        => { type     => SCALAR }, y1     => { type => SCALAR },
-            width     => { type     => SCALAR }, height => { type => SCALAR },
-            normalize => { optional => 1,        type   => BOOLEAN },
+    } else {
+        %params = @_;
+        if ( exists $params{width} || exists $params{height} ) {
+            # case: width and height arguments
+            %params = validate( @_,
+                {   x1        => { type => SCALAR }, y1     => { type => SCALAR },
+                    width     => { type => SCALAR }, height => { type => SCALAR },
+                    normalize => { type => BOOLEAN, default => 1 },
+                }
+            );
+            $params{x2} = $params{x1} + $params{width};
+            $params{y2} = $params{y1} + $params{height};
+        } else {
+            %params = validate( @_,
+                {   x1 => { type => SCALAR|CODEREF }, y1 => { type => SCALAR|CODEREF },
+                    x2 => { type => SCALAR|CODEREF }, y2 => { type => SCALAR|CODEREF },
+                    normalize => { type => BOOLEAN, default => 1 },
+                }
+            );
         }
-    );
-    $params{x2} = $params{x1} + $params{width};
-    $params{y2} = $params{y1} + $params{height};
-    defined $params{normalize} or $params{normalize} = 1;
 
-    return \%params;
-}
-
-# called when object has been built
-sub BUILD {
-    my $self = shift;
-
-    # force all numbers to be integers
-    my $meta = __PACKAGE__->meta;
-    foreach my $att_name (qw(x1 y1 x2 y2)) {
-        my $att_class = $meta->get_attribute($att_name);
-        my $old_value = $att_class->get_value($self);
-        ref $old_value
-          or $att_class->set_value($self, int($old_value) );
+        foreach (qw( x1 x2 y1 y2 )) {
+            ref $params{$_} eq 'CODE'
+              or $params{$_} = int($params{$_});
+        }
     }
-
-    $self->get_normalize and $self->_normalize;
+    my $self = bless \%params, $class;
+    $self->_normalize();
+    return $self;
 }
-
 
 =method new_zero
 
@@ -180,12 +161,17 @@ sub clone {
     return ref($self)->new($self);
 }
 
+sub get_x1 { my $v = shift->{x1}; ref $v eq 'CODE' ? $v->() : $v }
+sub get_y1 { my $v = shift->{y1}; ref $v eq 'CODE' ? $v->() : $v }
+sub get_x2 { my $v = shift->{x2}; ref $v eq 'CODE' ? $v->() : $v }
+sub get_y2 { my $v = shift->{y2}; ref $v eq 'CODE' ? $v->() : $v }
+sub get_normalize { shift->{normalize} }
 
 # -- public methods
 
 =method set
 
-    $coord->set( x1=>$x1, y1=>$y1, x2=>$x2, y2=>$y2 );
+    $coord->set( x1=>$x1, y1=>$y1, x2=>$x2, y2=>$y2, normalize => 1 );
 
 Set attributes of the coordinate object.
 
@@ -202,16 +188,16 @@ sub set {
         @_,
         {   x1 => { type => SCALAR | CODEREF, optional => 1 }, y1 => { type => SCALAR | CODEREF, optional => 1 },
             x2 => { type => SCALAR | CODEREF, optional => 1 }, y2 => { type => SCALAR | CODEREF, optional => 1 },
+            normalize => { type => BOOLEAN, default => 1 },
         }
     );
-    keys %params or die "One of (x1, y1, x2, y2) argument must be passed";
+    keys %params or die "One of (x1, y1, x2, y2, normalize) argument must be passed";
 
     # set the new coords
     foreach my $k ( keys %params ) {
-        my $method = "set_$k";
-        $self->$method( $params{$k} );
+        $self->{$k} = $params{$k};
     }
-    $self->_normalize;
+    $self->_normalize();
     return $self;
 }
 
@@ -242,8 +228,6 @@ sub height {
     my ($self) = @_;
     return $self->get_y2() - $self->get_y1();
 }
-
-
 
 
 =method add
@@ -388,6 +372,8 @@ sub restrict_to {
     $self->get_y2 > $c->get_y2 and $self->{y2} = $c->{y2};
     $self->get_y2 < $c->get_y1 and $self->{y2} = $c->{y1};
 
+    $self->_normalize();
+
     return $self;
 }
 
@@ -412,6 +398,8 @@ sub grow_to {
 
     $self->get_y1 > $c->get_y1 and $self->{y1} = $c->{y1};
     $self->get_y2 < $c->get_y2 and $self->{y2} = $c->{y2};
+
+    $self->_normalize();
 
     return $self;
 }
@@ -451,6 +439,9 @@ sub translate {
         $self->{y1} += $params{y};
         $self->{y2} += $params{y};
     }
+
+    $self->_normalize();
+
     return $self;
 }
 
@@ -616,18 +607,6 @@ sub _clone_subtract {
 
 
 #
-# don't use this method directly, it's meant to be used as a moose
-# around wrapper for the coordinates attributes of the object.
-#
-sub _coderef2value {
-    my $orig = shift;
-    my $self = shift;
-    my $val = $self->$orig;
-    return ref($val) eq 'CODE' ? $val->($self) : $val;
-}
-
-
-#
 # my $bool = $c1->_equals( $c2 );
 # my $bool = $c1 == $c2;    # overloaded
 #
@@ -669,9 +648,7 @@ sub _stringify {
 #
 sub _normalize {
     my ($self) = @_;
-
-    # WARNING: this method assumes that the object is a hashref, which might
-    # change with later versions of moose (even if not very probable)
+    $self->get_normalize() or return;
     $self->get_x1() <= $self->get_x2() or ( $self->{x1}, $self->{x2} ) = ( $self->{x2}, $self->{x1} );
     $self->get_y1() <= $self->get_y2() or ( $self->{y1}, $self->{y2} ) = ( $self->{y2}, $self->{y1} );
     return;
