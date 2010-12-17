@@ -161,6 +161,7 @@ sub _recompute {
 
     $self->{stripped_string} = join( '', map { $_->[0] } @struct );
     $self->{attr_struct} = \@struct;
+
     return;
 }
 
@@ -179,6 +180,7 @@ sub substring {
     my $new_stripped_string = '';
     $start < length( $self->{stripped_string} )
         and $new_stripped_string = substr( $self->{stripped_string}, $start, $width );
+
     my $r = $class->new_from_computed_string(
         undef,                                                          # markup string
         $new_stripped_string,                                           # stripped string
@@ -218,14 +220,15 @@ sub split_string {
     my $count   = 0;
     my @results = ();
     while ( $string =~ /$pattern/g ) {
-        my $end = $start + length($`) - 1;
+        my ($prematch, $match, $postmatch) = ($`, $&, $');
+        my $end = $start + length($prematch) - 1;
         push @results, $class->new_from_computed_string(
             undef,                                           # markup string
-            $`,                                              # stripped string
+            $prematch,                                       # stripped string
             [ @{ $self->{attr_struct} }[ $start .. $end ] ], # attr_struct
         );
-        $start  = $end + 1 + length($&);
-        $string = $';
+        $start  = $end + 1 + length($match);
+        $string = $postmatch;
         defined $limit or next;
         ++$count >= $limit and last;
     }
@@ -234,7 +237,7 @@ sub split_string {
         $class->new_from_computed_string(
         undef,
         $string,
-        [ @{ $self->{attr_struct} }[ $start .. length($string) - $start - 1 ] ]
+        [ @{ $self->{attr_struct} }[ $start .. $start + length($string) - 1 ] ]
         );
     return @results;
 }
