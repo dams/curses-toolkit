@@ -12,6 +12,9 @@ sub BUILDARGS {
     $class eq __PACKAGE__ and die "abstract class";
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 __END__
 
