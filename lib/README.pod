@@ -1,0 +1,224 @@
+=head1 SYNOPSIS
+
+  # spawn a root window
+  my $root = POE::Component::Curses->spawn();
+  # adds some widget
+  $root->add_window(
+      my $window = Curses::Toolkit::Widget::Window
+        ->new()
+        ->set_name('main_window')
+        ->add_widget(
+          my $button = Curses::Toolkit::Widget::Button
+            ->new_with_label('Click Me to quit')
+            ->set_name('my_button')
+            ->signal_connect(clicked => sub { exit(0); })
+        )
+        ->set_coordinates(x1 => 0,   y1 => 0,
+                          x2 => '100%',
+                          y2 => '100%',
+                         )
+  );
+
+  # start main loop
+  POE::Kernel->run();
+
+=head1 DESCRIPTION
+
+This module tries to be a modern curses toolkit, based on the Curses module, to
+build "semi-graphical" user interfaces easily.
+
+B<WARNING> : This is still in "beta" version, not all the features are
+implemented, and the API may change. However, most of the components are there,
+and things should not change that much in the future... Still, don't use it in
+production, and don't consider it stable.
+
+L<Curses::Toolkit> is meant to be used with a mainloop, which is not part of this
+module. I recommend you L<POE::Component::Curses>, which is probably what you
+want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a mainloop
+and handles keyboard, mouse, timer and other events, whereas Curses::Toolkit is
+just the drawing library. See the example above. the C<spawn> method returns a
+L<Curses::Toolkit> object, which you can call methods on.
+
+If you already have a mainloop or if you don't need it, you might want
+to use Curses::Toolkit directly. But again, it's probably not what you want to
+use. In this case you would do something like :
+
+  use Curses::Toolkit;
+
+  # using Curses::Toolkit without any event loop
+  my $root = Curses::Toolkit->init_root_window();
+  my $window = Curses::Toolkit::Widget::Window->new();
+  $root->add($window);
+  ...
+  $root->render
+
+=head1 TUTORIAL
+
+If you are new with C<Curses::Toolkit>, I suggest you go through the tutorial. You can find it here:
+
+L<Curses::Toolkit::Tutorial> (not yet done!)
+
+=head1 WIDGETS
+
+Curses::Toolkit is based on a widget model, inspired by Gtk. I suggest you read
+the POD of the following widgets :
+
+=over
+
+=item L<Curses::Toolkit::Widget::Window>
+
+Use this widget to create a window. It's the first thing to do once you have a root_window
+
+=item L<Curses::Toolkit::Widget>
+
+Useful to read, it contains the common methods of all the widgets
+
+=item L<Curses::Toolkit::Widget::Label>
+
+To display simple text, with text colors and attributes
+
+=item L<Curses::Toolkit::Widget::Button>
+
+Simple text button widget to interact with the user
+
+=item L<Curses::Toolkit::Widget::GenericButton>
+
+A button widget that can contain anything, not just a label
+
+=item L<Curses::Toolkit::Widget::Entry>
+
+To input text from the user
+
+=item L<Curses::Toolkit::Widget::VBox>
+
+To pack widgets vertically, thus building complex layouts
+
+=item L<Curses::Toolkit::Widget::HBox>
+
+To pack widgets horizontally, thus building complex layouts
+
+=item L<Curses::Toolkit::Widget::Border>
+
+Add a simple border around any widget
+
+=item L<Curses::Toolkit::Widget::HPaned>
+
+To pack 2 widgets horizontally with a flexible gutter
+
+=item L<Curses::Toolkit::Widget::VPaned>
+
+To pack 2 widgets vertically with a flexible gutter
+
+=item L<Curses::Toolkit::Widget::HScrollBar>
+
+Not yet implemented
+
+=item L<Curses::Toolkit::Widget::VScrollBar.pm>
+
+Not yet implemented
+
+=item L<Curses::Toolkit::Widget::HProgressBar>
+
+An horizontal progress bar widget
+
+=item L<Curses::Toolkit::Widget::VProgressBar>
+
+A vertical progress bar widget
+
+=back
+
+For reference, here are the various hierarchy of the objects/concepts of the
+toolkit you might have to use :
+
+=head1 WIDGETS HIERARCHY
+
+This is the inheritance hierarchy of the widgets of the toolkit :
+
+  Curses::Toolkit::Widget
+  |
+  +-- Curses::Toolkit::Widget::Window
+  |   |
+  |   +-- Curses::Toolkit::Widget::Window::Dialog
+  |       |
+  |       + Curses::Toolkit::Widget::Window::Dialog::About
+  |
+  +-- Curses::Toolkit::Widget::Label
+  |
+  +-- Curses::Toolkit::Widget::Entry
+  |
+  +-- Curses::Toolkit::Widget::Scrollbar
+  |   |
+  |   +-- Curses::Toolkit::Widget::HScrollbar
+  |   |
+  |   +-- Curses::Toolkit::Widget::VScrollbar
+  |
+  +-- Curses::Toolkit::Widget::Container
+      |
+      +-- Curses::Toolkit::Widget::HBox
+      |
+      +-- Curses::Toolkit::Widget::VBox
+      |
+      +-- Curses::Toolkit::Widget::Paned
+      |   |
+      |   +-- Curses::Toolkit::Widget::HPaned
+      |   |
+      |   +-- Curses::Toolkit::Widget::VPaned
+      |
+      +-- Curses::Toolkit::Widget::Bin
+          |
+          +-- Curses::Toolkit::Widget::Border
+              |
+              +-- Curses::Toolkit::Widget::Button
+              |
+              +-- Curses::Toolkit::Widget::GenericButton
+              |
+              +-- Curses::Toolkit::Widget::ProgressBar
+                  |
+                  +-- Curses::Toolkit::Widget::HProgressBar
+                  |
+                  +-- Curses::Toolkit::Widget::VProgressBar
+
+=head1 SIGNALS HIERARCHY
+
+This is the inheritance hierarchy of the signals :
+
+  Curses::Toolkit::Signal
+  |
+  +-- Curses::Toolkit::Signal::Clicked
+  |
+  +-- Curses::Toolkit::Signal::Content
+  |   |
+  |   +-- Curses::Toolkit::Signal::Content::Changed
+  |
+  +-- Curses::Toolkit::Signal::Focused
+      |
+      +-- Curses::Toolkit::Signal::Focused::In
+      |
+      +-- Curses::Toolkit::Signal::Focused::Out
+
+=head1 THEMES HIERARCHY
+
+This is the inheritance hierarchy of the themes :
+
+  Curses::Toolkit::Theme
+  |
+  +-- Curses::Toolkit::Theme::Default
+      |
+      +-- Curses::Toolkit::Theme::Default::Color
+      |
+      +-- Curses::Toolkit::Theme::Default::Color::Pink
+      |
+      +-- Curses::Toolkit::Theme::Default::Color::Yellow
+
+=head1 OBJECTS HIERARCHY
+
+This is the list of objects of the toolkit :
+
+  Curses::Toolkit::Object
+  |
+  +-- Curses::Toolkit::Object::Coordinates
+  |
+  +-- Curses::Toolkit::Object::MarkupString
+  |
+  +-- Curses::Toolkit::Object::Shape
+
