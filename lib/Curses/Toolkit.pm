@@ -132,6 +132,10 @@ Not yet implemented
 
 An horizontal progress bar widget
 
+=item L<Curses::Toolkit::Widget::HProgressBar>
+
+A vertical progress bar widget
+
 =back
 
 For reference, here are the various hierarchy of the objects/concepts of the
