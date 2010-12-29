@@ -1,5 +1,10 @@
 {{$NEXT}}
-	various minor fixes
+
+0.200     2010-12-29 16:58:16 Europe/Paris
+	Dist::Zilla related fixes
+	Moose related fixes
+	speed optimizations
+	fix compatibility issues of examples
 0.100680
 	add Moose::Meta::Attribute::Custom::Trait::Chained requirement
 0.100630
@@ -19,6 +24,6 @@
 	added UNIVERSAL::require prereq
 0.093000  2009-10-27 10:13:37 UTC
 	fix prereq
-0.092920 2009-10-19
+0.092920  2009-10-19
 	Initial version
 
