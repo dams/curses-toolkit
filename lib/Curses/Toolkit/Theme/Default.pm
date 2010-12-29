@@ -81,8 +81,8 @@ sub _get_default_properties {
             # inherited from Border
             border_width => 0,
 
-            start_enclosing => '.',
-            end_enclosing   => '>',
+            start_enclosing => '-',
+            end_enclosing   => '-',
             default_length  => 12,
             char_done       => '#',
             char_left       => '|',
