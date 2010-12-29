@@ -44,7 +44,7 @@ use Params::Validate qw(:all);
 
 POE::Component::Curses is a mainloop for L<Curses::Toolkit>.
 
-It has only one method : C<spawn>, which instantiate and returs a
+It has only one method : C<spawn>, which instantiates and returns a
 L<Curses::Toolkit> object for you. This is the root window.
 
 You should use this object to populate your root window with widgets. See
