@@ -838,7 +838,7 @@ sub render {
 
     if (!defined $self->{_root_theme}) {
         $self->{_root_theme} = $self->get_theme_name->new(Curses::Toolkit::Widget::Window->new());
-        $self->{_root_theme}->_set_colors($dummy_theme->ROOT_COLOR, $dummy_theme->ROOT_COLOR);
+        $self->{_root_theme}->_set_colors($self->{_root_theme}->ROOT_COLOR, $self->{_root_theme}->ROOT_COLOR);
     }
     my $root_theme = $self->{_root_theme};
 
