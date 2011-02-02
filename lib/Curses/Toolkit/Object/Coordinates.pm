@@ -86,7 +86,7 @@ sub new {
 
     my %params;
 
-    if ( ref($_[0]) eq __PACKAGE__ ) {
+    if ( ref($_[0]) && $_[0]->isa(__PACKAGE__) ) {
         # case: Coordinates->new( $clone );
         my $c    = $_[0];
         %params = (
