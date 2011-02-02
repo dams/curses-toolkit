@@ -28,7 +28,7 @@ You want to use this theme if you are a stereotyped girl, or a child, or Book. O
 sub new {
     my $class = shift;
     has_colors()
-        or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
+        or die "Cannot create a '$class' object : color is not supported";
     return $class->SUPER::new(@_);
 }
 

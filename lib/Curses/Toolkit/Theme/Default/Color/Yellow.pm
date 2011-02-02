@@ -27,7 +27,7 @@ This theme is used by default when rendering widgets, if color is available.
 sub new {
     my $class = shift;
     has_colors()
-        or die "Cannot create a '" . __PACKAGE__ . "' object : color is not supported";
+        or die "Cannot create a '$class' object : color is not supported";
     return $class->SUPER::new(@_);
 }
 
