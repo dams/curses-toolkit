@@ -1,8 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 use strict;
 
 use FindBin;
-use lib "$FindBin::RealBin/../lib";
 use Curses::UI;
 
 my $cui = new Curses::UI(
