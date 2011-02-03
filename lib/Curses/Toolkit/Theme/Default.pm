@@ -132,6 +132,8 @@ sub BLANK_NORMAL  { shift->_set_colors( 'white', 'black' ) }
 sub BLANK_FOCUSED { shift->_set_colors( 'white', 'black' ) }
 sub BLANK_CLICKED { shift->_set_colors( 'white', 'black' ) }
 
+sub ROOT_COLOR    { return 'black'; }
+
 sub draw_hline {
     my ( $self, $x1, $y1, $width, $attr ) = @_;
     $self->get_widget->is_visible() or return;
