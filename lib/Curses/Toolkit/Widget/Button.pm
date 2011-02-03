@@ -139,9 +139,10 @@ sub draw {
     my $t1 = ' ' x ( ( $w2 - length $text ) / 2 );
     my $t2 = ' ' x ( $w2 - length($text) - length($t1) );
 
-    $theme->draw_string( $c->get_x1() + $bw,       $c->get_y1() + $bw, $left_string );
-    $theme->draw_string( $c->get_x1() + $bw + $o2, $c->get_y1() + $bw, $right_string );
-    $theme->draw_string( $c->get_x1() + $bw + $o1, $c->get_y1() + $bw, $t1 . $text . $t2 );
+    my $y = $c->get_y1() + $bw + (  ($c->height - (2*$bw)) / 2);
+    $theme->draw_string( $c->get_x1() + $bw,       $y, $left_string );
+    $theme->draw_string( $c->get_x1() + $bw + $o2, $y, $right_string );
+    $theme->draw_string( $c->get_x1() + $bw + $o1, $y, $t1 . $text . $t2 );
 
     return;
 }
