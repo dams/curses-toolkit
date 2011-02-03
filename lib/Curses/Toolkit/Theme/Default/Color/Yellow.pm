@@ -31,6 +31,27 @@ sub new {
     return $class->SUPER::new(@_);
 }
 
+# the values of this theme
+sub _get_default_properties {
+    my ( $self, $class_name ) = @_;
+    my %properties = (
+        'Curses::Toolkit::Widget::Window' => {
+            title_width               => 80,
+            title_bar_position        => 'top',
+            title_position            => 'center',
+            title_brackets_characters => [ '< ', ' >' ],
+            title_left_offset         => 1,
+            title_right_offset        => 1,
+            title_animation           => 1,
+            title_loop_duration       => 4,
+            title_loop_pause          => 2 / 3,
+
+            # inherited from Border
+            border_width => 1,
+        }    );
+    return $properties{$class_name} || $self->SUPER::_get_default_properties($class_name);
+}
+
 sub default_fgcolor { 'yellow' }
 sub default_bgcolor { 'black' }
 
