@@ -268,14 +268,14 @@ sub draw {
         }
         if ( $justify eq 'center' ) {
             $theme->draw_string(
-                $c->get_x1() + ( $c->width() - length $t ) / 2,
+                $c->get_x1() + ( $c->width() - $t->stripped_length() ) / 2,
                 $c->get_y1() + $y,
                 $t
             );
         }
         if ( $justify eq 'right' ) {
             $theme->draw_string(
-                $c->get_x1() + $c->width() - length $t,
+                $c->get_x1() + $c->width() - $t->stripped_length(),
                 $c->get_y1() + $y,
                 $t
             );
