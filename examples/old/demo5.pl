@@ -76,12 +76,10 @@ sub main {
 	use Curses::Toolkit::Object::Coordinates;
 	while (1) {
 		foreach ( 1 .. 15 ) {
-			usleep(80000);
 			$window->set_coordinates( $window->get_coordinates() + { y2 => 1, x2 => 2 } );
 			$root->render()->display();
 		}
 		foreach ( 1 .. 15 ) {
-			usleep(80000);
 			$window->set_coordinates( $window->get_coordinates() + { y2 => -1, x2 => -2 } );
 			$root->render()->display();
 		}
