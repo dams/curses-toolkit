@@ -47,7 +47,7 @@ sub _get_default_properties {
             title_loop_pause          => 2 / 3,
 
             # inherited from Border
-            border_width => 1,
+            border_width => 2,
         }    );
     return $properties{$class_name} || $self->SUPER::_get_default_properties($class_name);
 }
@@ -55,17 +55,17 @@ sub _get_default_properties {
 sub default_fgcolor { 'yellow' }
 sub default_bgcolor { 'black' }
 
-sub HLINE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
-sub HLINE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
-sub HLINE_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }
+sub HLINE_NORMAL  { shift->_set_colors( 'yellow', 'yellow' ) }
+sub HLINE_FOCUSED { shift->_set_colors( 'red',    'yellow' )->_attron(A_BOLD) }
+sub HLINE_CLICKED { shift->_set_colors( 'yellow', 'yellow' )->_attron(A_REVERSE) }
 
-sub VLINE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
-sub VLINE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
-sub VLINE_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }
+sub VLINE_NORMAL  { shift->_set_colors( 'yellow', 'yellow' ) }
+sub VLINE_FOCUSED { shift->_set_colors( 'red',    'yellow' )->_attron(A_BOLD) }
+sub VLINE_CLICKED { shift->_set_colors( 'yellow', 'yellow' )->_attron(A_REVERSE) }
 
-sub CORNER_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
-sub CORNER_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
-sub CORNER_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }
+sub CORNER_NORMAL  { shift->_set_colors( 'yellow', 'yellow' ) }
+sub CORNER_FOCUSED { shift->_set_colors( 'red',    'yellow' )->_attron(A_BOLD) }
+sub CORNER_CLICKED { shift->_set_colors( 'yellow', 'yellow' )->_attron(A_REVERSE) }
 
 sub STRING_NORMAL  { shift->_set_colors( 'white', 'black' ) }
 sub STRING_FOCUSED { shift->_set_colors( 'white', 'black' )->_attron(A_REVERSE) }
@@ -75,13 +75,13 @@ sub VSTRING_NORMAL  { shift->_set_colors( 'white', 'black' ) }
 sub VSTRING_FOCUSED { shift->_set_colors( 'white', 'black' )->_attron(A_REVERSE) }
 sub VSTRING_CLICKED { shift->_set_colors( 'white', 'black' )->_attron(A_BOLD) }
 
-sub TITLE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
-sub TITLE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
-sub TITLE_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }
+sub TITLE_NORMAL  { shift->_set_colors( 'black', 'yellow' ) }
+sub TITLE_FOCUSED { shift->_set_colors( 'red',   'yellow' )->_attron(A_BOLD) }
+sub TITLE_CLICKED { shift->_set_colors( 'black', 'yellow' )->_attron(A_REVERSE) }
 
-sub RESIZE_NORMAL  { shift->_set_colors( 'yellow', 'black' ) }
-sub RESIZE_FOCUSED { shift->_set_colors( 'red',    'black' )->_attron(A_BOLD) }
-sub RESIZE_CLICKED { shift->_set_colors( 'yellow', 'black' )->_attron(A_REVERSE) }
+sub RESIZE_NORMAL  { shift->_set_colors( 'black', 'yellow' ) }
+sub RESIZE_FOCUSED { shift->_set_colors( 'red',    'yellow' )->_attron(A_BOLD) }
+sub RESIZE_CLICKED { shift->_set_colors( 'yellow', 'yellow' )->_attron(A_REVERSE) }
 
 
 1;
