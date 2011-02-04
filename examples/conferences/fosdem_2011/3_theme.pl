@@ -6,10 +6,14 @@ use warnings;
 use FindBin qw( $Bin );
 use lib "$Bin/../../../lib";
 
+open STDERR, '>>/dev/null';
+
 use relative -to      => "Curses::Toolkit::Widget",
              -aliased => qw(Window Label VBox HBox Button);
+
 use relative -to      => "Curses::Toolkit::Theme::Default::Color",
              -aliased => qw(BlueWhite Yellow Pink);
+
 use relative -to      => "Curses::Toolkit::Theme",
              -aliased => qw(Default);
 
@@ -24,7 +28,8 @@ sub main {
 
     my $window1 =
       Window->new->set_name('window')->set_title("Theme demonstration")
-          ->set_coordinates( x1 => 5, y1 => 5, x2 => 95, y2 => 21 );
+          ->set_coordinates( x1 => '5%', y1 => '30%',
+                             x2 => '95%', y2 => '70%' );
 
     $root->add_window($window1);
     $window1->add_widget(
