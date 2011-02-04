@@ -19,7 +19,6 @@ sub main {
 	open STDERR, '/dev/null';
 
 	my $root = Curses::Toolkit->init_root_window(
-		clear      => 0,
 		theme_name => 'Curses::Toolkit::Theme::Default'
 		)->add_window(
 		my $window = Curses::Toolkit::Widget::Window->new()->set_name('main_window')->add_widget(

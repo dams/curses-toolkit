@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ sub main {
 	# 	  ->display();
 
 
-	my $root = Curses::Toolkit->init_root_window( clear => 0 )->add_window(
+	my $root = Curses::Toolkit->init_root_window(  )->add_window(
 		my $window = Curses::Toolkit::Widget::Window->new()->set_name('main_window')->add_widget(
 			my $border1 = Curses::Toolkit::Widget::Border->new()->set_name('border1')->add_widget(
 				my $border2 = Curses::Toolkit::Widget::Border->new()->set_name('border2')->add_widget(

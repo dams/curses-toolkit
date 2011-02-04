@@ -18,9 +18,8 @@ sub main {
 	local $| = 1;
 	open STDERR, '/dev/null';
 
-	my $root = Curses::Toolkit->init_root_window( clear => 0, )->add_window(
+	my $root = Curses::Toolkit->init_root_window(  )->add_window(
 		my $window = Curses::Toolkit::Widget::Window->new()->set_name('main_window')->add_widget(
-			my $border1 = Curses::Toolkit::Widget::Border->new()->set_name('border1')->add_widget(
 				my $vbox1 = Curses::Toolkit::Widget::VBox->new()->pack_end(
 					my $border2 = Curses::Toolkit::Widget::Border->new()->set_name('border2')->add_widget(
 						my $label1 =
@@ -28,11 +27,6 @@ sub main {
 							->set_text('non-expanding border but a long label that hopefully wraps')
 					)
 					)->pack_end(
-
-					#                      my $border3 = Curses::Toolkit::Widget::Border
-					#                        ->new()
-					#                        ->set_name('border3')
-					#                        ->add_widget(
 					my $hbox1 = Curses::Toolkit::Widget::HBox->new()->set_name('hbox1')->pack_end(
 						my $border4 = Curses::Toolkit::Widget::Border->new()->set_name('border4')->add_widget(
 							my $label3 =
@@ -50,6 +44,23 @@ sub main {
 
 					#                       ),
 					)->pack_end(
+					my $hbox12 = Curses::Toolkit::Widget::HBox->new()->set_name('hbox1')->pack_end(
+						my $border42 = Curses::Toolkit::Widget::Border->new()->set_name('border4')->add_widget(
+							my $label32 =
+								Curses::Toolkit::Widget::Label->new()->set_name('label3')->set_text('expanding border with fill')
+						),
+						{ expand => 1, fill => 1 }
+						)->pack_end(
+						my $border52 = Curses::Toolkit::Widget::Border->new()->set_name('border5')->add_widget(
+							my $label42 =
+								Curses::Toolkit::Widget::Label->new()->set_name('label4')->set_text('expanding border with fill')
+						),
+						{ expand => 1, fill => 1 }
+						),
+					{ expand => 1}
+
+					#                       ),
+					)->pack_end(
 					my $border6 = Curses::Toolkit::Widget::Border->new()->set_name('border6')->add_widget(
 						my $label5 =
 							Curses::Toolkit::Widget::Label->new()->set_name('label5')->set_text('expanding border')
@@ -61,7 +72,6 @@ sub main {
 							Curses::Toolkit::Widget::Label->new()->set_name('label6')->set_text('non expanding border')
 					),
 					)
-			)
 			)->set_coordinates(
 			x1 => 0,
 			y1 => 0,

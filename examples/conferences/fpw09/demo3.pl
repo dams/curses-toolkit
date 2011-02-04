@@ -18,7 +18,7 @@ sub main {
 	local $| = 1;
 	open STDERR, '/dev/null';
 
-	my $root = Curses::Toolkit->init_root_window( clear => 0 )->add_window(
+	my $root = Curses::Toolkit->init_root_window(  )->add_window(
 		my $window = Curses::Toolkit::Widget::Window->new()->set_name('main_window')->add_widget(
 			my $border1 = Curses::Toolkit::Widget::Border->new()->set_name('border1')->add_widget(
 				my $vbox1 = Curses::Toolkit::Widget::VBox->new()->pack_end(
