@@ -318,6 +318,8 @@ sub init_root_window {
     use Curses::Toolkit::Theme::Default;
     use Curses::Toolkit::Theme::Default::Color::Yellow;
     use Curses::Toolkit::Theme::Default::Color::Pink;
+    use Curses::Toolkit::Theme::Default::Color::BlueWhite;
+
     use Tie::Array::Iterable;
     $params{theme_name} ||= Curses::Toolkit->get_default_theme_name();
     my @windows = ();
@@ -465,7 +467,7 @@ sub get_default_theme_name {
     my ($class) = @_;
     return (
         has_colors()
-        ? 'Curses::Toolkit::Theme::Default::Color::Yellow'
+        ? 'Curses::Toolkit::Theme::Default::Color::BlueWhite'
         : 'Curses::Toolkit::Theme::Default'
     );
 
