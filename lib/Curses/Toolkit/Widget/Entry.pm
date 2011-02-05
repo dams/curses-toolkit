@@ -362,15 +362,17 @@ sub draw {
 
     # get the text to display
 
+    my $y = $c->get_y1() + $c->height() / 2;
+
     if ( !$self->get_edit_mode() ) {
         my $t = substr( $text, 0, $w2 );
 
         # put the background text below it
         substr( $display_text, 0, length($t) ) = $t;
 
-        $theme->draw_string( $c->get_x1(),       $c->get_y1(), $left_enclosing );
-        $theme->draw_string( $c->get_x1() + $o2, $c->get_y1(), $right_enclosing );
-        $theme->draw_string( $c->get_x1() + $o1, $c->get_y1(), $display_text );
+        $theme->draw_string( $c->get_x1(),       $y, $left_enclosing );
+        $theme->draw_string( $c->get_x1() + $o2, $y, $right_enclosing );
+        $theme->draw_string( $c->get_x1() + $o1, $y, $display_text );
 
     } else {
         if ( $self->get_cursor_position() >= $self->{text_display_offset} + $w2 - 1 ) {
@@ -386,11 +388,11 @@ sub draw {
         my $t2                       = substr( $display_text, $relative_cursor_position, 1 );
         my $t3                       = substr( $display_text, $relative_cursor_position + 1 );
 
-        $theme->draw_string( $c->get_x1(),                         $c->get_y1(), $left_enclosing,  { reverse => 0 } );
-        $theme->draw_string( $c->get_x1() + $o2,                   $c->get_y1(), $right_enclosing, { reverse => 0 } );
-        $theme->draw_string( $c->get_x1() + $o1,                   $c->get_y1(), $t1,              { reverse => 0 } );
-        $theme->draw_string( $c->get_x1() + $o1 + length($t1),     $c->get_y1(), $t2,              { reverse => 1 } );
-        $theme->draw_string( $c->get_x1() + $o1 + length($t1) + 1, $c->get_y1(), $t3,              { reverse => 0 } );
+        $theme->draw_string( $c->get_x1(),                         $y, $left_enclosing,  { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o2,                   $y, $right_enclosing, { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o1,                   $y, $t1,              { reverse => 0 } );
+        $theme->draw_string( $c->get_x1() + $o1 + length($t1),     $y, $t2,              { reverse => 1 } );
+        $theme->draw_string( $c->get_x1() + $o1 + length($t1) + 1, $y, $t3,              { reverse => 0 } );
     }
 
 
