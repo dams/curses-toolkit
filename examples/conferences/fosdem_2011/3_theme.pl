@@ -27,7 +27,7 @@ sub main {
     my ($button01, $button02, $button03, $button04);
 
     my $window1 =
-      Window->new->set_name('window')->set_title("Theme demonstration")
+      Window->new->set_name('window')->set_title("Curses::Toolkit Theme demonstration")
           ->set_coordinates( x1 => '5%', y1 => '30%',
                              x2 => '95%', y2 => '70%' );
 

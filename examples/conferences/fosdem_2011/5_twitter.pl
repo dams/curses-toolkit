@@ -14,7 +14,7 @@ my $nt = Net::Twitter->new();
 
 
 use relative -to      => "Curses::Toolkit::Widget",
-             -aliased => qw(Window Label VBox HBox Button HPaned Entry);
+             -aliased => qw(Window Label VBox HBox Button HPaned Entry Border);
 
 use relative -to      => "Curses::Toolkit::Theme::Default::Color",
              -aliased => qw(BlueWhite Yellow Pink);
@@ -24,10 +24,50 @@ use relative -to      => "Curses::Toolkit::Theme",
 
 main() unless caller;
 
+my $border;
+
 sub search_twitter {
-    my ($button, $entry) = @_;
-    print STDERR "\n -------- button widget : $button\n";
-    print STDERR "\n -------- entry widget : $entry\n";
+    my ($event, $button, $entry) = @_;
+
+    my $query = $entry->get_text;
+
+    defined $query && length $query
+      or return;
+
+    $border->remove_widget();
+    $border->add_widget(
+        VBox->new->pack_end(
+            Label->new
+                 ->set_justify('center')
+                 ->set_text("searching for $query..."),
+            { expand => 0 }
+        )
+    );
+    $border->needs_redraw();
+
+    my $struct = $nt->search($query);
+    my $results = $struct->{results};
+    $border->remove_widget();
+    my $vbox = VBox->new;
+    foreach my $result (@$results) {
+        my $from_user = $result->{from_user};
+        my $to_user = $result->{to_user};
+        my $message = $result->{text};
+        $message =~ s|$query|<span fgcolor='red'>$query</span>|;
+        my $text = "<u><b>" . $from_user . "</b></u> said : $message";
+        defined $to_user
+          and $text .= " to <u><b>$to_user</b></u>";
+        $vbox->pack_end(
+            Label->new
+                 ->set_justify('left')
+                 ->set_text($text),
+            { expand => 0 }
+        );
+        print STDERR "\n [ $text ]\n";
+    }
+    $border->add_widget($vbox);
+    $border->needs_redraw();
+
 }
 
 
@@ -40,8 +80,9 @@ sub main {
 
 
     my $entry;
+
     my $window1 =
-      Window->new->set_name('window')->set_title("Theme demonstration")
+      Window->new->set_name('window')->set_title("Twitter Search demonstration at FOSDEM")
           ->set_coordinates( x1 => '5%', y1 => '5%',
                              x2 => '95%', y2 => '95%' );
 
@@ -69,15 +110,17 @@ sub main {
                               )
                       )
                       ->add2(
-                          VBox->new()
-                              ->pack_end(
-                                  Label->new
-                                       ->set_justify('center')
-                                       ->set_text("Please try to search for something..."),
-                                  { expand => 0 }
-                                        )
+                          $border = Border->new()->add_widget(
+                              VBox->new()
+                                  ->pack_end(
+                                      Label->new
+                                           ->set_justify('center')
+                                           ->set_text("Please try to search for something..."),
+                                      { expand => 0 }
+                                  )
+                          )
                       ),
-                      { expand => 1 }
+                { expand => 1 }
             )
             ->pack_end(
                 HBox->new()
@@ -95,16 +138,5 @@ sub main {
 
     POE::Kernel->run();
 }
-
-
-
-
-
-#my $results = $nt->public_timeline();
-
-
-#    my $results = $nt->search('perl');
-
-# print Dumper($results); use Data::Dumper;
 
 
