@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.203     2011-02-07 11:59:34 Europe/Paris
         . cleanup code to remove Data::Dumper requirement
         . require Test::More 0.94  (fix RT#65505)
 
