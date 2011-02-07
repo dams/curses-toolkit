@@ -289,7 +289,6 @@ You can also set coordinates in percent of the root window width / height :
 sub set_coordinates {
     my $self = shift;
     use Curses::Toolkit::Object::Coordinates;
-    use Data::Dumper;
     if ( !ref( $_[0] ) ) {
         my %params = @_;
         foreach my $x (qw(x1 x2)) {

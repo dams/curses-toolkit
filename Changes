@@ -1,4 +1,6 @@
 {{$NEXT}}
+        . cleanup code to remove Data::Dumper requirement
+        . require Test::More 0.94  (fix RT#65505)
 
 0.202     2011-02-07 10:43:49 Europe/Paris
         . added fosdem 2011 examples

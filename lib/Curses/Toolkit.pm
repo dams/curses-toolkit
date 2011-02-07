@@ -311,10 +311,6 @@ sub init_root_window {
     my $old_mouse_mask;
     my $mouse_mask = mousemask( ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, $old_mouse_mask );
 
-    # erase the window if asked.
-    #    print STDERR Dumper($params{clear}); use Data::Dumper;
-    #    $params{clear} and $curses_handler->erase();
-
     use Curses::Toolkit::Theme::Default;
     use Curses::Toolkit::Theme::Default::Color::Yellow;
     use Curses::Toolkit::Theme::Default::Color::Pink;

@@ -107,7 +107,6 @@ sub spawn {
             },
             key_handler => sub {
                 my ( $kernel, $heap, $keystroke ) = @_[ KERNEL, HEAP, ARG0 ];
-                use Data::Dumper;
 
                 #				my $k = $keystroke;
                 #				while(length $k) {
