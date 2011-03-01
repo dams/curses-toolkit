@@ -127,8 +127,8 @@ sub _rebuild_children_coordinates {
             $height += $h;
             $remaining_space->subtract( { y2 => $h } );
             $children_heights[$idx] = $h;
-            $idx++;
             $children_padding[$idx] = { before => 0, after => 0 };
+            $idx++;
         }
     }
 
