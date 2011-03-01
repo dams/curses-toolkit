@@ -14,10 +14,6 @@ main() unless caller;
 sub main {
     use POE::Component::Curses;
 
-    use Curses::Toolkit::Widget::Window;
-    use Curses::Toolkit::Widget::Label;
-    use Curses::Toolkit::Widget::Border;
-
     my $root = POE::Component::Curses->spawn;
     my $window =
       Window->new->set_name('window')->set_title("window")
