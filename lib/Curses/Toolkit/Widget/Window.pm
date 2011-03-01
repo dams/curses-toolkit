@@ -292,7 +292,7 @@ sub set_coordinates {
     if ( !ref( $_[0] ) ) {
         my %params = @_;
         foreach my $x (qw(x1 x2)) {
-            if ( $params{$x} =~ /^(.+)%$/ ) {
+            if ( defined $params{$x} && $params{$x} =~ /^(.+)%$/ ) {
                 my $percent = $1;
                 $params{$x} = sub {
                     return $self->get_root_window()
@@ -302,7 +302,7 @@ sub set_coordinates {
             }
         }
         foreach my $y (qw(y1 y2)) {
-            if ( $params{$y} =~ /^(.+)%$/ ) {
+            if ( $params{$y} && $params{$y} =~ /^(.+)%$/ ) {
                 my $percent = $1;
                 $params{$y} = sub {
                     return $self->get_root_window()
