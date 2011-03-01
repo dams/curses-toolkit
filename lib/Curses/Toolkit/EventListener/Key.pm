@@ -9,7 +9,7 @@ package Curses::Toolkit::EventListener::Key;
 
 use parent qw(Curses::Toolkit::EventListener);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

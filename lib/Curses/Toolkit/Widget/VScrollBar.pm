@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::VScrollBar;
 
 use parent qw(Curses::Toolkit::Widget);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

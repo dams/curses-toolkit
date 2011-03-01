@@ -5,7 +5,7 @@ package Curses::Toolkit;
 
 # ABSTRACT: a modern Curses toolkit
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit::Theme;
 

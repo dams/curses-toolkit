@@ -9,7 +9,7 @@ use POE::Component::Curses::MainLoop;
 
 use POE qw(Session);
 use POE qw(Wheel::Curses);
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 SYNOPSIS
 

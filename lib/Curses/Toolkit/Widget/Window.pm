@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::Window;
 
 use parent qw(Curses::Toolkit::Widget::Border);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use List::MoreUtils qw(any none);
 use List::Util qw(min sum max);

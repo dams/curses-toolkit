@@ -5,7 +5,7 @@ package Curses::Toolkit::Theme;
 
 # ABSTRACT: base class for widgets themes
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use Curses;
 
 =head1 DESCRIPTION

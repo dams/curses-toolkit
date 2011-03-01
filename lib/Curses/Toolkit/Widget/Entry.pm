@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::Entry;
 
 use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 Appearence
 

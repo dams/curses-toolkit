@@ -8,7 +8,7 @@ package POE::Component::Curses::MainLoop;
 use Moose 0.92;
 use MooseX::FollowPBP;
 use POE;
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit;
 

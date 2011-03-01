@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::Border;
 
 use parent qw(Curses::Toolkit::Widget::Bin);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit::Object::Coordinates;
 

@@ -5,7 +5,7 @@ package Curses::Toolkit::Event;
 
 # ABSTRACT: base class for events
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

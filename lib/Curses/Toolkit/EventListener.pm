@@ -5,7 +5,7 @@ package Curses::Toolkit::EventListener;
 
 # ABSTRACT: base class for event listeners
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

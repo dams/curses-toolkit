@@ -7,7 +7,7 @@ package Curses::Toolkit::Event::Mouse::Click;
 
 use parent qw(Curses::Toolkit::Event::Mouse);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

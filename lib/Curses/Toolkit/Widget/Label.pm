@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::Label;
 
 use parent qw(Curses::Toolkit::Widget);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use List::Util qw(min max);
 use Curses::Toolkit::Object::MarkupString;
 

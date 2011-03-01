@@ -5,7 +5,7 @@ package Curses::Toolkit::Signal::Focused::Out;
 
 use parent qw(Curses::Toolkit::Signal::Focused);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 NAME
 

@@ -7,7 +7,7 @@ package Curses::Toolkit::Object::Shape;
 
 use parent qw(Curses::Toolkit::Object::Coordinates);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 DESCRIPTION
 

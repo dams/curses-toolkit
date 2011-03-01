@@ -7,7 +7,7 @@ package Curses::Toolkit::Widget::HPaned;
 
 use parent qw(Curses::Toolkit::Widget::Paned);
 
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 Appearence
 

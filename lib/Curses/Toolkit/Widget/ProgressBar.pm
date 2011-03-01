@@ -8,7 +8,7 @@ package Curses::Toolkit::Widget::ProgressBar;
 use Moose;
 use MooseX::Has::Sugar;
 use MooseX::FollowPBP;
-use Params::Validate qw(:all);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit::Object::Coordinates;
 use Curses::Toolkit::Types;
