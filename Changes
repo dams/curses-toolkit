@@ -1,6 +1,8 @@
 {{$NEXT}}
+        . minor dist.ini fix
 
 0.205     2011-03-02 00:17:30 Europe/Paris
+        . nothing changed
 
 0.204     2011-03-02 00:15:49 Europe/Paris
         . fixed shebang in examples
