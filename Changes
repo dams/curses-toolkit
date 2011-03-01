@@ -2,6 +2,9 @@
         . fixed shebang in examples
         . fixed documentation
         . added missing dep
+        . fixed RT#66290 (thanks to Gabor Szabo)
+        . fixed RT#66289 (thanks to Gabor Szabo)
+        . fixed POE::Component::Curses::MainLoop::OBJECT issue (thanks to Apocalypse on #poe)
 
 0.203     2011-02-07 11:59:34 Europe/Paris
         . cleanup code to remove Data::Dumper requirement
