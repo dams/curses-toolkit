@@ -126,8 +126,8 @@ sub _rebuild_children_coordinates {
             $width += $w;
             $remaining_space->subtract( { x2 => $w } );
             $children_widths[$idx] = $w;
-            $idx++;
             $children_padding[$idx] = { before => 0, after => 0 };
+            $idx++;
         }
     }
 
