@@ -14,7 +14,8 @@ main() unless caller;
 sub main {
     use POE::Component::Curses;
 
-    my $root = POE::Component::Curses->spawn;
+    use Curses::Toolkit::Theme::Default::Test;
+    my $root = POE::Component::Curses->spawn( args => { theme_name => 'Curses::Toolkit::Theme::Default::Test' } );
     my $window =
       Window->new->set_name('window')->set_title("window")
             ->set_coordinates( x1 => 5, y1 => 5, width => 40, height => 5 );

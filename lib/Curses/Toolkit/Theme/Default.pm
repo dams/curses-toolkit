@@ -140,7 +140,7 @@ sub draw_hline {
     $y1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1 )
         or return;
-    $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), HLINE(), $c->width() );
+    $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), $self->HLINE(), $c->width() );
     return $self;
 }
 
@@ -150,7 +150,7 @@ sub draw_vline {
     $x1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $height )
         or return;
-    $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), VLINE(), $c->height() );
+    $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), $self->VLINE(), $c->height() );
     return $self;
 }
 
@@ -158,7 +158,7 @@ sub draw_corner_ul {
     my ( $self, $x1, $y1, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $self->is_in_shape( x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1 ) or return;
-    $self->curses($attr)->addch( $y1, $x1, ULCORNER() );
+    $self->curses($attr)->addch( $y1, $x1, $self->ULCORNER() );
     return $self;
 }
 
@@ -166,7 +166,7 @@ sub draw_corner_ll {
     my ( $self, $x1, $y1, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $self->is_in_shape( x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1 ) or return;
-    $self->curses($attr)->addch( $y1, $x1, LLCORNER() );
+    $self->curses($attr)->addch( $y1, $x1, $self->LLCORNER() );
     return $self;
 }
 
@@ -174,7 +174,7 @@ sub draw_corner_ur {
     my ( $self, $x1, $y1, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $self->is_in_shape( x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1 ) or return;
-    $self->curses($attr)->addch( $y1, $x1, URCORNER() );
+    $self->curses($attr)->addch( $y1, $x1, $self->URCORNER() );
     return $self;
 }
 
@@ -182,7 +182,7 @@ sub draw_corner_lr {
     my ( $self, $x1, $y1, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $self->is_in_shape( x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1 ) or return;
-    $self->curses($attr)->addch( $y1, $x1, LRCORNER() );
+    $self->curses($attr)->addch( $y1, $x1, $self->LRCORNER() );
     return $self;
 }
 
