@@ -7,7 +7,7 @@ package Curses::Toolkit::Object::MarkupString;
 
 use parent qw(Curses::Toolkit::Object);
 
-use Curses;
+#use Curses;
 
 =head1 DESCRIPTION
 

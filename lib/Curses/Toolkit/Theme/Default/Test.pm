@@ -8,7 +8,7 @@ package Curses::Toolkit::Theme::Default::Test;
 use parent qw(Curses::Toolkit::Theme::Default::Color);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
-use Curses;
+#use Curses;
 
 
 =head1 DESCRIPTION
@@ -17,6 +17,18 @@ This theme is used for testing : it doesn't mess too much with the terminal,
 and it provides the output as string, that can be used for checking test
 results.
 
+=head1 CLASS METHOD
+
+=head2 set_writer
+
+=cut
+
+my $output_writer;
+sub set_writer {
+    my ($class, $writer) = @_;
+    $output_writer = $writer;
+}
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -24,7 +36,6 @@ results.
 the coderef will be called with 3 arguments : $x, $y, and the data to be outputed.
 
   input : a Curses::Toolkit::Widget
-          a CoderRef, called for each line to be output
   output : a Curses::Toolkit::Theme::Default::Test object
 
 =cut
@@ -32,11 +43,8 @@ the coderef will be called with 3 arguments : $x, $y, and the data to be outpute
 sub new {
     my $class = shift;
     my $widget = shift;
-    my $output_writer = sub { print "@_\n"; };
-#    my ($widget, $output_writer) = validate_pos( @_, { isa => 'Curses::Toolkit::Widget' }, { type => CODEREF } );
-    $output_writer ||= sub { };
     my $self = $class->SUPER::new($widget);
-    $self->{output_writer} = $output_writer;
+    $self->{output_writer} = $output_writer || sub { print STDERR "@_\n"; };
     $self->{curses_mockup} = Curses::Toolkit::Theme::Default::Test::CursesMockup->new( { output_writer => $output_writer } );
 
     return $self;

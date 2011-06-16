@@ -3,7 +3,7 @@ use strict;
 
 package Curses::Toolkit::Widget::ScrollArea;
 
-# ABSTRACT: a vertical scrollable area
+# ABSTRACT: a scrollable area
 
 use parent qw(Curses::Toolkit::Widget::Bin);
 

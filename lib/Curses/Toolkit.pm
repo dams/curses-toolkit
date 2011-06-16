@@ -255,10 +255,11 @@ is not really a constructor, because you can't have more than one
 Curses::Toolkit object for one Curses environment. Think of it more like a
 service.
 
-  input  : theme_name        : optional, the name of them to use as default display theme
+  input  : theme_name        : optional, the name of the theme to use as default display theme
            mainloop          : optional, the mainloop object that will be used for event handling
            quit_key          : the key used to quit the whole application. Default to 'q'. If set to undef, it's disabled
            switch_key        : the key used to switch between windows. Default to 'r'. If set to undef, it's disabled
+           test_environment  : optional, a hashref, if set, Curses::Toolkit will be in test mode
   output : a Curses::Toolkit object
 
 =cut
@@ -280,6 +281,10 @@ sub init_root_window {
             switch_key => {
                 type    => SCALAR,
                 default => 'r',
+            },
+            test_environment => {
+                type    => HASHREF,
+                optional => 1,
             },
         }
     );
@@ -327,6 +332,7 @@ sub init_root_window {
         last_stack      => 0,
         event_listeners => [],
         window_iterator => undef,
+        test_environment => $params{test_environment},
     }, $class;
     $self->_recompute_shape();
 
@@ -488,7 +494,7 @@ DESTROY {
   my $theme_name = $root_window->get_theme_name();
 
 Return the theme associated with the root window. Typically used to get a
-usable default theme name. Use tha instead of hard-wiring
+usable default theme name. Use that instead of hard-coding
 'Curses::Toolkit::Theme::Default'
 
 =cut
@@ -832,7 +838,8 @@ Build everything in the buffer. You need to call 'display' after that to display
 sub render {
     my ($self) = @_;
 
-    $self->{curses_handler}->erase();
+    $self->{test_environment}
+      or $self->{curses_handler}->erase();
 
     if (!defined $self->{_root_theme}) {
         $self->{_root_theme} = $self->get_theme_name->new(Curses::Toolkit::Widget::Window->new());
@@ -930,7 +937,7 @@ Sends an event to the mainloop so it gets dispatched. You probably don't want
 to use this method.
 
   input  : a Curses::Toolkit::Event
-           optional, a widget. if given, the event dispatching will start with this wisget (and not the focused one)
+           optional, a widget. if given, the event dispatching will start with this widget (and not the focused one)
   output : the root_window
 
 =cut
@@ -1018,8 +1025,13 @@ sub _recompute_shape {
     use Curses::Toolkit::Object::Coordinates;
     my ( $screen_h, $screen_w );
     use Curses;
-    endwin;
-    $self->{curses_handler}->getmaxyx( $screen_h, $screen_w );
+    if ($self->{test_environment}) {
+        $screen_h = $self->{test_environment}->{screen_h};
+        $screen_w = $self->{test_environment}->{screen_w};
+    } else {
+        endwin;
+        $self->{curses_handler}->getmaxyx( $screen_h, $screen_w );
+    }
     use Curses::Toolkit::Object::Shape;
     $self->{shape} ||= Curses::Toolkit::Object::Shape->new_zero();
     $self->{shape}->_set(

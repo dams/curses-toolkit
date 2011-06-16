@@ -67,6 +67,7 @@ sub remove_widget {
     my ($self) = @_;
     my @children = ();
 
+    use Tie::Array::Iterable;
     $self->{children} = Tie::Array::Iterable->new(@children);
     return $self;
 }
