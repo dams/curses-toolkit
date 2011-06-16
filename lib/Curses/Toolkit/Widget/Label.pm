@@ -301,7 +301,7 @@ sub _textwrap {
     $tmp[-1]->chomp_string() unless $text->stripped() =~ /\n$/;
 
     # Split each paragraph into lines, according to whitespace
-    for $p (@tmp) {
+    for my $p (@tmp) {
 
         # Snag lines that meet column limits (not counting newlines
         # as a character)
