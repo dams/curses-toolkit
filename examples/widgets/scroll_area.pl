@@ -7,7 +7,7 @@ use FindBin qw( $Bin );
 use lib "$Bin/../../lib";
 
 use relative -to      => "Curses::Toolkit::Widget",
-             -aliased => qw(Window Label HBox Border ScrollArea);
+             -aliased => qw(Window Label HBox VBox Border ScrollArea);
 
 main() unless caller;
 
@@ -29,8 +29,23 @@ sub main {
         ->add_widget(
             Curses::Toolkit::Widget::Border->new
               ->add_widget(
-                Curses::Toolkit::Widget::Label->new()
-                  ->set_text("This is a quite long label. Actually, it is <b>very</b> long. How long can it be ? Not sure...")
+                VBox->new->pack_end(
+                    Label->new()
+                      ->set_text("This is a quite long label. Actually, it is <b>very</b> long.\n How long can it be ? Not sure..."),
+                    { expand => 0 },
+                )->pack_end(
+                    Label->new()
+                      ->set_text("This is a another label"),
+                    { expand => 0 },
+                )->pack_end(
+                    Label->new()
+                      ->set_text("This is a third line"),
+                    { expand => 0 },
+                )->pack_end(
+                    Label->new()
+                      ->set_text(" LINE 4"),
+                    { expand => 0 },
+                )
               )
         )
     );

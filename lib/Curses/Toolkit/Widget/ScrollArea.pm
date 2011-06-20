@@ -13,6 +13,8 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new();
 #    $self->{visibility_mode} = 'auto';
+    $self->{scroll_x} = 0;
+    $self->{scroll_y} = -2;
     return $self;
 }
 
@@ -41,6 +43,12 @@ sub _rebuild_children_coordinates {
 
     # How much does the child widget want ? We don't specify a given size
     my $child_space = $child_widget->get_desired_space();
+
+    # scroll the space accordingly
+    $child_space->set(
+        x1 => $child_space->get_x1() + $self->{scroll_x}, y1 => $child_space->get_y1() + $self->{scroll_y},
+        x2 => $child_space->get_x2() + $self->{scroll_x}, y2 => $child_space->get_y2() + $self->{scroll_y},
+    );
 
     # A Scroll Area always grant the desired space
     $child_widget->_set_relatives_coordinates($child_space);

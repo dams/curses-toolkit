@@ -380,7 +380,7 @@ sub get_minimum_space {
 #           x2 => 4, y2 => 2,
 # );
     defined $available_space
-      or return $self->_get_space(Curses::Toolkit::Object::Coordinates->new_zero(), 'active');
+      or return $self->_get_space(Curses::Toolkit::Object::Coordinates->new_zero(), 'never');
     return $self->_get_space($available_space, $self->get_wrap_mode);
 }
 
