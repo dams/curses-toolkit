@@ -30,7 +30,7 @@ sub main {
             Curses::Toolkit::Widget::Border->new
               ->add_widget(
                 Curses::Toolkit::Widget::Label->new()
-                  ->set_text("Reduce the window This is a quite long label. Actually, it is <b>very</b> long. How long can it be ? Not sure...")
+                  ->set_text("This is a quite long label. Actually, it is <b>very</b> long. How long can it be ? Not sure...")
               )
         )
     );

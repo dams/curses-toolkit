@@ -9,6 +9,8 @@ use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+use Curses::Toolkit::Object::Coordinates;
+
 =head1 DESCRIPTION
 
 This widget can contain 0 or more widgets. The children are packed horizontally.
@@ -196,6 +198,9 @@ Given a coordinate representing the available space, returns the space desired
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
 
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my $desired_space   = $available_space->clone();
 
 return $desired_space;
@@ -246,13 +251,27 @@ needed to properly display itself
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
 
+    my @children = $self->get_children();
+    # compute how high all the children are
+    my $width    = 0;
+    my $height   = 0;
+
+    if (! defined $available_space) {
+        foreach my $child (@children) {
+            my $space = $child->get_minimum_space();
+            my $w     = $space->width();
+            $width += $w;
+            use List::Util qw(max);
+            $height = max $height, $space->height();
+        }
+        return Curses::Toolkit::Object::Coordinates->new(
+                   x1 => 0, y1 => 0,
+                   x2 => $width, y2 => $height );
+    }
+
     my $minimum_space   = $available_space->clone();
     my $remaining_space = $available_space->clone();
 
-    # compute how high all the children are
-    my @children = $self->get_children();
-    my $width    = 0;
-    my $height   = 0;
     foreach my $child (@children) {
         my $space = $child->get_minimum_space($remaining_space);
         my $w     = $space->width();
