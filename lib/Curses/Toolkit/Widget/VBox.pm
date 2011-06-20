@@ -155,6 +155,8 @@ sub _rebuild_children_coordinates {
                     $children_padding[$idx] = { before => $p, after => ($avg_height-$h-$p) };
                 }
             }
+            $children_padding[$idx]{before} ||= 0;
+            $children_padding[$idx]{after} ||= 0;
             $remaining_space->subtract( { y2 => $h + $children_padding[$idx]{before} + $children_padding[$idx]{after} } );
             $height += $h;
             $children_heights[$idx] = $h;

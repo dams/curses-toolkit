@@ -6,7 +6,7 @@ use warnings;
 use FindBin qw( $Bin );
 use lib "$Bin/../../../lib";
 
-open STDERR, '>>/dev/null';
+#open STDERR, '>>/dev/null';
 
 
 use Net::Twitter;
@@ -55,15 +55,13 @@ sub search_twitter {
         my $message = $result->{text};
         $message =~ s|$query|<span fgcolor='red'>$query</span>|;
         my $text = "<u><b>" . $from_user . "</b></u> said : $message";
-        defined $to_user
-          and $text .= " to <u><b>$to_user</b></u>";
         $vbox->pack_end(
             Label->new
                  ->set_justify('left')
                  ->set_text($text),
             { expand => 0 }
         );
-        print STDERR "\n [ $text ]\n";
+#        print STDERR "\n [ $text ]\n";
     }
     $border->add_widget($vbox);
     $border->needs_redraw();

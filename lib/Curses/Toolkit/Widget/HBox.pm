@@ -153,6 +153,8 @@ sub _rebuild_children_coordinates {
                     $children_padding[$idx] = { before => $p, after => ($avg_width-$w-$p) };
                 }
             }
+            $children_padding[$idx]{before} ||= 0;
+            $children_padding[$idx]{after} ||= 0;
             $remaining_space->subtract( { x2 => $w + $children_padding[$idx]{before} + $children_padding[$idx]{after} } );
             $width += $w;
             $children_widths[$idx] = $w;
