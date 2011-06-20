@@ -123,6 +123,10 @@ The desired space is as much horizontal space as possible, with a height of 1.
 
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
+
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my $desired_space = $available_space->clone;
     $desired_space->set( y2 => $desired_space->get_y1 + 1 );
     $desired_space->grow_to($self->get_minimum_space($available_space));
@@ -145,6 +149,8 @@ The ProgressBar requires 12x1 minimum.
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
 
+    defined $available_space
+      or $available_space = Curses::Toolkit::Object::Coordinates->new_zero();
     my $minimum_space = $available_space->clone;
     my $default_width = $self->get_theme_property('default_length');
     my $bw            = $self->get_theme_property('border_width');

@@ -84,6 +84,9 @@ sub get_desired_space {
 
     my ( $self, $available_space ) = @_;
 
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my ($child)     = $self->get_children();
     my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
     my $bw          = $self->get_theme_property('border_width');
@@ -123,8 +126,23 @@ needed to properly display itself
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
     my ($child)     = $self->get_children();
-    my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
     my $bw          = $self->get_theme_property('border_width');
+
+    if ( ! defined $available_space) {
+        defined $child
+          or return Curses::Toolkit::Object::Coordinates->new(
+                        x1 => 0 , y1 => 0,
+                        x2 => 2*$bw, y2 => 2*$bw, 
+             );
+        my $minimum_space = $child->get_minimum_space();
+        $minimum_space->set(
+            x2 => $minimum_space->get_x2() + 2*$bw,
+            y2 => $minimum_space->get_y2() + 2*$bw,
+        );
+        return $minimum_space;
+    }
+
+    my $child_space = Curses::Toolkit::Object::Coordinates->new_zero();
     # computation goes like that :
     # minimum space = (child_minimum_space(available_space - borders) + borders)
     if ( defined $child ) {

@@ -10,6 +10,7 @@ use parent qw(Curses::Toolkit::Widget);
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use List::Util qw(min max);
 use Curses::Toolkit::Object::MarkupString;
+use Curses::Toolkit::Object::Coordinates;
 
 =head1 DESCRIPTION
 
@@ -354,6 +355,10 @@ The Label desires the minimum space that lets it display entirely
 
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
+
+    defined $available_space
+      or return $self->get_minimum_space();
+
     return $self->_get_space($available_space, $self->get_wrap_mode);
 }
 
@@ -369,6 +374,13 @@ needed to properly display itself
 
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
+#     defined $available_space
+#       or return Curses::Toolkit::Object::Coordinates->new(
+#           x1 => 0, y1 => 0,
+#           x2 => 4, y2 => 2,
+# );
+    defined $available_space
+      or return $self->_get_space(Curses::Toolkit::Object::Coordinates->new_zero(), 'active');
     return $self->_get_space($available_space, $self->get_wrap_mode);
 }
 

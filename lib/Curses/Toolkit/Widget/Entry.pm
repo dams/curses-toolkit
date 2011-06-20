@@ -412,6 +412,9 @@ The Entry desires 12x1
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
 
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my $desired_space = $available_space->clone();
 
     #	$desired_space->set( x2 => $available_space->get_x1() + $self->get_width(),
@@ -436,6 +439,9 @@ The Entry requires 3x1 minimum
 
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
+
+    defined $available_space
+      or $available_space = Curses::Toolkit::Object::Coordinates->new_zero();
 
     my $minimum_space = $available_space->clone();
     my $default_width = $self->get_theme_property('default_width');

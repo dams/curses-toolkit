@@ -9,6 +9,8 @@ use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+use Curses::Toolkit::Object::Coordinates;
+
 sub new {
     my $class = shift;
 
@@ -197,6 +199,10 @@ sub _rebuild_children_coordinates {
 
 sub get_desired_space {
     my ( $self,   $available_space ) = @_;
+
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my ( $child1, $child2 )          = $self->get_children();
 
     #	my $gw = $self->get_theme_property('gutter_width');
@@ -228,6 +234,10 @@ sub get_minimum_space {
     my ( $self,   $available_space ) = @_;
     my ( $child1, $child2 )          = $self->get_children();
 
+    my $available_space_is_undef = ! defined $available_space;
+    defined $available_space
+      or $available_space = Curses::Toolkit::Object::Coordinates->new_zero();
+
     #	my $gw = $self->get_theme_property('gutter_width');
     my $gw = 1;
     my $gp = $self->get_gutter_position();
@@ -242,13 +252,13 @@ sub get_minimum_space {
     if ( !defined $child1 ) {
         $minimum_space1->set( $self->_p12($minimum_space1) );
     } else {
-        $minimum_space1 = $child1->get_minimum_space($minimum_space1);
+        $minimum_space1 = $child1->get_minimum_space($available_space_is_undef ? () : $minimum_space1);
         $minimum_space1->set( $self->_p8( $minimum_space1, $gp, $gw ) );
     }
     if ( defined $child2 ) {
         my $minimum_space2 = $available_space->clone();
         $minimum_space2->set( $self->_p5( $available_space, $gp, $gw ) );
-        $minimum_space2 = $child2->get_minimum_space($minimum_space2);
+        $minimum_space2 = $child2->get_minimum_space($available_space_is_undef ? () : $minimum_space2);
         my $return_space = $minimum_space2->clone();
         $return_space->set( $self->_p10($minimum_space1) );
         $return_space->set( $self->_p11( $minimum_space1, $minimum_space2 ) );
