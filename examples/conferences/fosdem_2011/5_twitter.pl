@@ -86,48 +86,42 @@ sub main {
 
     $root->add_window($window1);
     $window1->add_widget(
-        VBox->new
-            ->pack_end(
-                HPaned->new
-                      ->set_name('hpaned')
-                      ->set_gutter_position(30)
-                      ->add1(
-                          VBox->new
-                              ->pack_end(
-                                  HBox->new
-                                      ->pack_end(
-                                          $entry = Entry->new(),
-                                          { expand => 1 }
-                                      )
-                                      ->pack_end(
-                                          Button->new_with_label('Search')
-                                                ->signal_connect( clicked => \&search_twitter, $entry ),
-                                          { expand => 0 }
-                                      ),
-                                  { expand => 0 }
-                              )
-                      )
-                      ->add2(
-                          $border = Border->new()->add_widget(
-                              VBox->new()
-                                  ->pack_end(
-                                      Label->new
-                                           ->set_justify('center')
-                                           ->set_text("Please try to search for something..."),
-                                      { expand => 0 }
-                                  )
-                          )
+        VBox->new->pack_end(
+            HPaned->new
+              ->set_name('hpaned')
+              ->set_gutter_position(30)
+              ->add1(
+                  VBox->new->pack_end(
+                      HBox->new->pack_end(
+                          $entry = Entry->new(),
+                          { expand => 1 }
+                      )->pack_end(
+                          Button->new_with_label('Search')
+                            ->signal_connect( clicked => \&search_twitter, $entry ),
+                          { expand => 0 }
                       ),
-                { expand => 1 }
-            )
-            ->pack_end(
-                HBox->new()
-                    ->pack_end($button01 = Button->new_with_label('Default'),   { expand => 1 } )
-                    ->pack_end($button02 = Button->new_with_label('BlueWhite'), { expand => 1 } )
-                    ->pack_end($button03 = Button->new_with_label('Yellow'),    { expand => 1 } )
-                    ->pack_end($button04 = Button->new_with_label('Pink'),      { expand => 1 } ),
-                { expand => 0 }
-            )
+                      { expand => 0 }
+                  )
+              )
+              ->add2(
+                  $border = Border->new()->add_widget(
+                      VBox->new()->pack_end(
+                          Label->new
+                            ->set_justify('center')
+                            ->set_text("Please try to search for something..."),
+                          { expand => 0 }
+                      )
+                  )
+              ),
+              { expand => 1 }
+        )->pack_end(
+            HBox->new()
+                ->pack_end($button01 = Button->new_with_label('Default'),   { expand => 1 } )
+                ->pack_end($button02 = Button->new_with_label('BlueWhite'), { expand => 1 } )
+                ->pack_end($button03 = Button->new_with_label('Yellow'),    { expand => 1 } )
+                ->pack_end($button04 = Button->new_with_label('Pink'),      { expand => 1 } ),
+            { expand => 0 }
+        )
     );
     $button01->signal_connect( clicked => sub { $window1->set_theme_name(Default, 1)} );
     $button02->signal_connect( clicked => sub { $window1->set_theme_name(BlueWhite, 1)} );
