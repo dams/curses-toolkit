@@ -138,11 +138,9 @@ sub draw_hline {
     my ( $self, $x1, $y1, $width, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $y1 >= 0 or return;
-    print STDERR "           ----------------- before restrict : $x1 $y1 w : $width\n";
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1 )
         or return;
     my ($cx1,$cy1,$cx2,$cy2) = ($c->get_x1, $c->get_y1, $c->get_x2, $c->get_y2);
-    print STDERR "           ----------------- after  restrict : $cx1 $cy1  $cx2 $cy2\n";
     $c->height > 0
       and $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), $self->HLINE(), $c->width() );
     return $self;
@@ -200,7 +198,8 @@ sub draw_string {
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1 ) or return;
-
+    $c->height > 0
+      or return;
     my $start = $c->get_x1() - $x1;
     my $end   = $c->get_x1() - $x1 + $c->width();
     my $width = $end - $start;
@@ -219,6 +218,8 @@ sub draw_vstring {
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $text->stripped_length() ) or return;
+    $c->width > 0
+      or return;
 
     my $start  = $c->get_y1() - $y1;
     my $end    = $c->get_y1() - $y1 + $c->height();
