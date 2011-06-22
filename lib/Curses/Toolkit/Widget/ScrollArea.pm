@@ -14,7 +14,7 @@ sub new {
     my $self  = $class->SUPER::new();
 #    $self->{visibility_mode} = 'auto';
     $self->{scroll_x} = 0;
-    $self->{scroll_y} = -2;
+    $self->{scroll_y} = -1000;
     return $self;
 }
 

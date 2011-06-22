@@ -31,19 +31,19 @@ sub main {
               ->add_widget(
                 VBox->new->pack_end(
                     Label->new()
-                      ->set_text("This is a quite long label. Actually, it is <b>very</b> long.\n How long can it be ? Not sure..."),
+                      ->set_text("line 1"),
                     { expand => 0 },
                 )->pack_end(
                     Label->new()
-                      ->set_text("This is a another label"),
+                      ->set_text("line 2"),
                     { expand => 0 },
                 )->pack_end(
                     Label->new()
-                      ->set_text("This is a third line"),
+                      ->set_text("line 3"),
                     { expand => 0 },
                 )->pack_end(
                     Label->new()
-                      ->set_text(" LINE 4"),
+                      ->set_text("line 4"),
                     { expand => 0 },
                 )
               )
