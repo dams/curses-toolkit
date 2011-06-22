@@ -9,6 +9,9 @@ use POE::Component::Curses::MainLoop;
 
 use POE qw(Session);
 use POE qw(Wheel::Curses);
+use Term::TermKey qw( FORMAT_WRAPBRACKET KEYMOD_CTRL FORMAT_MOUSE_POS);
+use POE qw(Wheel::TermKey);
+
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 =head1 SYNOPSIS
@@ -96,11 +99,28 @@ sub spawn {
                 # listen for window resize signals
                 $kernel->sig( WINCH => 'pre_window_resize' );
 
+
+
+############ TODO
+# Extract libtermkey code and create a POE::Component::Curses::TermKey
+
+
+
+                if (0) {
+
+                # now listen to the keys using TermKey
+                $_[HEAP]{termkey} = POE::Wheel::TermKey->new(
+                    InputEvent => 'key_handler',
+                );
+
+                } else {
+
                 # now listen to the keys
                 $_[HEAP]{console} = POE::Wheel::Curses->new(
                     InputEvent => 'key_handler',
                 );
 
+                }
                 # ask the mainloop to rebuild_all coordinate
                 $kernel->yield('rebuild_all');
 
@@ -113,6 +133,30 @@ sub spawn {
                 #					my $c = substr($k, 0, 1, '');
                 #					print STDERR sprintf(" -- A D H O  : [%s] [%d] [%x] [%o]- \n", $c, ord($c), ord($c), ord($c));
                 #				}
+
+                if (0) {
+
+                my $key     = $_[ARG0];
+                my $termkey = $_[HEAP]{termkey};
+
+                my $keystroke = $termkey->format_key( $key, FORMAT_WRAPBRACKET | FORMAT_MOUSE_POS );
+                print STDERR "\n\n Got key : $keystroke";
+                if ( $keystroke eq '<C-l>' ) {
+                    $kernel->yield('window_resize');
+                } elsif ( $keystroke eq '<C-c>' ) {
+                    exit();
+                } else {
+                    $heap->{mainloop}->event_key(
+                            type => 'stroke',
+                            key  => $keystroke,
+                        );
+                }
+                } else {
+
+
+# Got key : <MouseRelease(0) @ (-64,17)>
+
+
                 use Curses; # for keyname and unctrl
                 if ( $keystroke ne -1 ) {
                     if ( $keystroke lt ' ' ) {
@@ -120,6 +164,43 @@ sub spawn {
                     } elsif ( $keystroke =~ /^\d{2,}$/ ) {
                         $keystroke = '<' . uc( keyname($keystroke) ) . '>';
                     }
+                    local $_ = $keystroke;
+
+                    s/^<\^I>$/<KEY_TAB>/;
+                    s/^<\^M>$/<KEY_ENTER>/;
+
+
+                    # backspace ? begin enf pageup pagedown delete enter home
+                    #shift beg shift end shift home shift enter etc
+
+                    s/^<KEY_TAB>$/<Tab>/;
+                    s/^<KEY_BTAB>$/<S-Tab>/;
+                    s/^<KEY_STAB>$/<S-Tab>/;
+                    s/^<KEY_LEFT>$/<Left>/;
+                    s/^<KEY_RIGHT>$/<Right>/;
+                    s/^<KEY_UP>$/<Up>/;
+                    s/^<KEY_DOWN>$/<Down>/;
+                    s/^<KEY_SLEFT>$/<S-Left>/;
+                    s/^<KEY_SRIGHT>$/<S-Right>/;
+                    s/^<KEY_SUP>$/<S-Up>/;
+                    s/^<KEY_SDOWN>$/<S-Down>/;
+
+                    s/^<KEY_BACKSPACE>$/<Backspace>/;
+                    s/^<KEY_HOME>$/<Home>/;
+                    s/^<KEY_END>$/<End>/;
+                    s/^<KEY_PPAGE>$/<PageUp>/;
+                    s/^<KEY_NPAGE>$/<PageDown>/;
+                    s/^<KEY_DC>$/<Delete>/;
+                    s/^<KEY_DELETE>$/<Delete>/;
+                    s/^<KEY_ENTER>$/<Enter>/;
+
+
+                    s/^<\^(.*)>$/'<C-' . lc($1) . '>'/e;
+
+
+                    $keystroke = $_;
+                    print STDERR "\n\nGot key: ".$keystroke."\n\n\n";
+
                     if ( $keystroke eq '<KEY_RESIZE>' ) {
 
                         # don't handle this here, it's handled in window_resize
@@ -184,9 +265,9 @@ sub spawn {
 
                     } else {
 
-                        if ( $keystroke eq '<^L>' ) {
+                        if ( $keystroke eq '<C-l>' ) {
                             $kernel->yield('window_resize');
-                        } elsif ( $keystroke eq '<^C>' ) {
+                        } elsif ( $keystroke eq '<C-c>' ) {
                             exit();
                         } else {
                             $heap->{mainloop}->event_key(
@@ -196,6 +277,7 @@ sub spawn {
                         }
                     }
                 }
+                } #  END IF(0)
             },
             pre_window_resize => sub {
 

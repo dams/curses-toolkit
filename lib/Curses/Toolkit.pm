@@ -409,7 +409,7 @@ sub init_root_window {
                 'Curses::Toolkit::Event::Key' => sub {
                     my ($event) = @_;
                     $event->{type} eq 'stroke' or return 0;
-                    $event->{params}{key} eq '<^I>' or return 0;
+                    $event->{params}{key} eq '<Tab>' or return 0;
                 },
             },
             code => sub {
@@ -435,7 +435,7 @@ sub init_root_window {
                 'Curses::Toolkit::Event::Key' => sub {
                     my ($event) = @_;
                     $event->{type} eq 'stroke' or return 0;
-                    $event->{params}{key} eq 'KEY_BTAB' or return 0;
+                    $event->{params}{key} eq '<S-Tab>' or return 0;
                 },
             },
             code => sub {

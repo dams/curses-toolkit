@@ -5,7 +5,7 @@ package Curses::Toolkit::Theme::Default::Test;
 
 # ABSTRACT: widget test theme
 
-use parent qw(Curses::Toolkit::Theme::Default::Color);
+use parent qw(Curses::Toolkit::Theme::Default);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use Curses;

@@ -790,36 +790,6 @@ sub _recursive_f2 {
     return;
 }
 
-# =head2 get_previous_focused_widget
-
-#   my $next_previous_widget = $widget->get_previous_focused_widget();
-
-# Returns the widget previous in the focus chain
-
-#   input : optional, a true value to start searching from $widget
-#   output : the previous focused widget
-
-# =cut
-
-# sub get_previous_focused_widget {
-# 	my ($self, $dont_avoid_me) = @_;
-
-# 	my $prev_widget;
-# 	# look down and right
-# 	$prev_widget = $self->_recursive_f1($self, !$dont_avoid_me);
-# 	defined $prev_widget and return $prev_widget;
-
-# 	# nothing down and right ? look up and right
-# 	$prev_widget = $self->_recursive_f2($self);
-# 	defined $prev_widget and return $prev_widget;
-
-# 	# still nothing ? Start from top and look down
-# 	my $window = $self->get_window();
-# 	defined $window or return;
-# 	return $self->_recursive_f1($window);
-# }
-
-
 =head2 possible_signals
 
 my @signals = keys $widget->possible_signals();

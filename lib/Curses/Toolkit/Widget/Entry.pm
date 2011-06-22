@@ -47,22 +47,34 @@ sub new {
 
                 # accept only key strokes
                 $event->{type} eq 'stroke' or return 0;
-                $event->{params}{key} eq '<KEY_BACKSPACE>' and return 1;
-                $event->{params}{key} eq '<^D>'            and return 1;
-                $event->{params}{key} eq '<KEY_LEFT>'      and return 1;
-                $event->{params}{key} eq '<KEY_RIGHT>'     and return 1;
-                $event->{params}{key} eq '<KEY_UP>'        and return 1;
-                $event->{params}{key} eq '<KEY_DOWN>'      and return 1;
-                if ( $event->{params}{key} eq '<^?>' ) {
-                    $event->{params}{key} = '<KEY_BACKSPACE>';
+                $event->{params}{key} eq '<Backspace>' and return 1;
+                $event->{params}{key} eq '<Left>'      and return 1;
+                $event->{params}{key} eq '<Right>'     and return 1;
+                $event->{params}{key} eq '<Up>'        and return 1;
+                $event->{params}{key} eq '<Down>'      and return 1;
+                $event->{params}{key} eq '<Delete>'      and return 1;
+                if ( $event->{params}{key} eq '<C-d>' ) {
+                    $event->{params}{key} = '<Delete>';
                     return 1;
                 }
-                if ( $event->{params}{key} eq '<^E>' ) {
-                    $event->{params}{key} = '<KEY_DOWN>';
+                if ( $event->{params}{key} eq '<C-?>' ) {
+                    $event->{params}{key} = '<Backspace>';
                     return 1;
                 }
-                if ( $event->{params}{key} eq '<^A>' ) {
-                    $event->{params}{key} = '<KEY_UP>';
+                if ( $event->{params}{key} eq '<C-e>' ) {
+                    $event->{params}{key} = '<Down>';
+                    return 1;
+                }
+                if ( $event->{params}{key} eq '<End>' ) {
+                    $event->{params}{key} = '<Down>';
+                    return 1;
+                }
+                if ( $event->{params}{key} eq '<C-a>' ) {
+                    $event->{params}{key} = '<Up>';
+                    return 1;
+                }
+                if ( $event->{params}{key} eq '<Home>' ) {
+                    $event->{params}{key} = '<Up>';
                     return 1;
                 }
 
@@ -78,21 +90,21 @@ sub new {
             my $k = $event->{params}{key};
             my $c = $entry->get_cursor_position();
             my $t = $entry->get_text();
-            if ( $k eq '<KEY_LEFT>' ) {
+            if ( $k eq '<Left>' ) {
                 $entry->move_cursor_position(-1);
-            } elsif ( $k eq '<KEY_RIGHT>' ) {
+            } elsif ( $k eq '<Right>' ) {
                 $entry->move_cursor_position(1);
-            } elsif ( $k eq '<KEY_UP>' ) {
+            } elsif ( $k eq '<Up>' ) {
                 $entry->set_cursor_position(0);
-            } elsif ( $k eq '<KEY_DOWN>' ) {
+            } elsif ( $k eq '<Down>' ) {
                 $entry->set_cursor_position( length($t) );
-            } elsif ( $k eq '<KEY_BACKSPACE>' ) {
+            } elsif ( $k eq '<Backspace>' ) {
                 if ( $c > 0 ) {
                     substr( $t, $c - 1, 1 ) = '';
                     $entry->set_text($t);
                     $entry->move_cursor_position(-1);
                 }
-            } elsif ( $k eq '<^D>' ) {
+            } elsif ( $k eq '<Delete>' ) {
                 if ( $c < length($t) ) {
                     substr( $t, $c, 1 ) = '';
                     $entry->set_text($t);
@@ -121,7 +133,7 @@ sub new {
                 'Curses::Toolkit::Event::Key' => sub {
                     my ($event) = @_;
                     $event->{type} eq 'stroke' or return 0;
-                    $event->{params}{key} eq '<^M>' or return 0;
+                    $event->{params}{key} eq '<Enter>' or return 0;
                     return 1;
                 },
             },

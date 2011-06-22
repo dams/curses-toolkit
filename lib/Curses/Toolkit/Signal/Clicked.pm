@@ -40,7 +40,7 @@ sub generate_listener {
                 my ($event) = @_;
                 $event->{type} eq 'stroke' or return 0;
                 $event->{params}{key} eq ' '           # space key
-                    || $event->{params}{key} eq '<^M>' # enter key
+                    || $event->{params}{key} eq '<Enter>' # enter key
                     or return 0;
                 return 1;
             },

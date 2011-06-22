@@ -6,7 +6,7 @@ use warnings;
 use FindBin qw( $Bin );
 use lib "$Bin/../../../lib";
 
-open STDERR, '>>/dev/null';
+#open STDERR, '>>/dev/null';
 
 
 use Net::Twitter;
