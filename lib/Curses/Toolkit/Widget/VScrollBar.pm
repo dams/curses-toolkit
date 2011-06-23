@@ -64,8 +64,16 @@ sub get_visibility_mode {
 
 sub draw {
     my ($self) = @_;
-    my $theme => $self->get_theme();
-    my $c = get_coordinates();
+    my $theme = $self->get_theme();
+    my $c = $self->get_coordinates();
+
+#    print STDERR "\n\n----------------\n\n";
+#    print STDERR Dumper($c); use Data::Dumper;
+    $theme->draw_string( 0, 0, 'PLOP');
+    $theme->draw_string( $c->get_x1(), $c->get_y1(), '^');
+    $theme->draw_vline( $c->get_x1(), $c->get_y1()+1, $c->height()-2);
+    $theme->draw_string( $c->get_x1(), $c->get_y2()-1, 'v');
+    return;
 }
 
 

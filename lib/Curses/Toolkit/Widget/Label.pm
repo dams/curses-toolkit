@@ -380,12 +380,13 @@ sub get_minimum_space {
 #           x2 => 4, y2 => 2,
 # );
     defined $available_space
-      or return $self->_get_space(Curses::Toolkit::Object::Coordinates->new_zero(), 'never');
+      or return $self->_get_space(Curses::Toolkit::Object::Coordinates->new_zero(), 'lazy', 5000);
     return $self->_get_space($available_space, $self->get_wrap_mode);
 }
 
 sub _get_space {
-    my ( $self, $available_space, $wrap_mode ) = @_;
+    my ( $self, $available_space, $wrap_mode, $max_length ) = @_;
+    $max_length ||= 0;
 
     $wrap_mode      ||= $self->get_wrap_mode();
 
@@ -422,7 +423,7 @@ sub _get_space {
         }
         return $minimum_space;
     } elsif ( $wrap_mode eq 'lazy' ) {
-        my @text = _textwrap( $self->{_markup_string}, max( $available_space->width(), 1 ) );
+        my @text = _textwrap( $self->{_markup_string}, max( $available_space->width(), 1, $max_length ) );
         $minimum_space->set( x2 => $minimum_space->get_x1() + max( map { $_->stripped_length() } @text ) + 1,
                              y2 => $minimum_space->get_y1() + scalar(@text)
                            );

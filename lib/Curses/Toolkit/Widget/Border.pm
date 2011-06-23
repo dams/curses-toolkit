@@ -67,6 +67,7 @@ sub _get_available_space {
     return Curses::Toolkit::Object::Coordinates->new(
         x1 => $bw,                y1 => $bw,
         x2 => $rc->width() - $bw, y2 => $rc->height() - $bw,
+#        x2 => $rc->get_x2() - $bw, y2 => $rc->get_y2() - $bw,
     );
 }
 
@@ -193,6 +194,17 @@ sub _get_theme_properties_definition {
             }
         },
     };
+}
+
+sub get_visible_shape_for_children {
+    my ($self) = @_;
+    my $shape = $self->get_visible_shape();
+    my $bw = $self->get_theme_property('border_width');
+    $shape->width >= 2 * $bw
+      and $shape->set( x1 => $shape->get_x1() + $bw, x2 => $shape->get_x2() - $bw);
+    $shape->height >= 2 * $bw
+      and $shape->set( y1 => $shape->get_y1() + $bw, y2 => $shape->get_y2() - $bw);
+    return $shape;
 }
 
 1;
