@@ -10,6 +10,7 @@ use parent qw(Curses::Toolkit::Widget::Bin);
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit::Widget::VScrollBar;
+use Curses::Toolkit::Widget::HScrollBar;
 
 sub new {
     my $class = shift;
@@ -31,7 +32,7 @@ sub set_scrollbars_mode {
     if ($mode eq 'always') {
         $self->{scrollbars_mode} = $mode;
         $self->{v_scrollbar} = Curses::Toolkit::Widget::VScrollBar->new();
-#        $self->{h_scrollbar} = Curses::Toolkit::Widget::HScrollBar->new();
+        $self->{h_scrollbar} = Curses::Toolkit::Widget::HScrollBar->new();
     } else {
         die "scrollbar mode '" . $mode . "' is not supported";
     }
@@ -65,22 +66,39 @@ sub draw {
     if ($self->{scrollbars_mode} eq 'always') {
         if ( defined ($self->{v_scrollbar}) ) {
 
-            # XXX FIXME This is a Hack
-
-#            my $c = $self->get_coordinates();
             my $c = $self->get_visible_shape;
-            my $theme = $self->get_theme();
-#            $theme->draw_string( $c->get_x1(), $c->get_y1(), 'PLOP');
-
-
+            my ($child_widget)  = $self->get_children();
+            my $child_rc = $child_widget->_get_relatives_coordinates();
+            if ($child_rc->height <= $c->height) {
+                $self->{v_scrollbar}->set_fill(1);
+            } else {
+                $self->{v_scrollbar}->set_fill($c->height / $child_rc->height);
+            }
+            # XXX FIXME This is a Hack
             $self->{v_scrollbar}->{coordinates} = Curses::Toolkit::Object::Coordinates->new(
                 x1 => $c->get_x2()-1, y1 => $c->get_y1(),
-                x2 => $c->get_x2(), y2 => $c->get_y2(),
+                x2 => $c->get_x2(), y2 => $c->get_y2() - ( defined($self->{h_scrollbar}) ? 1 : 0),
             );
-#            $self->{v_scrollbar}->set_theme_name($self->get_theme_name);
+
+            # XXX FIXME This is a Hack
             $self->{v_scrollbar}->{theme_name} = $self->get_theme_name;
             $self->{v_scrollbar}->{theme} = $self->get_theme;
             $self->{v_scrollbar}->draw();
+        }
+        if ( defined ($self->{h_scrollbar}) ) {
+
+            my $c = $self->get_visible_shape;
+
+            # XXX FIXME This is a Hack
+            $self->{h_scrollbar}->{coordinates} = Curses::Toolkit::Object::Coordinates->new(
+                x1 => $c->get_x1(), y1 => $c->get_y2()-1,
+                x2 => $c->get_x2()  - ( defined($self->{v_scrollbar}) ? 1 : 0), y2 => $c->get_y2(),
+            );
+
+            # XXX FIXME This is a Hack
+            $self->{h_scrollbar}->{theme_name} = $self->get_theme_name;
+            $self->{h_scrollbar}->{theme} = $self->get_theme;
+            $self->{h_scrollbar}->draw();
         }
     } else {
         die "scrollbar mode '" . $self->{scrollbars_mode} . "' is not supported";
@@ -105,7 +123,7 @@ sub _rebuild_children_coordinates {
         x2 => $child_space->get_x2() + $self->{scroll_x}, y2 => $child_space->get_y2() + $self->{scroll_y},
     );
 
-    # A Scroll Area always grant the desired space
+    # A Scroll Area always grants the desired space
     $child_widget->_set_relatives_coordinates($child_space);
     $child_widget->can('_rebuild_children_coordinates')
         and $child_widget->_rebuild_children_coordinates();
@@ -118,6 +136,9 @@ sub get_visible_shape_for_children {
     my $shape = $self->get_visible_shape();
     if ($shape->width > 0) {
         $shape->set( x2 => $shape->get_x2() - 1);
+    }
+    if ($shape->height > 0) {
+        $shape->set( y2 => $shape->get_y2() - 1);
     }
     return $shape;
 }

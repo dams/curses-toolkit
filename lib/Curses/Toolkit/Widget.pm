@@ -621,13 +621,21 @@ sub needs_redraw {
 }
 
 # sets the relatives coordinates, from the origin of the parent widget
-#  input  : any Curses::Toolkit::Object::Coordinates costructor input
+#  input  : any Curses::Toolkit::Object::Coordinates constructor input
 #  output : the widget
 sub _set_relatives_coordinates {
     my $self = shift;
     use Curses::Toolkit::Object::Coordinates;
     $self->{relatives_coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
     return $self;
+}
+
+# gets the relatives coordinates, from the origin of the parent widget
+#  input  : none
+#  output : Curses::Toolkit::Object::Coordinates
+sub _get_relatives_coordinates {
+    my ($self) = @_;
+    return $self->{relatives_coordinates};
 }
 
 # Sets the Curses object to the widget.
