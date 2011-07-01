@@ -27,10 +27,13 @@ sub main {
 
     $window->add_widget(
       my $s = Curses::Toolkit::Widget::ScrollArea->new
+        ->set_name('scroll_area')
         ->add_widget(
             Curses::Toolkit::Widget::Border->new
+              ->set_name('border')
               ->add_widget(
                     Label->new()
+                      ->set_name('label')
                       ->set_text(
 "This is a paragraph. It's cool, but it's on one line. Isn't it ?
 

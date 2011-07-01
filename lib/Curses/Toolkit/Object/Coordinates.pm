@@ -575,6 +575,27 @@ sub is_in_widget {
         && $w_coord->get_y2 >= $self->get_y2;
 }
 
+=method is_in_widget_visible_shape
+
+    my $bool = $coord->is_in_widget_visible_shape( $widget );
+
+Return true if the coordinates is inside the visible part of a given widget
+
+  input  : Curses::Toolkit::Widget : the widget
+  output : true or false
+
+=cut
+
+sub is_in_widget_visible_shape {
+    my ( $self, $widget ) = @_;
+    my $w_coord = $widget->get_visible_shape();
+    return
+           $w_coord->get_x1 <= $self->get_x1
+        && $w_coord->get_x2 >= $self->get_x2
+        && $w_coord->get_y1 <= $self->get_y1
+        && $w_coord->get_y2 >= $self->get_y2;
+}
+
 
 # -- private methods
 

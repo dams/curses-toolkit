@@ -27,7 +27,59 @@ sub new {
     my $class = shift;
     my $self  = $class->SUPER::new();
     $self->{visibility_mode} = 'auto';
+    $self->{scroll_area} = undef;
+
+    print STDERR "   -> NEW VSCROLLBAR\n";
+
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Mouse::Click' => sub {
+                    my ($event) = @_;
+                    print STDERR "   -> VSCROLLBAR event click\n";
+                    $event->{type}   eq 'clicked' or return 0;
+                    $event->{button} eq 'button1' or return 0;
+
+                    my $c  = $event->{coordinates};
+                    my $wc = $self->get_coordinates();
+                    print STDERR "   -> VSCROLLBAR event click c : $c    wc : $wc\n";
+                    $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2()
+                      or return 0;
+                    print STDERR "   -> VSCROLLBAR event click success\n";
+                    return 1;
+                },
+            },
+            code => sub {
+                my ( $event, $vscrollbar ) = @_;
+
+                my $scroll_area = $vscrollbar->get_scroll_area;
+                defined $scroll_area
+                  or return;
+
+                my $c  = $event->{coordinates};
+                my $wc = $self->get_coordinates();
+                $c->get_y1() == $wc->get_y1()
+                  and $scroll_area->scroll(y => -1);
+                $c->get_y1() == $wc->get_y2()
+                  and $scroll_area->scroll(y => 1);
+                return;
+            },
+        )
+    );
+
     return $self;
+}
+
+# attach the scrollbar to a given scroll area
+sub set_scroll_area {
+    my ($self, $scroll_area) = @_;
+    $self->{scroll_area} = $scroll_area;
+    return $self;
+}
+
+sub get_scroll_area {
+    my ($self) = @_;
+    return $self->{scroll_area};
 }
 
 sub draw {
@@ -35,8 +87,8 @@ sub draw {
     my $theme = $self->get_theme();
     my $c = $self->get_coordinates();
 
-    print STDERR "\n\n----------------\n\n";
-    print STDERR Dumper($self->get_fill); use Data::Dumper;
+#    print STDERR "\n\n----------------\n\n";
+#    print STDERR Dumper($self->get_fill); use Data::Dumper;
     my $fill = $self->get_fill();
     my $fill_height = $fill * ($c->height()-2);
     $theme->draw_string( $c->get_x1(), $c->get_y1(), '^');
@@ -48,5 +100,13 @@ sub draw {
     return;
 }
 
+sub possible_signals {
+    my ($self) = @_;
+    return (
+        $self->SUPER::possible_signals(),
+        scrolled_up => 'Curses::Toolkit::Signal::Scrolled::Up',
+        scrolled_down => 'Curses::Toolkit::Signal::Scrolled::Down',
+    );
+}
 
 1;

@@ -43,5 +43,13 @@ sub draw {
     return;
 }
 
+sub possible_signals {
+    my ($self) = @_;
+    return (
+        $self->SUPER::possible_signals(),
+        scrolled_up => 'Curses::Toolkit::Signal::Scrolled::Up',
+        scrolled_down => 'Curses::Toolkit::Signal::Scrolled::Down',
+    );
+}
 
 1;

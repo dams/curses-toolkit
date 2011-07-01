@@ -900,11 +900,14 @@ sub dispatch_event {
         { isa => 'Curses::Toolkit::Widget', optional => 1 },
     );
 
+    print STDERR "   -> DISPATCH event\n";
     if ( !defined $widget ) {
         $widget = $self->get_modal_widget();
         defined $widget and $self->unset_modal_widget();
     }
     $widget ||= $event->get_matching_widget();
+    $widget->can('get_name')
+      and print STDERR "      widget : " . ref($widget) . " | " . $widget->get_name() . "\n";
     defined $widget or return;
 
     while (1) {

@@ -613,9 +613,13 @@ only if a mainloop is active ( see POE::Component::Curses )
 sub needs_redraw {
     my ($self) = @_;
     my $window = $self->get_window();
+    print STDERR " ---------> 1\n";
     defined $window or return $self;
+    print STDERR " ---------> 2\n";
     my $root_window = $window->get_root_window();
+    print STDERR " ---------> 3\n";
     defined $root_window or return $self;
+    print STDERR " ---------> 4\n";
     $root_window->needs_redraw();
     return $self;
 }
