@@ -37,11 +37,6 @@ use Curses::Toolkit::Theme;
 This module tries to be a modern curses toolkit, based on the Curses module, to
 build "semi-graphical" user interfaces easily.
 
-B<WARNING> : This is still in "beta" version, not all the features are
-implemented, and the API may change. However, most of the components are there,
-and things should not change that much in the future... Still, don't use it in
-production, and don't consider it stable.
-
 L<Curses::Toolkit> is meant to be used with a mainloop, which is not part of this
 module. I recommend you L<POE::Component::Curses>, which is probably what you
 want. L<POE::Component::Curses> uses Curses::Toolkit, but provides a mainloop
