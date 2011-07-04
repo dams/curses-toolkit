@@ -301,13 +301,6 @@ sub init_root_window {
 
     if (has_colors) {
         start_color();
-
-        #          print STDERR "color is supported\n";
-        #          print STDERR "colors number : " . COLORS . "\n";
-        #          print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-        #          print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
-
-
     }
 
     eval { Curses->can('NCURSES_MOUSE_VERSION') && ( NCURSES_MOUSE_VERSION() >= 1 ) };

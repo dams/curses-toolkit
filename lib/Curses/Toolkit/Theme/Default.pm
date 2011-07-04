@@ -140,7 +140,9 @@ sub draw_hline {
     $y1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1 )
         or return;
-    $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), $self->HLINE(), $c->width() );
+    my ($cx1,$cy1,$cx2,$cy2) = ($c->get_x1, $c->get_y1, $c->get_x2, $c->get_y2);
+    $c->height > 0
+      and $self->curses($attr)->hline( $c->get_y1(), $c->get_x1(), $self->HLINE(), $c->width() );
     return $self;
 }
 
@@ -150,7 +152,8 @@ sub draw_vline {
     $x1 >= 0 or return;
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $height )
         or return;
-    $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), $self->VLINE(), $c->height() );
+    $c->width > 0
+      and $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), $self->VLINE(), $c->height() );
     return $self;
 }
 
@@ -195,7 +198,8 @@ sub draw_string {
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1 ) or return;
-
+    $c->height > 0
+      or return;
     my $start = $c->get_x1() - $x1;
     my $end   = $c->get_x1() - $x1 + $c->width();
     my $width = $end - $start;
@@ -214,6 +218,8 @@ sub draw_vstring {
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
     my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $text->stripped_length() ) or return;
+    $c->width > 0
+      or return;
 
     my $start  = $c->get_y1() - $y1;
     my $end    = $c->get_y1() - $y1 + $c->height();

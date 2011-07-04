@@ -549,8 +549,24 @@ sub get_visible_shape {
     my $shape  = $self->get_coordinates->clone;
     my $parent = $self->get_parent;
     defined $parent
-        and $shape->restrict_to( $parent->get_visible_shape );
+        and $shape->restrict_to( $parent->get_visible_shape_for_children );
     return $shape;
+}
+
+=head2 get_visible_shape_for_children
+
+Gets the Coordinates of the part of the widget which is visible and that its
+children can draw on. By default it's the same as get_visible_shape, but it may
+be overloaded to reduce it some time (for instance if the widget has borders)
+
+  input  : none
+  output : the shape (Curses::Toolkit::Object::Coordinates) or void
+
+=cut
+
+sub get_visible_shape_for_children {
+    my ($self) = @_;
+    return $self->get_visible_shape();
 }
 
 =head2 rebuild_all_coordinates
@@ -605,13 +621,21 @@ sub needs_redraw {
 }
 
 # sets the relatives coordinates, from the origin of the parent widget
-#  input  : any Curses::Toolkit::Object::Coordinates costructor input
+#  input  : any Curses::Toolkit::Object::Coordinates constructor input
 #  output : the widget
 sub _set_relatives_coordinates {
     my $self = shift;
     use Curses::Toolkit::Object::Coordinates;
     $self->{relatives_coordinates} = Curses::Toolkit::Object::Coordinates->new(@_);
     return $self;
+}
+
+# gets the relatives coordinates, from the origin of the parent widget
+#  input  : none
+#  output : Curses::Toolkit::Object::Coordinates
+sub _get_relatives_coordinates {
+    my ($self) = @_;
+    return $self->{relatives_coordinates};
 }
 
 # Sets the Curses object to the widget.

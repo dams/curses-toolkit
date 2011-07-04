@@ -79,7 +79,7 @@ sub main {
     my $entry;
 
     my $window1 =
-      Window->new->set_name('window')->set_title("Twitter Search demonstration at FOSDEM")
+      Window->new->set_name('window')->set_title("Twitter Search demonstration at FPW 2011")
           ->set_coordinates( x1 => '5%', y1 => '5%',
                              x2 => '95%', y2 => '95%' );
 

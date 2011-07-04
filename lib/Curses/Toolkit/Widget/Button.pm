@@ -172,7 +172,8 @@ The Button requires the text length plus the button brackets
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
     my $text = $self->get_text();
-
+    defined $available_space
+      or $available_space = Curses::Toolkit::Object::Coordinates->new_zero();
     my $minimum_space = $available_space->clone();
     my $bw            = $self->get_theme_property('border_width');
     my $left_string   = $self->get_theme_property('left_enclosing');

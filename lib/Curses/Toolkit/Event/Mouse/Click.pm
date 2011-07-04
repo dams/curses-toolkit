@@ -104,8 +104,12 @@ sub get_matching_widget {
     # sort by window stack then deepnes in the widget tree
     @all_widgets =
         sort { $b->[1] <=> $a->[1] || $b->[0] <=> $a->[0] }
-        grep { $self->{coordinates}->is_in_widget( $_->[2] ) } @all_widgets;
+        grep { $self->{coordinates}->is_in_widget_visible_shape( $_->[2] ) } @all_widgets;
 
+    foreach my $w (@all_widgets) {
+        my $n = $w->[2];
+        use Data::Dumper;
+    }
 
     @all_widgets and return $all_widgets[0]->[2];
     return $self->{root_window};

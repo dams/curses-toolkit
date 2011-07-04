@@ -24,7 +24,6 @@ sub main {
 
 	local $| = 1;
 	open STDERR, '/dev/null';
-	print STDERR "\n\n\n--- starting demo9 -----------------\n\n";
 
 	$root->add_window(
 		Curses::Toolkit::Widget::Window->new()->add_widget(
@@ -77,11 +76,6 @@ sub main {
 		)
 	);
 
-	#$root
-	#      ->render()
-	#      ->display();
-	#sleep 5;
-	#	print STDERR Dumper($root); use Data::Dumper;
 	POE::Kernel->run();
 }
 

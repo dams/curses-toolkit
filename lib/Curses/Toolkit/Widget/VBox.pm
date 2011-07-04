@@ -198,9 +198,12 @@ Given a coordinate representing the available space, returns the space desired
 sub get_desired_space {
     my ( $self, $available_space ) = @_;
 
+    defined $available_space
+      or return $self->get_minimum_space();
+
     my $desired_space   = $available_space->clone();
 
-return $desired_space;
+    return $desired_space;
 
 #     my $remaining_space = $available_space->clone();
 
@@ -248,13 +251,28 @@ needed to properly display itself
 sub get_minimum_space {
     my ( $self, $available_space ) = @_;
 
+    my @children = $self->get_children();
+
+    # compute how high all the children are
+    my $height   = 0;
+    my $width    = 0;
+
+    if (! defined $available_space) {
+        foreach my $child (@children) {
+            my $space = $child->get_minimum_space();
+            my $h     = $space->width();
+            $height += $h;
+            use List::Util qw(max);
+            $width = max $width, $space->width();
+        }
+        return Curses::Toolkit::Object::Coordinates->new(
+                   x1 => 0, y1 => 0,
+                   x2 => $width, y2 => $height );
+    }
+
     my $minimum_space   = $available_space->clone();
     my $remaining_space = $available_space->clone();
 
-    # compute how high all the children are
-    my @children = $self->get_children();
-    my $height   = 0;
-    my $width    = 0;
     foreach my $child (@children) {
         my $space = $child->get_minimum_space($remaining_space);
         my $h     = $space->height();
