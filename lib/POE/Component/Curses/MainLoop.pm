@@ -124,7 +124,6 @@ sub event_key {
 
     use Curses::Toolkit::Event::Key;
 
-    #		print STDERR " -- Mainloop stroke : [$params{key}] \n";
     my $event = Curses::Toolkit::Event::Key->new(
         type        => 'stroke',
         params      => { key => $params{key} },

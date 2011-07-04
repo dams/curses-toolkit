@@ -301,13 +301,6 @@ sub init_root_window {
 
     if (has_colors) {
         start_color();
-
-        #          print STDERR "color is supported\n";
-        #          print STDERR "colors number : " . COLORS . "\n";
-        #          print STDERR "colors pairs : " . COLOR_PAIRS . "\n";
-        #          print STDERR "can change colors ? : " . Curses::can_change_color() . "\n";
-
-
     }
 
     eval { Curses->can('NCURSES_MOUSE_VERSION') && ( NCURSES_MOUSE_VERSION() >= 1 ) };
@@ -900,14 +893,11 @@ sub dispatch_event {
         { isa => 'Curses::Toolkit::Widget', optional => 1 },
     );
 
-    print STDERR "   -> DISPATCH event\n";
     if ( !defined $widget ) {
         $widget = $self->get_modal_widget();
         defined $widget and $self->unset_modal_widget();
     }
     $widget ||= $event->get_matching_widget();
-    $widget->can('get_name')
-      and print STDERR "      widget : " . ref($widget) . " | " . $widget->get_name() . "\n";
     defined $widget or return;
 
     while (1) {

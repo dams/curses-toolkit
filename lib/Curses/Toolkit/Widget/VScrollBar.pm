@@ -29,23 +29,18 @@ sub new {
     $self->{visibility_mode} = 'auto';
     $self->{scroll_area} = undef;
 
-    print STDERR "   -> NEW VSCROLLBAR\n";
-
     $self->add_event_listener(
         Curses::Toolkit::EventListener->new(
             accepted_events => {
                 'Curses::Toolkit::Event::Mouse::Click' => sub {
                     my ($event) = @_;
-                    print STDERR "   -> VSCROLLBAR event click\n";
                     $event->{type}   eq 'clicked' or return 0;
                     $event->{button} eq 'button1' or return 0;
 
                     my $c  = $event->{coordinates};
                     my $wc = $self->get_coordinates();
-                    print STDERR "   -> VSCROLLBAR event click c : $c    wc : $wc\n";
                     $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2()
                       or return 0;
-                    print STDERR "   -> VSCROLLBAR event click success\n";
                     return 1;
                 },
             },
@@ -87,8 +82,6 @@ sub draw {
     my $theme = $self->get_theme();
     my $c = $self->get_coordinates();
 
-#    print STDERR "\n\n----------------\n\n";
-#    print STDERR Dumper($self->get_fill); use Data::Dumper;
     my $fill = $self->get_fill();
     my $fill_height = $fill * ($c->height()-2);
     $theme->draw_string( $c->get_x1(), $c->get_y1(), '^');

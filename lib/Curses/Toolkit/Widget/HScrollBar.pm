@@ -35,8 +35,6 @@ sub draw {
     my $theme = $self->get_theme();
     my $c = $self->get_coordinates();
 
-#    print STDERR "\n\n----------------\n\n";
-#    print STDERR Dumper($c); use Data::Dumper;
     $theme->draw_string( $c->get_x1(), $c->get_y1(), '&lt;');
     $theme->draw_hline( $c->get_x1()+1, $c->get_y1(), $c->width()-2);
     $theme->draw_string( $c->get_x2()-1, $c->get_y1(), '>');

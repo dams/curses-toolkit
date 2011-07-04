@@ -61,7 +61,6 @@ sub search_twitter {
                  ->set_text($text),
             { expand => 0 }
         );
-#        print STDERR "\n [ $text ]\n";
     }
     $border->add_widget($vbox);
     $border->needs_redraw();
