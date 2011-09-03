@@ -175,7 +175,7 @@ sub draw {
     my $fill_height = $fill * ($c->height()-2);
     $theme->draw_string( $c->get_x1(), $c->get_y1(), '^');
     foreach my $y (0..$fill_height) {
-        $theme->draw_string( $c->get_x1(), $c->get_y1()+1+$y, '#');
+        $theme->draw_resize( $c->get_x1(), $c->get_y1()+1+$y,);
     }
     $theme->draw_vline( $c->get_x1(), $c->get_y1()+1+$fill_height+1, $c->height()-2-$fill_height);
     $theme->draw_string( $c->get_x1(), $c->get_y2()-1, 'v');

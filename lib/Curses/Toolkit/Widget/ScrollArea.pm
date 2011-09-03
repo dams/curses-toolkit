@@ -32,20 +32,29 @@ sub set_scrollbars_mode {
     my ($self, $mode) = @_;
     if ($mode eq 'always') {
         $self->{scrollbars_mode} = $mode;
+
         $self->{v_scrollbar} = Curses::Toolkit::Widget::VScrollBar->new()->set_scroll_area($self)
           ->set_name($self . '_vscrollbar');
 
         # A bit hackish (especially the setting of iterator to undef. I should
         # stop using iterators anyway
-#        $self->_add_child_at_end($self->{v_scrollbar});
         $self->_add_child_at_beginning($self->{v_scrollbar});
         $self->{v_scrollbar}->_set_parent($self);
         $self->{v_scrollbar}->_set_iterator(undef);
 
+
+        $self->{h_scrollbar} = Curses::Toolkit::Widget::HScrollBar->new()->set_scroll_area($self)
+          ->set_name($self . '_hscrollbar');
+
+        # A bit hackish (especially the setting of iterator to undef. I should
+        # stop using iterators anyway
+        $self->_add_child_at_beginning($self->{h_scrollbar});
+        $self->{h_scrollbar}->_set_parent($self);
+        $self->{h_scrollbar}->_set_iterator(undef);
+
         # because it's a container, needs to take care of rebuilding coordinates
         # from top to bottom
         $self->rebuild_all_coordinates();
-        # $self->{h_scrollbar} = Curses::Toolkit::Widget::HScrollBar->new()->set_scroll_area($self);
     } else {
         die "scrollbar mode '" . $mode . "' is not supported";
     }
@@ -215,6 +224,22 @@ sub _rebuild_children_coordinates {
         $self->{v_scrollbar}->{theme_name} = $self->get_theme_name;
         $self->{v_scrollbar}->{theme} = $self->get_theme;
 #        $self->{v_scrollbar}->draw();
+    }
+    # take care of potential scrollbars
+    if ( defined ($self->{h_scrollbar}) ) {
+
+        my $c = $self->get_visible_shape;
+
+        # XXX FIXME This is a Hack
+        $self->{h_scrollbar}->{coordinates} = Curses::Toolkit::Object::Coordinates->new(
+            x1 => $c->get_x1, y1 => $c->get_y2()-1,
+            x2 => $c->get_x2() - ( defined($self->{v_scrollbar}) ? 1 : 0), y2 => $c->get_y2(),
+        );
+
+        # XXX FIXME This is a Hack
+        $self->{h_scrollbar}->{theme_name} = $self->get_theme_name;
+        $self->{h_scrollbar}->{theme} = $self->get_theme;
+#        $self->{h_scrollbar}->draw();
     }
     return $self;
 }

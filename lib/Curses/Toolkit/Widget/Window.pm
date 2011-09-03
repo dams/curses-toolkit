@@ -200,8 +200,8 @@ sub new {
                     my $wc = $self->get_coordinates();
                           !$self->{_resize_pressed}
                         && $event->{type} eq 'pressed'
-                        && $c->get_x2() == $wc->get_x2() - 1
-                        && $c->get_y2() == $wc->get_y2() - 1
+                        && ( $c->get_x2() == $wc->get_x2() - 1 || $c->get_x2() == $wc->get_x2() - 2)
+                        && ( $c->get_y2() == $wc->get_y2() - 1 || $c->get_y2() == $wc->get_y2() - 2)
                         and return 1;
                     return 0;
                 },
