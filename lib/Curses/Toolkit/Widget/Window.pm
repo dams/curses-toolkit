@@ -543,9 +543,6 @@ sub draw {
         );
     }
 
-    #	$theme->draw_corner_lr($c->get_x2() - 1, $c->get_y2() - 1);
-    $theme->draw_resize( $c->get_x2() - 1, $c->get_y2() - 1, { clicked => $self->{_resize_pressed} } );
-
     if ($self->{_candy1}{enabled}) {
         my $c = $self->{_candy1}{coordinates};
         my $offset = $self->{_candy1}{offset};
@@ -557,6 +554,9 @@ sub draw {
             $theme->draw_title( $c->get_x1() - 1 - $o, $c->get_y1() - 1 - $o, '\\', { clicked => 1, no_shape_restriction => 1 } );
         }
     }
+    #	$theme->draw_corner_lr($c->get_x2() - 1, $c->get_y2() - 1);
+    $theme->draw_resize( $c->get_x2() - 1, $c->get_y2() - 1, { clicked => $self->{_resize_pressed} } );
+
 }
 
 =head2 get_visible_shape

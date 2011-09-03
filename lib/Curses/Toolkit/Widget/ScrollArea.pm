@@ -76,6 +76,37 @@ sub scroll {
       and $self->{scroll_x} += $params{x};
     defined $params{y}
       and $self->{scroll_y} += $params{y};
+
+    my $count = 0;
+    defined $self->{v_scrollbar}
+      and $count++;
+    defined $self->{h_scrollbar}
+      and $count++;
+    
+    my @children  = $self->get_children();
+    if (@children > $count) {
+
+        # there is a main child
+
+        my $shape = $self->get_visible_shape_for_children;
+        
+        # main child is always the last, so that widget ordering (for events for
+        # instance), find the scrollbar before the real child
+        my $child_widget = $children[-1];
+        if (defined $child_widget) {
+            # How much does the child widget want ? We don't specify a given size
+            my $child_space = $child_widget->get_desired_space();
+            $child_space->width + $self->{scroll_x} < $shape->width()
+              and $self->{scroll_x} = $shape->width() - $child_space->width;
+            $child_space->height + $self->{scroll_y} < $shape->height()
+              and $self->{scroll_y} = $shape->height() - $child_space->height;
+        }
+    }
+    $self->{scroll_x} >=0
+      and $self->{scroll_x} = 0;
+    $self->{scroll_y} >=0
+      and $self->{scroll_y} = 0;
+
     $self->rebuild_all_coordinates();
     $self->needs_redraw;
     return $self;

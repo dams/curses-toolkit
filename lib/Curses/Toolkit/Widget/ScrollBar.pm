@@ -13,6 +13,8 @@ sub new {
         "This is an abstract class, please see Curses::Toolkit::Widget::VScrollBar and Curses::Toolkit::Widget::HScrollBar";
     my $self  = $class->SUPER::new();
     $self->{fill} = 1;
+    $self->{_pressed} = 0;
+    $self->{_scrolling} = { enabled => 0 };
     return $self;
 }
 

@@ -36,11 +36,62 @@ sub new {
                     my ($event) = @_;
 
                     $event->{button} eq 'button1' or return 0;
+                    $self->{_pressed} && $event->{type} eq 'released'
+                      and return 1;
+                    $self->{_pressed}
+                      and return 0;
+                    $event->{type} eq 'pressed'
+                      or return 0;
+                    my $scroll_delta = 1;
+                    my $c  = $event->{coordinates};
+                    my $wc = $self->get_coordinates();
+                    $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2() - 1
+                      or return 0;
+                    $c->get_y1() == $wc->get_y1()
+                      or $scroll_delta = -$scroll_delta;
+                    $event->custom_data->{scroll_delta} = $scroll_delta;
+                    return 1;
+                },
+            },
+            code => sub {
+                my ( $event, $vscrollbar ) = @_;
+
+                if ($self->{_pressed}) {
+                    # means we released it
+                    $vscrollbar->unset_modal();
+                    $self->{_pressed} = 0;
+                    $self->{_scrolling}{enabled} = 0;
+                    return;
+                }
+
+                # means we pressed it
+                $vscrollbar->set_modal();
+                my $scroll_area = $vscrollbar->get_scroll_area;
+                defined $scroll_area
+                  or return;
+
+                my $scroll_delta = $event->custom_data->{scroll_delta};
+                $scroll_area->scroll(y => $scroll_delta);
+
+                $self->{_pressed} = 1;
+                $self->{_scrolling}{enabled} = 1;
+                $self->{_scrolling}{scroll_delta} = $scroll_delta;
+                $self->_start_scrolling_animation();
+                return;
+            },
+        )
+    );
+
+    $self->add_event_listener(
+        Curses::Toolkit::EventListener->new(
+            accepted_events => {
+                'Curses::Toolkit::Event::Mouse::Click' => sub {
+                    my ($event) = @_;
+
+                    $event->{button} eq 'button1' or return 0;
 
                     my $scroll_delta = 0;
                     $event->{type}   eq 'clicked'
-                      and $scroll_delta = 1;
-                    $event->{type}   eq 'pressed'
                       and $scroll_delta = 1;
                     $event->{type}   eq 'double_clicked'
                       and $scroll_delta = 2;
@@ -48,12 +99,14 @@ sub new {
                       and $scroll_delta = 3;
                     $scroll_delta or return 0;
 
-                    $event->custom_data->{scroll_delta} = $scroll_delta;
-
                     my $c  = $event->{coordinates};
                     my $wc = $self->get_coordinates();
                     $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2() - 1
                       or return 0;
+                    $c->get_y1() == $wc->get_y1()
+                      or $scroll_delta = -$scroll_delta;
+
+                    $event->custom_data->{scroll_delta} = $scroll_delta;
                     return 1;
                 },
             },
@@ -65,19 +118,40 @@ sub new {
                   or return;
 
                 my $scroll_delta = $event->custom_data->{scroll_delta};
-
-                my $c  = $event->{coordinates};
-                my $wc = $self->get_coordinates();
-                $c->get_y1() == $wc->get_y1()
-                  and $scroll_area->scroll(y => $scroll_delta);
-                $c->get_y1() == $wc->get_y2() - 1
-                  and $scroll_area->scroll(y => -$scroll_delta);
+                $scroll_area->scroll(y => $scroll_delta);
                 return;
             },
         )
     );
 
     return $self;
+}
+
+sub _start_scrolling_animation {
+    my ($self) = @_;
+
+    my $root_window = $self->get_root_window();
+    my $delay = 1/4;
+
+    my $delay_sub;
+    $delay_sub = sub {
+
+        $self->{_scrolling}{enabled}
+          or return;
+
+        my $scroll_area = $self->get_scroll_area;
+        defined $scroll_area
+          or return;
+
+        my $scroll_delta = $self->{_scrolling}{scroll_delta};
+        $scroll_area->scroll(y => $scroll_delta);
+
+        my $root_window = $self->get_root_window();
+        $root_window->add_delay( $delay, $delay_sub );
+    };
+
+    $root_window->add_delay( $delay, $delay_sub );
+    return;
 }
 
 # attach the scrollbar to a given scroll area
