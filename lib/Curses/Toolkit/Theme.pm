@@ -257,9 +257,14 @@ are in the shape
 
 sub restrict_to_shape {
     my $self  = shift;
+    my %args = @_;
+    my $attr = delete $args{attr} || {};
+    my $c = Curses::Toolkit::Object::Coordinates->new(%args);
+    $attr->{no_shape_restriction}
+      and return $c;
     my $shape = $self->get_shape()
         or return;
-    return Curses::Toolkit::Object::Coordinates->new(@_)->restrict_to($shape);
+    return $c->restrict_to($shape);
 }
 
 =head2 curses

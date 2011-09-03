@@ -138,7 +138,7 @@ sub draw_hline {
     my ( $self, $x1, $y1, $width, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $y1 >= 0 or return;
-    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1 )
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $width, height => 1, attr => $attr )
         or return;
     my ($cx1,$cy1,$cx2,$cy2) = ($c->get_x1, $c->get_y1, $c->get_x2, $c->get_y2);
     $c->height > 0
@@ -150,7 +150,7 @@ sub draw_vline {
     my ( $self, $x1, $y1, $height, $attr ) = @_;
     $self->get_widget->is_visible() or return;
     $x1 >= 0 or return;
-    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $height )
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $height, attr => $attr )
         or return;
     $c->width > 0
       and $self->curses($attr)->vline( $c->get_y1(), $c->get_x1(), $self->VLINE(), $c->height() );
@@ -197,7 +197,7 @@ sub draw_string {
     ref $text
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
-    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1 ) or return;
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => $text->stripped_length(), height => 1, attr => $attr ) or return;
     $c->height > 0
       or return;
     my $start = $c->get_x1() - $x1;
@@ -217,7 +217,7 @@ sub draw_vstring {
     ref $text
         or $text = Curses::Toolkit::Object::MarkupString->new($text);
 
-    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $text->stripped_length() ) or return;
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => 1, height => $text->stripped_length(), attr => $attr ) or return;
     $c->width > 0
       or return;
 
@@ -236,7 +236,7 @@ sub draw_vstring {
 sub draw_title {
     my ( $self, $x1, $y1, $text, $attr ) = @_;
     $self->get_widget->is_visible() or return;
-    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => length($text), height => 1 ) or return;
+    my $c = $self->restrict_to_shape( x1 => $x1, y1 => $y1, width => length($text), height => 1, attr => $attr ) or return;
 
     $c->get_x1() - $x1 < length $text
         or return;
@@ -257,8 +257,12 @@ sub draw_resize {
 sub draw_blank {
     my $self = shift;
     $self->get_widget->is_visible or return;
-    my ($c) = validate_pos( @_, { isa => 'Curses::Toolkit::Object::Coordinates' } );
-    $c = $self->restrict_to_shape($c)
+    if (ref $_[0] && $_[0]->isa ('Curses::Toolkit::Object::Coordinates')) {
+        my $c = shift;
+        unshift @_, x1 => $c->get_x1, y1 => $c->get_y1, x2 => $c->get_x2, y2 => $c->get_y2;
+    }
+
+    my $c = $self->restrict_to_shape(@_)
         or return;
     my $l = $c->get_x2() - $c->get_x1();
     $l > 0 or return $self;
