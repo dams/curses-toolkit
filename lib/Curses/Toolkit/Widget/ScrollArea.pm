@@ -71,14 +71,13 @@ sub add_widget {
 
 sub scroll {
     my ($self, %params) = @_;
-    $self->{scroll_y} += 5;
-    $self->rebuild_all_coordinates();
-    $self->needs_redraw;
-return;
+#    $self->{scroll_y} += 5;
     defined $params{x}
       and $self->{scroll_x} += $params{x};
     defined $params{y}
       and $self->{scroll_y} += $params{y};
+    $self->rebuild_all_coordinates();
+    $self->needs_redraw;
     return $self;
 }
 # Returns the relative rectangle that a child widget can occupy. Overloads the

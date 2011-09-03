@@ -34,12 +34,25 @@ sub new {
             accepted_events => {
                 'Curses::Toolkit::Event::Mouse::Click' => sub {
                     my ($event) = @_;
-                    $event->{type}   eq 'clicked' or return 0;
+
                     $event->{button} eq 'button1' or return 0;
+
+                    my $scroll_delta = 0;
+                    $event->{type}   eq 'clicked'
+                      and $scroll_delta = 1;
+                    $event->{type}   eq 'pressed'
+                      and $scroll_delta = 1;
+                    $event->{type}   eq 'double_clicked'
+                      and $scroll_delta = 2;
+                    $event->{type}   eq 'triple_clicked'
+                      and $scroll_delta = 3;
+                    $scroll_delta or return 0;
+
+                    $event->custom_data->{scroll_delta} = $scroll_delta;
 
                     my $c  = $event->{coordinates};
                     my $wc = $self->get_coordinates();
-                    $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2()
+                    $c->get_y1() == $wc->get_y1() || $c->get_y1() == $wc->get_y2() - 1
                       or return 0;
                     return 1;
                 },
@@ -51,12 +64,14 @@ sub new {
                 defined $scroll_area
                   or return;
 
+                my $scroll_delta = $event->custom_data->{scroll_delta};
+
                 my $c  = $event->{coordinates};
                 my $wc = $self->get_coordinates();
                 $c->get_y1() == $wc->get_y1()
-                  and $scroll_area->scroll(y => -1);
-                $c->get_y1() == $wc->get_y2()
-                  and $scroll_area->scroll(y => 1);
+                  and $scroll_area->scroll(y => $scroll_delta);
+                $c->get_y1() == $wc->get_y2() - 1
+                  and $scroll_area->scroll(y => -$scroll_delta);
                 return;
             },
         )

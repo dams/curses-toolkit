@@ -42,6 +42,7 @@ sub new {
     return bless {
         can_propagate => 1,
         restricted    => 0,
+        custom_data   => {},
     }, $class;
 }
 
@@ -126,6 +127,18 @@ Returns wether the event is restricted to the widget
 
 sub restricted_to_widget {
     return shift->{restricted};
+}
+
+=head2 custom_data
+
+Returns a HashRef, which is attached to the event. The pointed Hash can be
+modified to store custom temporary data in the event. Mostly useful when
+creating an event listener.
+
+=cut
+
+sub custom_data {
+    return shift->{custom_data};
 }
 
 1;

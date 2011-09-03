@@ -56,7 +56,7 @@ sub new {
             root_window => { isa => 'Curses::Toolkit' },
         }
     );
-    $self = bless( \%args, $class );
+    @{$self}{keys %args} = values %args;
     return $self;
 }
 

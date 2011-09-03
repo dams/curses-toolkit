@@ -56,7 +56,7 @@ sub can_handle {
     #	exists $self->{accepted_events}{$event_class} or return;
     if ( !exists $self->{accepted_events}{$event_class} ) {
         eval "require $event_class";
-        $@ and die "failed requireing event class '$event_class'";
+        $@ and die "failed requiring event class '$event_class'";
         my $found;
         foreach my $class_name ( keys %{ $self->{accepted_events} } ) {
             $event_class->isa($class_name)
