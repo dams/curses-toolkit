@@ -9,7 +9,6 @@ sub PROGRESS_BAR_LABEL {
     return({ map { $_ => 1 } (qw(none value percent)) });
 }
 
-
 1;
 __END__
 
