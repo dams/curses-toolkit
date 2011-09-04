@@ -4,8 +4,6 @@ use strict;
 package Curses::Toolkit::Object::Coordinates;
 # ABSTRACT: simple coordinates class
 
-# We don't use Moose for speed purpose
-
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use parent qw(Curses::Toolkit::Object);

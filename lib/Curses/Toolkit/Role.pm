@@ -3,12 +3,11 @@ use strict;
 
 package Curses::Toolkit::Role;
 
-# ABSTRACT: base class for roles, before migrating to Moose
+# ABSTRACT: base class for roles
 
 =head1 DESCRIPTION
 
-Base class for Roles. Thiw will disappear once I use Moose and don't need
-multiple inheriatance anmore.
+Base class for Roles.
 
 =head1 CONSTRUCTOR
 

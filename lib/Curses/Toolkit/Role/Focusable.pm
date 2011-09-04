@@ -12,8 +12,7 @@ use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF H
 =head1 DESCRIPTION
 
 If a widget inherits of this role, it can be focused (except if its sensitivity
-is set to false). This will disappear once I use Moose and don't need
-multiple inheritance anymore.
+is set to false).
 
 This role can be merged in anything that is a Curses::Toolkit::Widget
 
