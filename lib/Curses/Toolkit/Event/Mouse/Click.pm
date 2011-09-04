@@ -108,7 +108,6 @@ sub get_matching_widget {
 
     foreach my $w (@all_widgets) {
         my $n = $w->[2];
-        use Data::Dumper;
     }
 
     @all_widgets and return $all_widgets[0]->[2];
