@@ -4,16 +4,11 @@ use strict;
 package Curses::Toolkit::Object;
 # ABSTRACT: base class for objects
 
-use Moose;
-
-sub BUILDARGS {
-    my ($class) = shift;
-    # TODO : use Exception;
+sub new {
+    my $class = shift;
     $class eq __PACKAGE__ and die "abstract class";
+    return bless { }, $class;
 }
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
