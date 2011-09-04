@@ -3,10 +3,8 @@ use strict;
 
 package POE::Component::Curses::MainLoop;
 
-# ABSTRACT: <FIXME to be filled>
+# ABSTRACT: <FIXME>
 
-use Moose 0.92;
-use MooseX::FollowPBP;
 use POE;
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
@@ -24,19 +22,25 @@ Please look at L<POE::Component::Curses>. Thanks !
 =cut
 
 # constructor arguments
-has session_name => ( is => 'rw', isa => 'Str' );
-has args => ( is => 'ro', isa => 'HashRef', default => sub { {} } );
+sub get_session_name { $_[0]->{session_name}; }
+sub set_session_name { $_[0]->{set_session_name} = $_[1]; $_[0]; }
 
-has toolkit_root  => ( is => 'ro', isa => 'Curses::Toolkit', lazy_build => 1, init_arg => undef );
-has redraw_needed => ( is => 'rw', isa => 'Bool',            default    => 0, init_arg => undef );
+sub get_args { $_[0]->{args}; }
+sub get_toolkit_root { $_[0]->{toolkit_root}; }
+sub get_redraw_needed { $_[0]->{redraw_needed}; }
+sub set_redraw_needed { $_[0]->{redraw_needed} = $_[1]; $_[0]; }
 
-sub _build_toolkit_root {
-    my $self         = shift;
-    my $toolkit_root = Curses::Toolkit->init_root_window( %{ $self->get_args } );
-    $toolkit_root->set_mainloop($self);
-    return $toolkit_root;
+sub new {
+    my $class = shift;
+    my $self = bless { args => {},
+                       @_,
+                       redraw_needed => 0,
+                     }, $class;
+    $self->{toolkit_root} = Curses::Toolkit->init_root_window( %{ $self->get_args } );;
+    $self->{toolkit_root}->set_mainloop($self);
+    return $self;
+    
 }
-
 
 
 #### Now implement the Mainloop API ####
@@ -170,8 +174,5 @@ sub event_generic {
     my $self = shift;
     $self->get_toolkit_root->dispatch_event(@_);
 }
-
-no Moose;
-__PACKAGE__->meta->make_immutable;
 
 1;
