@@ -22,6 +22,7 @@ use relative -to      => "Curses::Toolkit::Theme::Default::Color",
 use relative -to      => "Curses::Toolkit::Theme",
              -aliased => qw(Default);
 
+use Curses::Toolkit::Widget::ScrollArea;
 main() unless caller;
 
 my $border;
@@ -62,7 +63,11 @@ sub search_twitter {
             { expand => 0 }
         );
     }
-    $border->add_widget($vbox);
+    $border->add_widget(
+      my $s = Curses::Toolkit::Widget::ScrollArea->new
+                        ->set_name('scroll_area')
+                        ->add_widget($vbox)
+                       );
     $border->needs_redraw();
 
 }
