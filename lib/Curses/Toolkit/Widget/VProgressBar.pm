@@ -5,15 +5,12 @@ package Curses::Toolkit::Widget::VProgressBar;
 
 # ABSTRACT: a vertical progress bar widget
 
-use Moose;
-use MooseX::Has::Sugar;
-use MooseX::FollowPBP;
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
 use Curses::Toolkit::Object::Coordinates;
 use Curses::Toolkit::Types;
 
-extends qw(Curses::Toolkit::Widget::ProgressBar);
+use parent qw(Curses::Toolkit::Widget::ProgressBar);
 
 
 # -- attributes
@@ -255,9 +252,6 @@ Example :
 
 =cut
 
-no Moose;
-__PACKAGE__->meta->make_immutable (inline_constructor => 0);
-
 1;
 
 __END__
@@ -278,7 +272,7 @@ With a border:
 
 =head1 DESCRIPTION
 
-The C<Curses::Toolkit::Widget::VProgressBar> widget is a classical
+The C<Curses::Toolkit::Widget::VProgressBar> widget is a classic
 progress bar widget, used to provide some sort of progress information
 to your program user.
 
