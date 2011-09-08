@@ -11,6 +11,11 @@ use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF H
 
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(Border);
+our %EXPORT_TAGS = (all => [qw(Border)]);
+
+sub Border { 'Curses::Toolkit::Widget::Border' }
+
 =head1 Appearence
 
   +----------+

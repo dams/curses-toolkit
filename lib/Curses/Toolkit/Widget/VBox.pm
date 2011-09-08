@@ -9,6 +9,10 @@ use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @EXPORT_OK = qw(VBox);
+our %EXPORT_TAGS = (all => [qw(VBox)]);
+
+sub VBox { 'Curses::Toolkit::Widget::VBox' }
 
 =head1 DESCRIPTION
 

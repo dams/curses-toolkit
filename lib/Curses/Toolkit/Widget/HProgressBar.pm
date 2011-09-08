@@ -12,8 +12,13 @@ use Curses::Toolkit::Types;
 
 use parent qw(Curses::Toolkit::Widget::ProgressBar);
 
+our @EXPORT_OK = qw(HProgressBar);
+our %EXPORT_TAGS = (all => [qw(HProgressBar)]);
+
+sub HProgressBar { 'Curses::Toolkit::Widget::HProgressBar' }
 
 # -- attributes
+
 
 =attr minimum
 

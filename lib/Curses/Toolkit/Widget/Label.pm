@@ -12,6 +12,11 @@ use List::Util qw(min max);
 use Curses::Toolkit::Object::MarkupString;
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(Label);
+our %EXPORT_TAGS = (all => [qw(Label)]);
+
+sub Label { 'Curses::Toolkit::Widget::Label' }
+
 =head1 DESCRIPTION
 
 This widget consists of a text label. This widget is more powerful than it

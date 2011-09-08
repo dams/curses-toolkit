@@ -9,6 +9,11 @@ use parent qw(Curses::Toolkit::Widget::Container);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @EXPORT_OK = qw(Bin);
+our %EXPORT_TAGS = (all => [qw(Bin)]);
+
+sub Bin { 'Curses::Toolkit::Widget::Bin' }
+
 =head1 DESCRIPTION
 
 This widget can contain 0 or 1 other widget.

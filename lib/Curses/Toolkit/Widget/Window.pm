@@ -14,6 +14,11 @@ use List::Util qw(min sum max);
 
 use Curses::Toolkit::EventListener;
 
+our @EXPORT_OK = qw(Window);
+our %EXPORT_TAGS = (all => [qw(Window)]);
+
+sub Window { 'Curses::Toolkit::Widget::Window' }
+
 =head1 Appearence
 
 
@@ -394,7 +399,8 @@ Bring the window to front
 
 sub bring_to_front {
     my ($self) = @_;
-    my $root_window = $self->get_root_window();
+    my $
+root_window = $self->get_root_window();
     defined $root_window or return;
     $root_window->bring_window_to_front($self);
     return $self;

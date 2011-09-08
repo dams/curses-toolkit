@@ -7,13 +7,24 @@ package Curses::Toolkit::Widget;
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(Widget);
+our @EXPORT_TAGS = qw(:all);
+
+sub Widget { 'Curses::Toolkit::Widget' }
+
+=head1 EXPORTS
+
+  use Curses::Toolkit::Widget qw(Widget)
+  use Curses::Toolkit::Widget qw(:all)
+
 =head1 DESCRIPTION
 
 Base class for widgets
 
 =head1 CONSTRUCTOR
 
-None, this is an abstract class
+None, this is an abstract class.
 
 =cut
 

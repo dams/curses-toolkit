@@ -11,6 +11,11 @@ use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF H
 
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(HBox);
+our %EXPORT_TAGS = (all => [qw(HBox)]);
+
+sub HBox { 'Curses::Toolkit::Widget::HBox' }
+
 =head1 DESCRIPTION
 
 This widget can contain 0 or more widgets. The children are packed horizontally.

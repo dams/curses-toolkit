@@ -10,6 +10,10 @@ use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(Button);
+our %EXPORT_TAGS = (all => [qw(Button)]);
+
+sub Button { 'Curses::Toolkit::Widget::Button' }
 
 =head1 Appearence
 

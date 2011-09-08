@@ -9,6 +9,11 @@ use parent qw(Curses::Toolkit::Widget Curses::Toolkit::Role::Focusable);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @EXPORT_OK = qw(Entry);
+our %EXPORT_TAGS = (all => [qw(Entry)]);
+
+sub Entry { 'Curses::Toolkit::Widget::Entry' }
+
 =head1 Appearence
 
   [entry text____]

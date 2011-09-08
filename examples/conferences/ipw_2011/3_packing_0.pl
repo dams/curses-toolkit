@@ -5,82 +5,45 @@ use warnings;
 
 use lib qw(../../../lib);
 
-open STDERR, '>>/dev/null';
+use Curses::Toolkit;
+use Curses::Toolkit::Widget::Window qw(:all);
+use Curses::Toolkit::Widget::Border qw(:all);
+use Curses::Toolkit::Widget::Label qw(:all);
+use Curses::Toolkit::Widget::VBox qw(:all);
+use Curses::Toolkit::Widget::HBox qw(:all);
 
 main() unless caller;
 
 sub main {
 
-	use Curses::Toolkit;
-	use Curses::Toolkit::Widget::Window;
-	use Curses::Toolkit::Widget::Border;
-	use Curses::Toolkit::Widget::Label;
-	use Curses::Toolkit::Widget::VBox;
-	use Curses::Toolkit::Widget::HBox;
+Curses::Toolkit->init_root_window()->add_window(
+    Window->new()->add_widget(
+        VBox->new()
+          ->pack_end(border_with_label('non-expanding border but a long label that hopefully wraps'))
+          ->pack_end(
+              HBox->new()
+                ->pack_end( border_with_label('expanding border'), { expand => 1 } )
+                ->pack_end( border_with_label('expanding border'), { expand => 1 } ),
+              { expand => 1 })
+          ->pack_end(
+              HBox->new()
+                ->pack_end( border_with_label('expanding border with fill'), { expand => 1, fill => 1 } )
+                ->pack_end( border_with_label('expanding border with fill'), { expand => 1, fill => 1 } ),
+              { expand => 1})
+          ->pack_end(border_with_label('expanding border'),{ expand => 1 })
+          ->pack_end(border_with_label('non expanding border'))
+        )
+    ->set_coordinates(
+        x1 => 0,
+        y1 => 0,
+        x2 => 40,
+        y2 => 30
+    )
+)->render()->display();
 
-
-	my $root = Curses::Toolkit->init_root_window(  )->add_window(
-		my $window = Curses::Toolkit::Widget::Window->new()->set_name('main_window')->add_widget(
-				my $vbox1 = Curses::Toolkit::Widget::VBox->new()->pack_end(
-					my $border2 = Curses::Toolkit::Widget::Border->new()->set_name('border2')->add_widget(
-						my $label1 =
-							Curses::Toolkit::Widget::Label->new()->set_name('label1')
-							->set_text('non-expanding border but a long label that hopefully wraps')
-					)
-					)->pack_end(
-					my $hbox1 = Curses::Toolkit::Widget::HBox->new()->set_name('hbox1')->pack_end(
-						my $border4 = Curses::Toolkit::Widget::Border->new()->set_name('border4')->add_widget(
-							my $label3 =
-								Curses::Toolkit::Widget::Label->new()->set_name('label3')->set_text('expanding border')
-						),
-						{ expand => 1 }
-						)->pack_end(
-						my $border5 = Curses::Toolkit::Widget::Border->new()->set_name('border5')->add_widget(
-							my $label4 =
-								Curses::Toolkit::Widget::Label->new()->set_name('label4')->set_text('expanding border')
-						),
-						{ expand => 1 }
-						),
-					{ expand => 1 }
-
-					#                       ),
-					)->pack_end(
-					my $hbox12 = Curses::Toolkit::Widget::HBox->new()->set_name('hbox1')->pack_end(
-						my $border42 = Curses::Toolkit::Widget::Border->new()->set_name('border4')->add_widget(
-							my $label32 =
-								Curses::Toolkit::Widget::Label->new()->set_name('label3')->set_text('expanding border with fill')
-						),
-						{ expand => 1, fill => 1 }
-						)->pack_end(
-						my $border52 = Curses::Toolkit::Widget::Border->new()->set_name('border5')->add_widget(
-							my $label42 =
-								Curses::Toolkit::Widget::Label->new()->set_name('label4')->set_text('expanding border with fill')
-						),
-						{ expand => 1, fill => 1 }
-						),
-					{ expand => 1}
-
-					#                       ),
-					)->pack_end(
-					my $border6 = Curses::Toolkit::Widget::Border->new()->set_name('border6')->add_widget(
-						my $label5 =
-							Curses::Toolkit::Widget::Label->new()->set_name('label5')->set_text('expanding border')
-					),
-					{ expand => 1 }
-					)->pack_end(
-					my $border7 = Curses::Toolkit::Widget::Border->new()->set_name('border7')->add_widget(
-						my $label6 =
-							Curses::Toolkit::Widget::Label->new()->set_name('label6')->set_text('non expanding border')
-					),
-					)
-			)->set_coordinates(
-			x1 => 0,
-			y1 => 0,
-			x2 => 40,
-			y2 => 30
-			)
-	)->render()->display();
-
-	sleep;
+sleep;
 
 }
+
+sub border_with_label { Border->new()->add_widget(Label->new()->set_text(shift)) }
+

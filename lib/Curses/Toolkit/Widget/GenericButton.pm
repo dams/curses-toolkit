@@ -10,6 +10,11 @@ use parent qw(Curses::Toolkit::Widget::Border Curses::Toolkit::Role::Focusable);
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(GenericButton);
+our %EXPORT_TAGS = (all => [qw(GenericButton)]);
+
+sub GenericButton { 'Curses::Toolkit::Widget::GenericButton' }
+
 =head1 DESCRIPTION
 
 The Curses::Toolkit::Widget::GenericButton widget is generally used to attach a
