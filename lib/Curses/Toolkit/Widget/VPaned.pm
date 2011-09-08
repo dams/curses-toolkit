@@ -8,6 +8,11 @@ use parent qw(Curses::Toolkit::Widget::Paned);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @EXPORT_OK = qw(VPaned);
+our %EXPORT_TAGS = (all => [qw(VPaned)]);
+
+sub VPaned { 'Curses::Toolkit::Widget::VPaned' }
+
 =head1 Appearence
 
 With a border

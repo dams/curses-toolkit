@@ -9,6 +9,11 @@ use parent qw(Curses::Toolkit::Widget::ScrollBar);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 
+our @EXPORT_OK = qw(HScrollBar);
+our %EXPORT_TAGS = (all => [qw(HScrollBar)]);
+
+sub HScrollBar { 'Curses::Toolkit::Widget::HScrollBar' }
+
 =head1 DESCRIPTION
 
 This widget is just the horizontal scrollbar. Usually you will want to use 

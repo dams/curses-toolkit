@@ -6,6 +6,11 @@ package Curses::Toolkit::Widget::ScrollBar;
 use parent qw(Curses::Toolkit::Widget);
 use Carp;
 
+our @EXPORT_OK = qw(ScrollBar);
+our %EXPORT_TAGS = (all => [qw(ScrollBar)]);
+
+sub ScrollBar { 'Curses::Toolkit::Widget::Scrollbar' }
+
 sub new {
     my $class = shift;
     $class eq __PACKAGE__

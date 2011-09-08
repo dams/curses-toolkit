@@ -12,6 +12,10 @@ use Curses::Toolkit::Types;
 
 use parent qw(Curses::Toolkit::Widget::ProgressBar);
 
+our @EXPORT_OK = qw(VProgressBar);
+our %EXPORT_TAGS = (all => [qw(VProgressBar)]);
+
+sub VProgressBar { 'Curses::Toolkit::Widget::VProgressBar' }
 
 # -- attributes
 

@@ -13,14 +13,14 @@ main() unless caller;
 sub main {
     use POE::Component::Curses;
 
-    use Curses::Toolkit::Widget::Window;
-    use Curses::Toolkit::Widget::Label;
-    use Curses::Toolkit::Widget::HBox;
-    use Curses::Toolkit::Widget::VBox;
-    use Curses::Toolkit::Widget::Border;
-    use Curses::Toolkit::Widget::Button;
-    use Curses::Toolkit::Widget::HProgressBar;
-    use Curses::Toolkit::Widget::VProgressBar;
+    use Curses::Toolkit::Widget::Window qw(:all);
+    use Curses::Toolkit::Widget::Label qw(:all);
+    use Curses::Toolkit::Widget::HBox qw(:all);
+    use Curses::Toolkit::Widget::VBox qw(:all);
+    use Curses::Toolkit::Widget::Border qw(:all);
+    use Curses::Toolkit::Widget::Button qw(:all);
+    use Curses::Toolkit::Widget::HProgressBar qw(:all);
+    use Curses::Toolkit::Widget::VProgressBar qw(:all);
 
     my $root = POE::Component::Curses->spawn;
 
@@ -28,70 +28,35 @@ sub main {
     my $vbar;
     {
         my $window1 =
-          Curses::Toolkit::Widget::Window->new->set_name('window')->set_title("manual progress bar")
-              ->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => 30 );
+          Window->new->set_name('window')->set_title("manual progress bar")
+              ->set_coordinates( x1 => 0, y1 => 0, x2 => '100%', y2 => '100%' );
         $root->add_window($window1);
 
         $window1->add_widget(
-          Curses::Toolkit::Widget::VBox->new
-          ->pack_end(
-            Curses::Toolkit::Widget::HBox->new
-            ->pack_end(
-              Curses::Toolkit::Widget::Border->new
-              ->add_widget(
-                Curses::Toolkit::Widget::VBox->new
-                ->pack_end(
-                  Curses::Toolkit::Widget::Label->new->set_text('Click to decrease'),
-                  { expand => 0 },
-                )
-                ->pack_end(
-                  Curses::Toolkit::Widget::Button->new_with_label('-')->signal_connect( clicked => 
-                      sub {
-                          $hbar->set_position( $hbar->get_position - 1 );
-                          $vbar->set_position( $hbar->get_position - 1 );
-                      }),
-                  { expand => 0 },
-                )
-              ),
-              { expand => 0 },
-            )
-            ->pack_end(
-              Curses::Toolkit::Widget::VBox->new
+           VBox->new
               ->pack_end(
-                $hbar  = Curses::Toolkit::Widget::HProgressBar->new,
-                { expand => 1 },
+                  HBox->new
+                      ->pack_end(
+                          Button->new_with_label('Decrease -')->signal_connect( clicked => 
+                              sub {
+                                  $hbar->set_position( $hbar->get_position - 1 );
+                                  $vbar->set_position( $hbar->get_position - 1 );
+                              }),
+                          { expand => 0 } )
+                      ->pack_end(
+                          Button->new_with_label('Increase +')->signal_connect( clicked => 
+                              sub {
+                                  $hbar->set_position( $hbar->get_position + 1 );
+                                  $vbar->set_position( $hbar->get_position + 1 );
+                              }),
+                          { expand => 0 } )
               )
+              ->pack_end(
+                  $hbar  = HProgressBar->new,
+                  { expand => 0 } )
                ->pack_end(
-                 $vbar  = Curses::Toolkit::Widget::VProgressBar->new,
-                 { expand => 1 },
-               ),
-              { expand => 1 },
-            )
-            ->pack_end(
-              Curses::Toolkit::Widget::Border->new
-              ->add_widget(
-                Curses::Toolkit::Widget::VBox->new
-                ->pack_end(
-                  Curses::Toolkit::Widget::Label->new->set_text('Click to increase'),
-                  { expand => 0 },
-                )
-                ->pack_end(
-                  Curses::Toolkit::Widget::Button->new_with_label('+')->signal_connect( clicked =>
-                      sub {
-                          $hbar->set_position( $hbar->get_position + 1 );
-                          $vbar->set_position( $hbar->get_position + 1 );
-                      }),
-                  { expand => 0 },
-                )
-              ),
-              { expand => 0 },
-            ),
-            { expand => 1 },
-          )
-          ->pack_end(
-			Curses::Toolkit::Widget::Button->new_with_label('Exit')->signal_connect( clicked => sub {exit} ),
-			{ expand => 0 }
-          )
+                 $vbar  = VProgressBar->new,
+                 { expand => 0, fill => 1 } )
         );
     }
     POE::Kernel->run();

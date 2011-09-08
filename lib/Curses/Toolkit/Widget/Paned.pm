@@ -11,6 +11,11 @@ use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF H
 
 use Curses::Toolkit::Object::Coordinates;
 
+our @EXPORT_OK = qw(Paned);
+our %EXPORT_TAGS = (all => [qw(Paned)]);
+
+sub Paned { 'Curses::Toolkit::Widget::Paned' }
+
 sub new {
     my $class = shift;
 

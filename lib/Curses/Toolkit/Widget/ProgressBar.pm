@@ -5,12 +5,17 @@ package Curses::Toolkit::Widget::ProgressBar;
 
 # ABSTRACT: progress bar widget base class
 
-use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
+use parent qw(Curses::Toolkit::Widget::Border);
 
 use Curses::Toolkit::Object::Coordinates;
 use Curses::Toolkit::Types;
 
-use parent qw(Curses::Toolkit::Widget::Border);
+use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
+
+our @EXPORT_OK = qw(ProgressBar);
+our %EXPORT_TAGS = (all => [qw(ProgressBar)]);
+
+sub ProgressBar { 'Curses::Toolkit::Widget::ProgressBar' }
 
 # -- attributes
 
@@ -36,6 +41,12 @@ C<percent>.
 
 sub new {
     my $class = shift;
+
+    # TODO : use Exception;
+    $class eq __PACKAGE__
+        and die
+        "This is an abstract class, please see Curses::Toolkit::Widget::HProgressBar and Curses::Toolkit::Widget::VProgressBar";
+
     my $self = $class->SUPER::new();
     $self->{minimum} = 0;
     $self->{maximum} = 100;

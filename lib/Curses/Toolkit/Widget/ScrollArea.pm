@@ -12,6 +12,11 @@ use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF H
 use Curses::Toolkit::Widget::VScrollBar;
 use Curses::Toolkit::Widget::HScrollBar;
 
+our @EXPORT_OK = qw(ScrollArea);
+our %EXPORT_TAGS = (all => [qw(ScrollArea)]);
+
+sub ScrollArea { 'Curses::Toolkit::Widget::ScrollArea' }
+
 sub new {
     my $class = shift;
     my $self  = $class->SUPER::new();
