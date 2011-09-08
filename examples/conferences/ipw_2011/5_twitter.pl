@@ -12,9 +12,14 @@ use lib "$Bin/../../../lib";
 use Net::Twitter;
 my $nt = Net::Twitter->new();
 
-
-use relative -to      => "Curses::Toolkit::Widget",
-             -aliased => qw(Window Label VBox HBox Button HPaned Entry Border);
+use Curses::Toolkit::Widget::Window qw(:all);
+use Curses::Toolkit::Widget::Label qw(:all);
+use Curses::Toolkit::Widget::VBox qw(:all);
+use Curses::Toolkit::Widget::HBox qw(:all);
+use Curses::Toolkit::Widget::Button qw(:all);
+use Curses::Toolkit::Widget::HPaned qw(:all);
+use Curses::Toolkit::Widget::Entry qw(:all);
+use Curses::Toolkit::Widget::Border qw(:all);
 
 use relative -to      => "Curses::Toolkit::Theme::Default::Color",
              -aliased => qw(BlueWhite Yellow Pink);
