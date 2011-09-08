@@ -180,7 +180,8 @@ sub new {
                     # means we pressed it
                     $window->set_modal();
                     $self->{_move_pressed} = 1;
-                    $self->{_candy1}{enabled} = 1;
+#                    $self->{_candy1}{enabled} = 1;
+                    $self->{_candy1}{enabled} = 0;
                     $self->{_candy1}{offset} = 0;
                     $self->{_candy1}{coordinates} = $event->{coordinates};
                     $self->_start_candy1_animation();
@@ -230,7 +231,8 @@ sub new {
 
                     # means we pressed it
                     $window->set_modal();
-                    $self->{_candy1}{enabled} = 1;
+#                    $self->{_candy1}{enabled} = 1;
+                    $self->{_candy1}{enabled} = 0;
                     $self->{_candy1}{offset} = 0;
                     $self->{_candy1}{coordinates} = $event->{coordinates};
                     $self->_start_candy1_animation();

@@ -28,6 +28,8 @@ sub new {
 #    $self->{visibility_mode} = 'auto';
     $self->{scroll_x} = 0;
     $self->{scroll_y} = 0;
+    $self->{_display_h_scrollbar} = 0;
+    $self->{_display_v_scrollbar} = 0;
     $self->{_main_child} = undef;
     $self->set_scrollbars_mode($params{scrollbars_mode});
     return $self;
@@ -194,8 +196,24 @@ sub _rebuild_children_coordinates {
     my $child_widget = $children[-1];
     defined $child_widget or return;
 
+    my $shape = $self->get_visible_shape_for_children;
+
     # How much does the child widget want ? We don't specify a given size
     my $child_space = $child_widget->get_desired_space();
+
+    $self->{_display_h_scrollbar} = 1;
+    $child_space->width <= $shape->width()
+      and $self->{scroll_x} = 0, $self->{_display_h_scrollbar} = 0;
+
+    $self->{_display_v_scrollbar} = 1;
+    $child_space->height <= $shape->height()
+      and $self->{scroll_y} = 0, $self->{_display_v_scrollbar} = 0;
+
+    $self->{h_scrollbar}
+      and $self->{h_scrollbar}->set_visible($self->{_display_h_scrollbar});
+
+    $self->{v_scrollbar}
+      and $self->{v_scrollbar}->set_visible($self->{_display_v_scrollbar});
 
     # scroll the space accordingly
     $child_space->set(
@@ -209,7 +227,7 @@ sub _rebuild_children_coordinates {
         and $child_widget->_rebuild_children_coordinates();
 
     # take care of potential scrollbars
-    if ( defined ($self->{v_scrollbar}) ) {
+    if ( defined ($self->{v_scrollbar}) && $self->{_display_v_scrollbar} ) {
 
         my $c = $self->get_visible_shape;
         my ($child_widget)  = $self->get_children();
@@ -231,7 +249,7 @@ sub _rebuild_children_coordinates {
 #        $self->{v_scrollbar}->draw();
     }
     # take care of potential scrollbars
-    if ( defined ($self->{h_scrollbar}) ) {
+    if ( defined ($self->{h_scrollbar}) && $self->{_display_h_scrollbar}) {
 
         my $c = $self->get_visible_shape;
 
@@ -254,10 +272,10 @@ sub get_visible_shape_for_children {
     my ($self) = @_;
     my $shape = $self->get_visible_shape();
     if ($shape->width > 0) {
-        $shape->set( x2 => $shape->get_x2() - 1);
+        $shape->set( x2 => $shape->get_x2() - $self->{_display_v_scrollbar});
     }
     if ($shape->height > 0) {
-        $shape->set( y2 => $shape->get_y2() - 1);
+        $shape->set( y2 => $shape->get_y2() - $self->{_display_h_scrollbar});
     }
     return $shape;
 }

@@ -136,7 +136,7 @@ sub _start_scrolling_animation {
     my ($self) = @_;
 
     my $root_window = $self->get_root_window();
-    my $delay = 1/4;
+    my $delay = 1/8;
 
     my $delay_sub;
     $delay_sub = sub {
@@ -173,6 +173,8 @@ sub get_scroll_area {
 
 sub draw {
     my ($self) = @_;
+    $self->is_visible
+      or return;
     my $theme = $self->get_theme();
     my $c = $self->get_coordinates();
 
