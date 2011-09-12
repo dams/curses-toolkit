@@ -31,6 +31,8 @@ use Curses::Toolkit::Theme;
           ->set_coordinates( x1 => '20%',   y1 => '20%',
                              x2 => '80%',   y2 => '80%', )
     );
+    
+    POE::Kernel->run();
 
 =head1 DESCRIPTION
 
