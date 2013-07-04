@@ -290,6 +290,35 @@ sub get_edit_mode {
     return $self->{edit_mode};
 }
 
+=head2 set_password_mode
+
+Set the entry to be in password mode or not
+
+input  : true or false
+output : the entry widget
+
+=cut
+
+sub set_password_mode {
+    my ( $self, $bool ) = @_;
+    $self->{password_mode} = $bool;
+    return $self;
+}
+
+=head2 get_password_mode
+
+Returns true if the entry is in password mode, false otherwise
+
+input  : none
+output : true or false
+
+=cut
+
+sub get_password_mode {
+    my ($self) = @_;
+    return $self->{password_mode};
+}
+
 =head2 set_cursor_position
 
 Set absolute position of the cursor
@@ -353,6 +382,9 @@ sub draw {
     my $theme  = $self->get_theme();
     my $c      = $self->get_coordinates();
     my $text   = $self->get_text();
+    if ($self->get_password_mode) {
+        $text = '*' x length($text);
+    }
 
     my $left_enclosing  = $self->get_theme_property('left_enclosing');
     my $right_enclosing = $self->get_theme_property('right_enclosing');
