@@ -1,4 +1,5 @@
 {{$NEXT}}
+        . Support Password entry #86709
 
 0.207     2011-07-04 15:49:19 Europe/Paris
         . First implementation of ScrollBars.
