@@ -209,11 +209,11 @@ sub _get_theme_properties_definition {
     my ($self) = @_;
     return {
         %{ $self->SUPER::_get_theme_properties_definition() },
-        start_enclosing => { optional => 0, type => SCALAR, },
-        end_enclosing => { optional => 0, type => SCALAR, },
-        default_length => { optional => 0, type => SCALAR, },
-        char_done => { optional => 0, type => SCALAR, },
-        char_left => { optional => 0, type => SCALAR, },
+        start_enclosing => { optional => 1, type => SCALAR, },
+        end_enclosing => { optional => 1, type => SCALAR, },
+        default_length => { optional => 1, type => SCALAR, },
+        char_done => { optional => 1, type => SCALAR, },
+        char_left => { optional => 1, type => SCALAR, },
     };
 }
 
