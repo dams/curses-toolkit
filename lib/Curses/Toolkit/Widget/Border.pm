@@ -28,6 +28,11 @@ This widget consists of a border, and a child widget in that border
 
 This widget can contain 0 or 1 other widget.
 
+=head1 SYNOPSIS
+
+my $border = Curses::Toolkit::Widget::Border->new;
+$border->add_widget($some_other_widget);
+
 =head1 CONSTRUCTOR
 
 =head2 new
