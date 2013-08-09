@@ -31,7 +31,7 @@ The maximum value (a float) for the progress bar. Default to 100.
 
 The current value of the progress bar. Default to 0.
 
-=attr label
+=attr label_type
 
 What to show in the progress bar. Must be a C<PROGRESS_BAR_LABEL> -
 check L<Curses::Toolkit::Types> for valid options. Default to
