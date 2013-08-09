@@ -1,4 +1,6 @@
 {{$NEXT}}
+        . added an example for ribasushi
+        . fixed some documentation and theme properties
 
 0.208     2013-07-08 15:46:06 Europe/Paris
         . Support Password entry #86709
