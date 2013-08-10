@@ -2,8 +2,9 @@ Revision history for Perl module Curses::Toolkit
 
 {{$NEXT}}
 
-0.210     2013-08-10 18:13:21 Europe/Paris
+0.211     2013-08-10 18:15:23 Europe/Paris
 
+0.210     2013-08-10 18:13:21 Europe/Paris
         . fixed Changes syntax
 
 0.209     2013-08-09 12:57:39 Europe/Paris
