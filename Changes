@@ -1,3 +1,5 @@
+Revision history for Perl module Curses::Toolkit
+
 {{$NEXT}}
 
 0.209     2013-08-09 12:57:39 Europe/Paris
@@ -31,45 +33,44 @@
 
 0.202     2011-02-07 10:43:49 Europe/Paris
         . added fosdem 2011 examples
-	. label example
-	. cleaned up old examples and doc
-	. removed dependancy on Moose::Meta::Attribute::Custom::Trait::Chained
+        . label example
+        . cleaned up old examples and doc
+        . removed dependancy on Moose::Meta::Attribute::Custom::Trait::Chained
         . cleanup of changelog
 
 0.201     2011-02-05 00:42:42 Europe/Paris
 
 0.200     2010-12-29 16:58:16 Europe/Paris
-	. Dist::Zilla related fixes
-	. Moose related fixes
-	. speed optimizations
-	. fix compatibility issues of examples
+        . Dist::Zilla related fixes
+        . Moose related fixes
+        . speed optimizations
+        . fix compatibility issues of examples
 
-0.100680
-	. add Moose::Meta::Attribute::Custom::Trait::Chained requirement
+0.100680  2010-03-09
+        . add Moose::Meta::Attribute::Custom::Trait::Chained requirement
 
-0.100630
-	. progress bar widget (by jquelin)
-	. more signals
-	. more documentation, some cleanup
+0.100630  2010-03-04
+        . progress bar widget (by jquelin)
+        . more signals
+        . more documentation, some cleanup
 
-0.100320
-	. more signals
-	. additional examples
-	. introducing "visible shape" concept
+0.100320  2010-02-01
+        . more signals
+        . additional examples
+        . introducing "visible shape" concept
 
-0.100260
-	. the Label widget now supports color, underline, bold, etc
-	. more signals and events
+0.100260  2010-01-26
+        . the Label widget now supports color, underline, bold, etc
+        . more signals and events
 
 0.093060  2009-11-02 09:28:29 UTC
-	. more signals, cleanup, preparing rework of focus / window switch
+        . more signals, cleanup, preparing rework of focus / window switch
 
-0.093020
-	. added UNIVERSAL::require prereq
+0.093020  2009-10-29
+        . added UNIVERSAL::require prereq
 
 0.093000  2009-10-27 10:13:37 UTC
-	. fix prereq
+        . fix prereq
 
 0.092920  2009-10-19
-	. Initial version
-
+        . Initial version
