@@ -44,7 +44,7 @@ sub new {
     my $class = shift;
     my $widget = shift;
     my $self = $class->SUPER::new($widget);
-    $self->{output_writer} = $output_writer || sub { print STDERR "@_\n"; };
+    $self->{output_writer} = $output_writer ||= sub { print STDERR "@_\n"; };
     $self->{curses_mockup} = Curses::Toolkit::Theme::Default::Test::CursesMockup->new( { output_writer => $output_writer } );
 
     return $self;
