@@ -839,7 +839,8 @@ sub render {
 
     my $c = $self->{shape};
     my $str = ' ' x ($c->get_x2() - $c->get_x1());
-    $self->{curses_handler}->attron($root_theme->_get_color_pair);
+    has_colors
+      and $self->{curses_handler}->attron($root_theme->_get_color_pair);
     foreach my $y ( $c->get_y1() .. $c->get_y2() - 1 ) {
         $self->{curses_handler}->addstr( $y, $c->get_x1(), $str );
     }

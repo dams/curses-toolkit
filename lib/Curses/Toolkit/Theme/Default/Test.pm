@@ -5,7 +5,7 @@ package Curses::Toolkit::Theme::Default::Test;
 
 # ABSTRACT: widget test theme
 
-use parent qw(Curses::Toolkit::Theme::Default::Color);
+use parent qw(Curses::Toolkit::Theme::Default);
 
 use Params::Validate qw(SCALAR ARRAYREF HASHREF CODEREF GLOB GLOBREF SCALARREF HANDLE BOOLEAN UNDEF validate validate_pos);
 #use Curses;
@@ -40,14 +40,22 @@ the coderef will be called with 3 arguments : $x, $y, and the data to be outpute
 
 =cut
 
+my @current_orders;
+
 sub new {
     my $class = shift;
     my $widget = shift;
     my $self = $class->SUPER::new($widget);
-    $self->{output_writer} = $output_writer ||= sub { print STDERR "@_\n"; };
+    $self->{output_writer} = $output_writer ||= sub { push @current_orders, [ @_ ] };
     $self->{curses_mockup} = Curses::Toolkit::Theme::Default::Test::CursesMockup->new( { output_writer => $output_writer } );
 
     return $self;
+}
+
+sub get_current_orders {
+    my @orders = @current_orders;
+    @current_orders = ();
+    return @orders;
 }
 
 # override curses handler method
@@ -67,7 +75,7 @@ sub URCORNER { '+'; }
 sub LRCORNER { '+'; }
 sub HLINE    { '-'; }
 sub VLINE    { '|'; }
-
+sub RESIZE_CHAR { '#' }
 
 # the values of this theme
 sub HLINE_NORMAL  {  }

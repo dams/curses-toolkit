@@ -99,6 +99,7 @@ sub URCORNER { ACS_URCORNER; }
 sub LRCORNER { ACS_LRCORNER; }
 sub HLINE    { ACS_HLINE; }
 sub VLINE    { ACS_VLINE; }
+sub RESIZE_CHAR { ACS_CKBOARD; }
 
 sub STRING_NORMAL  { }
 sub STRING_FOCUSED { shift->_attron(A_REVERSE) }
@@ -250,7 +251,7 @@ sub draw_resize {
     my ( $self, $x1, $y1, $attr ) = @_;
     $self->get_widget->is_visible or return;
     $self->is_in_shape( x1 => $x1, y1 => $y1, x2 => $x1, y2 => $y1 ) or return;
-    $self->curses($attr)->addch( $y1, $x1, ACS_CKBOARD );
+    $self->curses($attr)->addch( $y1, $x1, $self->RESIZE_CHAR );
     return $self;
 }
 
