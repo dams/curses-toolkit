@@ -74,7 +74,7 @@ the POD of the following widgets :
 
 =item L<Curses::Toolkit::Widget::Window>
 
-Use this widget to create a window. It's the first thing to do once you have a root_window
+Use this widget to create a window. It's the first thing to do once you have a root window
 
 =item L<Curses::Toolkit::Widget>
 
